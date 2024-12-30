@@ -34,7 +34,7 @@ const Navbar = () => {
     return (
         <>
             {/* navbar Logo */}
-            <nav className="flex justify-center items-center px-2 py-4 h-20 shadow-sm lg:shadow-none dark:bg-slate-800">
+            <nav className="flex justify-center items-center px-2 py-4 h-20 shadow-sm dark:bg-slate-800">
                 <div className="flex items-center gap-1 lg:gap-4">
                     <div ref={menuRef} className="block xl:hidden absolute left-4" onClick={() => setIsClicked(!isClicked)}>
                         {isClicked ? (
@@ -168,7 +168,7 @@ const Navbar = () => {
             </div>
 
             {/* sidebar */}
-            <Drawer anchor="left" open={isClicked} onClose={() => setIsClicked(false)} className="z-50" >
+            <Drawer anchor="left" open={isClicked} onClose={() => setIsClicked(false)} className="z-50 xl:hidden" >
                 <Sidebar />
             </Drawer>
         </>

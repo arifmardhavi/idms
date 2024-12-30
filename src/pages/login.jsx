@@ -2,9 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
 import { IconUser, IconLockPassword, IconEye, IconEyeClosed } from "@tabler/icons-react";
+import { useDispatch } from "react-redux";
+import { toggleDarkMode } from "../redux/themeSlice";
+import { IconSun, IconMoon } from "@tabler/icons-react";
 
 export default function Login() {
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const dispatch = useDispatch();
     const isDarkMode = useSelector((state) => state.theme.isDarkMode); // Ambil status dark mode
 
     useEffect(() => {
@@ -29,7 +33,7 @@ export default function Login() {
 
     return (
         <div className="flex flex-row max-w-full h-screen">
-            <div className="hidden md:flex w-1/2 bg-[url('/images/background1.jpg')] bg-cover"></div>
+            <div className={`hidden md:flex w-1/2 ${isDarkMode ? "bg-[url('/images/background1.jpg')]" : "bg-[url('/images/background3.jpg')]"} bg-cover`}></div>
             <div className="w-full lg:w-1/2 px-4 py-4 flex flex-col justify-center items-center h-[calc(100vh-100px)] max-h-screen dark:bg-slate-900">
                 <div className="flex flex-col justify-center items-center gap-2 w-full">
                     <div className="flex flex-row justify-center items-center gap-3 px-2 py-4">
@@ -103,6 +107,13 @@ export default function Login() {
                             </Link>
                         </div>
                     </div>
+                    <button className="mt-2 bg-slate-300 dark:text-yellow-500 p-3 rounded-full dark:bg-slate-700" onClick={() => dispatch(toggleDarkMode())}>
+                    {isDarkMode ? (
+                        <IconSun className="text-yellow-500" />
+                        ) : (
+                        <IconMoon className="text-blue-500" />
+                        )}
+                    </button>
                 </div>
             </div>
         </div>

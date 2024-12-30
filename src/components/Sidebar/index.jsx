@@ -19,7 +19,7 @@ const Sidebar = () => {
     
     return (
         <aside className="fixed inset-0 bg-white dark:bg-slate-900 w-52 md:w-72 z-20 shadow-lg transition-all duration-300 ">
-            <Link to={'/'} className="flex justify-between px-2 py-2">
+            <Link to={'/'} className="flex justify-center px-2 py-2">
                 <div className="flex flex-row items-center gap-2">
                   {
                     isDarkMode ? 
