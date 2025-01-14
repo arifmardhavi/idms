@@ -386,7 +386,7 @@ const handleDelete = (row) => {
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
                     className="w-1/5 bg-emerald-950 text-lime-300 py-2 rounded-md uppercase"
-                    onClick={() => setEditMode(false)}
+                    onClick={() => {setEditMode(false); setEditCategory({})}}
                   >
                     batal
                   </motion.button>
