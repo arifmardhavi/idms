@@ -62,7 +62,7 @@ const Unit = () => {
 
   const CustomQuickFilter = () => (
       <GridToolbarQuickFilter
-        placeholder="Cari data..."
+        placeholder="Cari data berdasarkan nama unit dan deskripsi..."
         className="text-lime-300 px-4 py-4 border outline-none"
       />
   );

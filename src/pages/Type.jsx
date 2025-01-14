@@ -4,7 +4,7 @@ import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import { getType, addType, updateType, deleteType } from '../services/type.service';
 import { getUnit } from '../services/unit.service';
-import { getCategory, getCategoryByUnit } from '../services/category.service';
+import { getCategoryByUnit } from '../services/category.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -29,8 +29,6 @@ const Type = () => {
     
   }, []);
 
-  
-
   const handleUnitChange = (unitId) => {
     setSelectedUnit(unitId); // Simpan unit yang dipilih
     if (unitId) {
@@ -47,7 +45,6 @@ const Type = () => {
       setFilteredCategories([]); // Kosongkan jika tidak ada unit dipilih
     }
   };
-  
 
   const columns = [
     { field: 'type_name', headerName: 'Nama Tipe', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
@@ -91,7 +88,7 @@ const Type = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder="Cari data..."
+      placeholder="Cari data berdasarkan nama tipe dan deskripsi..."
       className="text-lime-300 px-4 py-4 border outline-none"
     />
   );
@@ -122,6 +119,8 @@ const Type = () => {
         });
 
         // Reset form
+        setSelectedUnit(null);
+        setFilteredCategories([]);
         event.target.reset();
       } else {
         // Tampilkan alert error
@@ -171,6 +170,7 @@ const Type = () => {
         // Reset mode edit
         setEditMode(false);
         setEditType({});
+        setSelectedUnit(null);
         event.target.reset();
       } else {
         // Tampilkan alert error
@@ -345,7 +345,7 @@ const Type = () => {
                   </div>
                   <div>
                     <label className="text-sm uppercase" htmlFor="description">
-                      Deskripsi Kategori
+                      Deskripsi Tipe
                     </label>
                     <textarea
                       className="w-full p-1 border border-gray-300 rounded-md"
@@ -397,18 +397,9 @@ const Type = () => {
                         name="unit"
                         id="unit"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                        value={editType.category?.unit_id || ''}
+                        value={selectedUnit || ''}
                         onChange={(e) => {
-                          const selectedUnitId = e.target.value;
-                          handleUnitChange(selectedUnitId);
-                          setSelectedUnit(selectedUnitId);
-                          setEditType((prev) => ({
-                            ...prev,
-                            category: {
-                              ...prev.category,
-                              unit_id: selectedUnitId,
-                            },
-                          }));
+                          handleUnitChange(e.target.value);
                         }}
                         required
                       >
@@ -463,7 +454,7 @@ const Type = () => {
                   </div>
                   <div>
                     <label className="text-sm uppercase" htmlFor="description">
-                      Deskripsi Kategori
+                      Deskripsi Tipe
                     </label>
                     <textarea
                       className="w-full p-1 border border-gray-300 rounded-md"
