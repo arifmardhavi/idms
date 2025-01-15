@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
-import { DataGrid, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { getTagnumber, addTagnumber, updateTagnumber, deleteTagnumber } from '../services/tagnumber.service';
+import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
+import { getTagnumber, addTagnumber, updateTagnumber, nonactiveTagnumber } from '../services/tagnumber.service';
 import { getUnit } from '../services/unit.service';
 import { getCategory } from '../services/category.service';
 import { getCategoryByUnit } from '../services/category.service';
@@ -40,13 +40,14 @@ const Tagnumber = () => {
   const columns = [
     { field: 'tag_number', headerName: 'Tag Number', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { field: 'description', headerName: 'Deskripsi', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
-    { field: 'type', headerName: 'Tipe', width: 300, renderCell: (params) => <div className="py-4">{params.value.type_name}</div> },
+    { field: 'type', valueGetter: (params) => params.type_name, headerName: 'Tipe', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
     {
-      field: 'status',
+      field: 'status', 
       headerName: 'Status',
+      valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
       renderCell: (params) => (
-        <div className={`${params.value == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-          {params.value == '1' ? 'Aktif' : 'Nonaktif'}
+        <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+          {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
         </div>
       )
     },
@@ -79,8 +80,14 @@ const Tagnumber = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder="Cari data berdasarkan tag number dan deskripsi..."
+      placeholder="Cari data disini..."
       className="text-lime-300 px-4 py-4 border outline-none"
+      quickFilterParser={(searchInput) =>
+        searchInput
+          .split(',')
+          .map((value) => value.trim())
+          .filter((value) => value !== '')
+      }
     />
   );
   // get tag number 
@@ -104,6 +111,7 @@ const Tagnumber = () => {
       }
     };
   // handle onChange input category by unit
+
   // handle onChange input type by category
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId); // Simpan kategori yang dipilih
@@ -235,7 +243,7 @@ const Tagnumber = () => {
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteTagnumber(row.id, (res) => {
+        nonactiveTagnumber(row.id, (res) => {
           if (res.success) {
             // Tampilkan alert sukses
             Swal.fire({
@@ -271,7 +279,7 @@ const Tagnumber = () => {
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">Tag Number</h1>
               <motion.a
-                href='/type'
+                href='/tagnumber'
                 whileTap={{ scale: 0.9 }}
                 whileHover={{ scale: 1.1 }}
                 className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
@@ -300,6 +308,13 @@ const Tagnumber = () => {
                 initialState={{
                   pagination: {
                     paginationModel: { pageSize: 5, page: 0 },
+                  },
+                  filter: {
+                    filterModel: {
+                      items: [],
+                      quickFilterExcludeHiddenColumns: false,
+                      quickFilterLogicOperator: GridLogicOperator.Or,
+                    },
                   },
                 }}
                 pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}

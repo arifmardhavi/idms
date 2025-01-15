@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
-import { DataGrid, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { getUnit, addUnit, updateUnit, deleteUnit } from '../services/unit.service';
+import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
+import { getUnit, addUnit, updateUnit, nonactiveUnit } from '../services/unit.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -27,9 +27,10 @@ const Unit = () => {
     { 
       field: 'status', 
       headerName: 'Status',
+      valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
       renderCell: (params) => (
-        <div className={`${params.value == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-          {params.value == '1' ? 'Aktif' : 'Nonaktif'}
+        <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+          {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
         </div>
       )
     },
@@ -62,7 +63,7 @@ const Unit = () => {
 
   const CustomQuickFilter = () => (
       <GridToolbarQuickFilter
-        placeholder="Cari data berdasarkan nama unit dan deskripsi..."
+        placeholder="Cari data disini..."
         className="text-lime-300 px-4 py-4 border outline-none"
       />
   );
@@ -160,7 +161,7 @@ const handleDelete = (row) => {
     cancelButtonText: 'Batal',
   }).then((result) => {
     if (result.isConfirmed) {
-      deleteUnit(row.id, (res) => {
+      nonactiveUnit(row.id, (res) => {
         if (res.success) {
           // Tampilkan alert sukses
           Swal.fire({
@@ -226,6 +227,13 @@ const handleDelete = (row) => {
               initialState={{
                 pagination: {
                   paginationModel: { pageSize: 5, page: 0 },
+                },
+                filter: {
+                  filterModel: {
+                    items: [],
+                    quickFilterExcludeHiddenColumns: false,
+                    quickFilterLogicOperator: GridLogicOperator.Or,
+                  },
                 },
               }}
               pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}

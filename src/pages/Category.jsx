@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
-import { DataGrid, GridToolbarQuickFilter } from '@mui/x-data-grid';
-import { getCategory, addCategory, updateCategory, deleteCategory } from '../services/category.service';
+import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
+import { getCategory, addCategory, updateCategory, nonactiveCategory } from '../services/category.service';
 import { getUnit } from '../services/unit.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
@@ -29,13 +29,15 @@ const Category = () => {
   const columns = [
     { field: 'category_name', headerName: 'Nama Kategori', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { field: 'description', headerName: 'Deskripsi', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
-    { field: 'unit', headerName: 'Unit', width: 300, renderCell: (params) => <div className="py-4">{params.value.unit_name}</div> },
+    { field: 'unit', valueGetter: (params) => params.unit_name , headerName: 'Unit', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { 
       field: 'status', 
       headerName: 'Status',
+      valueGetter: (params) => params,
       renderCell: (params) => (
-        <div className={`${params.value == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-          {params.value == '1' ? 'Aktif' : 'Nonaktif'}
+        <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+          {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
+          
         </div>
       )
     },
@@ -68,8 +70,14 @@ const Category = () => {
 
   const CustomQuickFilter = () => (
       <GridToolbarQuickFilter
-        placeholder="Cari data berdasarkan nama kategori dan deskripsi..."
+        placeholder="Cari data disini..."
         className="text-lime-300 px-4 py-4 border outline-none"
+        quickFilterParser={(searchInput) =>
+          searchInput
+            .split(',')
+            .map((value) => value.trim())
+            .filter((value) => value !== '')
+        }
       />
   );
 
@@ -169,7 +177,7 @@ const handleDelete = (row) => {
     cancelButtonText: 'Batal',
   }).then((result) => {
     if (result.isConfirmed) {
-      deleteCategory(row.id, (res) => {
+      nonactiveCategory(row.id, (res) => {
         if (res.success) {
           // Tampilkan alert sukses
           Swal.fire({
@@ -234,6 +242,13 @@ const handleDelete = (row) => {
               initialState={{
                 pagination: {
                   paginationModel: { pageSize: 5, page: 0 },
+                },
+                filter: {
+                  filterModel: {
+                    items: [],
+                    quickFilterExcludeHiddenColumns: false,
+                    quickFilterLogicOperator: GridLogicOperator.Or,
+                  },
                 },
               }}
               pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}

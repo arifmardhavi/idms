@@ -55,3 +55,14 @@ export const deleteCategory = (id, callback) => {
             console.log(err);
         }) 
 }
+
+export const nonactiveCategory = (id, callback) => {
+    axios
+        .put(`http://192.168.1.152:8080/api/categories/nonactive/${id}`)
+        .then((res) => {
+            callback(res.data);
+        }) 
+        .catch((err) => {
+            console.log(err);
+        }) 
+}

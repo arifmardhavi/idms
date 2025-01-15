@@ -43,3 +43,14 @@ export const deleteTagnumber = (id, callback) => {
             console.log(err);
         }) 
 }
+
+export const nonactiveTagnumber = (id, callback) => {
+    axios
+        .put(`http://192.168.1.152:8080/api/tagnumbers/nonactive/${id}`)
+        .then((res) => {
+            callback(res.data);
+        }) 
+        .catch((err) => {
+            console.log(err);
+        }) 
+}

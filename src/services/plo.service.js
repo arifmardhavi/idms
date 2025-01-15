@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export const getUnit = (callback) => {
+export const getPlo = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/units")
+        .get("http://192.168.1.152:8080/api/plo")
         .then((res) => {
             callback(res.data);
         })
@@ -11,9 +11,9 @@ export const getUnit = (callback) => {
         });
 };
 
-export const addUnit = (data, callback) => {
+export const addPlo = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/units", data)
+        .post("http://192.168.1.152:8080/api/plo", data)
         .then((res) => {
             callback(res.data);
         }) 
@@ -22,9 +22,9 @@ export const addUnit = (data, callback) => {
         }) 
 }
 
-export const updateUnit = (id, data, callback) => {
+export const updatePlo = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/units/${id}`, data)
+        .put(`http://192.168.1.152:8080/api/plo/${id}`, data)
         .then((res) => {
             callback(res.data);
         }) 
@@ -33,9 +33,9 @@ export const updateUnit = (id, data, callback) => {
         }) 
 }
 
-export const deleteUnit = (id, callback) => {
+export const deletePlo = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/units/${id}`)
+        .delete(`http://192.168.1.152:8080/api/plo/${id}`)
         .then((res) => {
             callback(res.data);
         }) 
@@ -44,9 +44,9 @@ export const deleteUnit = (id, callback) => {
         }) 
 }
 
-export const nonactiveUnit = (id, callback) => {
+export const nonactivePlo = (id, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/units/nonactive/${id}`)
+        .put(`http://192.168.1.152:8080/api/plo/nonactive/${id}`)
         .then((res) => {
             callback(res.data);
         }) 
