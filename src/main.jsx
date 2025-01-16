@@ -9,6 +9,7 @@ import Type from './pages/Type.jsx'
 import Tagnumber from './pages/Tagnumber.jsx'
 import Plo from './pages/Plo.jsx'
 import Coi from './pages/Coi.jsx'
+import AddPlo from './components/plo/AddPlo.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: '/coi',
     element: <Coi />,
+  },
+  {
+    path: '/plo/tambah',
+    element: <AddPlo />,
   },
 ])
 

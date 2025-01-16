@@ -11,6 +11,18 @@ export const getTagnumber = (callback) => {
         });
 };
 
+export const getTagnumberByType = (id, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/tagnumbers/type/${id}`)
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            callback(null);
+            // console.log(err);
+        });
+};
+
 export const addTagnumber = (data, callback) => {
     axios
         .post("http://192.168.1.152:8080/api/tagnumbers", data)

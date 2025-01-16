@@ -65,7 +65,7 @@ const Header = () => {
       {/* dekstop */}
       <div className={`${open ? "block absolute" : "hidden md:flex flex-col"} fixed w-60 min-h-screen space-y-2 bg-emerald-950 text-white shadow-lg px-2 py-4 z-50`}>
         <div className="flex flex-row justify-center items-center space-x-2">
-          <img className="w-24 xl:w-32 border-r-2 border-slate-300" src="images/kpi-putih.png" alt="Logo Pertamina" />
+          <img className="w-24 xl:w-32 border-r-2 border-slate-300" src="/images/kpi-putih.png" alt="Logo Pertamina" />
           <span className="text-md xl:text-xl font-bold">IDMS</span>
         </div>
         <div className="flex flex-col space-y-2">
@@ -110,7 +110,7 @@ const Header = () => {
       {/* mobile */}
       <div className="md:hidden flex flex-row justify-between items-center px-2 text-white bg-emerald-950">
         <div className="flex flex-row justify-center items-center w-[calc(100%-3rem)] space-x-2">
-          <img className="w-28 border-slate-300" src="images/kpi-putih.png" alt="Logo Pertamina" />
+          <img className="w-28 border-slate-300" src="/images/kpi-putih.png" alt="Logo Pertamina" />
           <span className="text-xl font-bold">IDMS</span>
         </div>
         <motion.div

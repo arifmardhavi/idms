@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { getPlo, addPlo, updatePlo, deletePlo, nonactivePlo } from '../services/plo.service';
+import { deletePlo, getPlo} from '../services/plo.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
-import { render } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { IconCloudDownload } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 
 const Plo = () => {
   const [plo, setPlo] = useState([]);
@@ -90,7 +90,8 @@ const Plo = () => {
       field: 'rla',
       headerName: 'RLA',
       width: 70,
-      renderCell: (params) => <div className="py-4"><span className={`${params.value == 0? 'text-lime-300 bg-emerald-950' : 'bg-lime-400 text-emerald-950'} rounded-lg w-fit px-2 py-1`}>{params.value == 0 ? 'NO' : 'YES'}</span></div>,
+      valueGetter: (params) => params == 1 ? 'YES' : 'NO',
+      renderCell: (params) => <div className="py-4"><span className={`${params.row.rla == 0? 'text-lime-300 bg-emerald-950' : 'bg-lime-400 text-emerald-950'} rounded-lg w-fit px-2 py-1`}>{params.row.rla == 0 ? 'NO' : 'YES'}</span></div>,
     },
     { field: 'rla_issue', 
       headerName: 'RLA Issue', 
@@ -141,6 +142,15 @@ const Plo = () => {
         }
       },
     },
+    {field: 'file_rla', headerName: 'File RLA', width: 80, renderCell: (params) => 
+    <div className="py-4 pl-4">
+      {params.value ?
+        <Link to={`http://192.168.1.152:8080/plo/rla/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
+      :
+        <p>-</p>
+      }
+    </div>
+    },
     {
       field: 'actions',
       headerName: 'Aksi',
@@ -159,7 +169,7 @@ const Plo = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
-            // onClick={() => handleDelete(params.row)}
+            onClick={() => handleDelete(params.row)}
           >
             <IconCircleMinus stroke={2} />
           </motion.button>
@@ -182,6 +192,44 @@ const Plo = () => {
   );
   // get PLO 
 
+  // delete PLO
+  const handleDelete = (row) => {
+    Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: 'Data PLO akan dihapus secara permanen!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deletePlo(row.id, (res) => {
+          if (res.success) {
+            // Tampilkan alert sukses
+            Swal.fire({
+              title: 'Berhasil!',
+              text: 'PLO berhasil dihapus!',
+              icon: 'success',
+            });
+
+            // Perbarui state dan localStorage
+            getPlo((data) => {
+              localStorage.setItem('plo', JSON.stringify(data.data));
+              setPlo(localStorage.getItem('plo') ? JSON.parse(localStorage.getItem('plo')) : data.data);
+            });
+          } else {
+            // Tampilkan alert error
+            Swal.fire({
+              title: 'Gagal!',
+              text: 'Terjadi kesalahan saat menghapus PLO!',
+              icon: 'error',
+            });
+          }
+        });
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col md:flex-row w-full">
         <Header />
@@ -190,15 +238,24 @@ const Plo = () => {
           <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">PLO</h1>
-              <motion.a
-                href='/plo'
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
-                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
-              >
-                <IconRefresh className='hover:rotate-180 transition duration-500' />
-                <span>Refresh</span>
-              </motion.a>
+              <div className='flex flex-row justify-end items-center space-x-2'>
+                <motion.a
+                  href='/plo'
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                >
+                  <IconRefresh className='hover:rotate-180 transition duration-500' />
+                  <span>Refresh</span>
+                </motion.a>
+                <Link
+                  to='/plo/tambah'
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100"
+                >
+                  <IconPlus className='hover:rotate-180 transition duration-500' />
+                  <span>Tambah</span>
+                </Link>
+              </div>
             </div>
             <div>
               <DataGrid
@@ -219,7 +276,7 @@ const Plo = () => {
                 }}
                 initialState={{
                   pagination: {
-                    paginationModel: { pageSize: 5, page: 0 },
+                    paginationModel: { pageSize: 10, page: 0 },
                   },
                   filter: {
                     filterModel: {
@@ -229,7 +286,7 @@ const Plo = () => {
                     },
                   },
                 }}
-                pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
+                pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               />
             </div>
           </div>
