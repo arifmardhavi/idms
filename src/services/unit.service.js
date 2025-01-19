@@ -11,6 +11,17 @@ export const getUnit = (callback) => {
         });
 };
 
+export const getUnitById = (id, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/units/${id}`)
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
 export const addUnit = (data, callback) => {
     axios
         .post("http://192.168.1.152:8080/api/units", data)

@@ -157,14 +157,16 @@ const Plo = () => {
       width: 150,
       renderCell: (params) => (
         <div className="flex flex-row justify-center py-2 items-center space-x-2">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
-            // onClick={() => handleEdit(params.row)}
-          >
-            <IconPencil stroke={2} />
-          </motion.button>
+          <Link to={`/plo/edit/${params.row.id}`}>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+              // onClick={() => handleEdit(params.row)}
+            >
+              <IconPencil stroke={2} />
+            </motion.button>
+          </Link>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}

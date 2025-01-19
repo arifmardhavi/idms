@@ -11,6 +11,17 @@ export const getCategory = (callback) => {
         });
 };
 
+export const getCategoryById = (id, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/categories/${id}`)
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
 export const getCategoryByUnit = (id, callback) => {
     axios
         .get(`http://192.168.1.152:8080/api/categories/unit/${id}`)

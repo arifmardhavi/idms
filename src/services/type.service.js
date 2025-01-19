@@ -11,6 +11,17 @@ export const getType = (callback) => {
         });
 };
 
+export const getTypeById = (id, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/types/${id}`)
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
 export const getTypeByCategory = (id, callback) => {
     axios
         .get(`http://192.168.1.152:8080/api/types/category/${id}`)

@@ -10,6 +10,7 @@ import Tagnumber from './pages/Tagnumber.jsx'
 import Plo from './pages/Plo.jsx'
 import Coi from './pages/Coi.jsx'
 import AddPlo from './components/plo/AddPlo.jsx'
+import EditPlo from './components/plo/EditPlo.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: '/plo/tambah',
     element: <AddPlo />,
+  },
+  {
+    path: '/plo/edit/:id',
+    element: <EditPlo />,
   },
 ])
 

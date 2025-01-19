@@ -11,6 +11,17 @@ export const getPlo = (callback) => {
         });
 };
 
+export const getPloById = (id, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/plo/${id}`)
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+}
+
 export const addPlo = (data, callback) => {
     axios
         .post("http://192.168.1.152:8080/api/plo", data)
@@ -24,7 +35,7 @@ export const addPlo = (data, callback) => {
 
 export const updatePlo = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/plo/${id}`, data)
+        .post(`http://192.168.1.152:8080/api/plo/${id}?_method=PUT`, data)
         .then((res) => {
             callback(res.data);
         }) 
