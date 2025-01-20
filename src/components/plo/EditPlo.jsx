@@ -298,8 +298,8 @@ const EditPlo = () => {
                                             id="plo_certificate"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                                         />
-                                        </div>
                                     </div>
+                                </div>
                                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
                                         <div className="w-full">
                                             <label className="text-emerald-950">Issue Date <sup className="text-red-500">*</sup></label>
@@ -373,29 +373,29 @@ const EditPlo = () => {
                                             </div>
                                         </div>
                                     )}
-                                </div>
-                                <div className="w-full flex flex-row space-x-2 py-2">
-                                    <motion.button
-                                    whileTap={{ scale: 0.9 }}
-                                    whileHover={{ scale: 0.98 }}
-                                    className="w-full bg-emerald-950 text-white py-2 rounded-md uppercase"
-                                    type="submit"
-                                    >
-                                    Submit
-                                    </motion.button>
-                                    <button
-                                        type="button"
-                                        className="w-1/3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 mr-2"
-                                        onClick={() => navigate('/plo')}
-                                    >
-                                        Batal
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div className="w-full flex flex-row space-x-2 py-2">
+                                <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                whileHover={{ scale: 0.98 }}
+                                className="w-full bg-emerald-950 text-white py-2 rounded-md uppercase"
+                                type="submit"
+                                >
+                                Submit
+                                </motion.button>
+                                <button
+                                    type="button"
+                                    className="w-1/3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 mr-2"
+                                    onClick={() => navigate('/plo')}
+                                >
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
         );
     };
     

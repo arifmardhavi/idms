@@ -34,6 +34,18 @@ export const getTagnumberByType = (id, callback) => {
         });
 };
 
+export const getTagnumberByTagnumberId = (id, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/tagnumbers/tag_number/${id}`)
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            callback(null);
+            // console.log(err);
+        });
+};
+
 export const getTagnumberByTagnumber = (tagname, callback) => {
     axios
         .get(`http://192.168.1.152:8080/api/tagname`, {
