@@ -11,6 +11,8 @@ import Plo from './pages/Plo.jsx'
 import Coi from './pages/Coi.jsx'
 import AddPlo from './components/plo/AddPlo.jsx'
 import EditPlo from './components/plo/EditPlo.jsx'
+import AddCoi from './components/coi/AddCoi.jsx'
+import EditCoi from './components/coi/EditCoi.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
   {
     path: '/plo/edit/:id',
     element: <EditPlo />,
+  },
+  {
+    path: '/coi/tambah',
+    element: <AddCoi />,
+  },
+  {
+    path: '/coi/edit/:id',
+    element: <EditCoi />,
   },
 ])
 

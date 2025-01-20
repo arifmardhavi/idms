@@ -129,7 +129,7 @@ const Plo = () => {
       width: 80, 
       renderCell: (params) => {
         if(params.row.rla_overdue) {
-          const overdueDate = new Date(params.row.overdue_date); // Mengonversi overdue_date ke Date
+          const overdueDate = new Date(params.row.rla_overdue); // Mengonversi overdue_date ke Date
           const currentDate = new Date(); // Mendapatkan tanggal saat ini
       
           // Menghitung selisih dalam milidetik
