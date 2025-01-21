@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { deleteCoi, getCoi} from '../services/coi.service';
-import { IconPencil } from '@tabler/icons-react';
-import { IconCircleMinus } from '@tabler/icons-react';
+import { deleteCoi, getCoi, downloadSelectedCoi } from '../services/coi.service';
+import { IconPencil, IconCircleMinus, IconRefresh, IconCloudDownload, IconPlus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
-import { IconRefresh } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
-import { IconCloudDownload } from '@tabler/icons-react';
-import { IconPlus } from '@tabler/icons-react';
 
 const Coi = () => {
   const [coi, setCoi] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
     getCoi((data) => {
@@ -21,7 +18,6 @@ const Coi = () => {
     });
   }, []);
 
-  // get COI
   const columns = [
     { field: 'tag_number', valueGetter: (params) => params.tag_number, headerName: 'Tag Number', width: 150, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { field: 'no_certificate', 
@@ -181,7 +177,6 @@ const Coi = () => {
     />
   );
 
-  // delete COI
   const handleDelete = (row) => {
     Swal.fire({
       title: 'Apakah Anda yakin?',
@@ -194,20 +189,16 @@ const Coi = () => {
       if (result.isConfirmed) {
         deleteCoi(row.id, (res) => {
           if (res.success) {
-            // Tampilkan alert sukses
             Swal.fire({
               title: 'Berhasil!',
               text: 'COI berhasil dihapus!',
               icon: 'success',
             });
-
-            // Perbarui state dan localStorage
             getCoi((data) => {
               localStorage.setItem('coi', JSON.stringify(data.data));
               setCoi(localStorage.getItem('coi') ? JSON.parse(localStorage.getItem('coi')) : data.data);
             });
           } else {
-            // Tampilkan alert error
             Swal.fire({
               title: 'Gagal!',
               text: 'Terjadi kesalahan saat menghapus COI!',
@@ -218,71 +209,104 @@ const Coi = () => {
       }
     });
   };
-  
+
+  const handleDownloadSelected = () => {
+    if (selectedRows.length === 0) {
+      Swal.fire({
+        title: 'Peringatan!',
+        text: 'Tidak ada file yang dipilih!',
+        icon: 'warning',
+      });
+      return;
+    }
+
+    // Panggil fungsi downloadSelectedCoi dengan ID yang dipilih
+    downloadSelectedCoi(selectedRows);
+    Swal.fire({
+      title: 'Berhasil!',
+      text: `${selectedRows.length} file berhasil didownload!`,
+      icon: 'success',
+    });
+    
+  };
+
   return (
     <div className="flex flex-col md:flex-row w-full">
-        <Header />
-        <div className="flex flex-col md:pl-64 w-full px-2 py-4 space-y-3">
-          {/* GET COI  */}
-          <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
-            <div className="flex flex-row justify-between">
-              <h1 className="text-xl font-bold uppercase">COI</h1>
-              <div className='flex flex-row justify-end items-center space-x-2'>
-                <motion.a
-                  href='/coi'
+      <Header />
+      <div className="flex flex-col md:pl-64 w-full px-2 py-4 space-y-3">
+        <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
+          <div className="flex flex-row justify-between">
+            <h1 className="text-xl font-bold uppercase">COI</h1>
+            <div className="flex flex-row justify-end items-center space-x-2">
+              {selectedRows.length > 0 && (
+                <motion.button
+                  onClick={handleDownloadSelected}
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 1.1 }}
                   className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
                 >
-                  <IconRefresh className='hover:rotate-180 transition duration-500' />
-                  <span>Refresh</span>
-                </motion.a>
-                <Link
-                  to='/coi/tambah'
-                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100"
-                >
-                  <IconPlus className='hover:rotate-180 transition duration-500' />
-                  <span>Tambah</span>
-                </Link>
-              </div>
-            </div>
-            <div>
-              <DataGrid
-                rows={coi}
-                columns={columns}
-                disableColumnFilter
-                disableColumnSelector
-                disableDensitySelector
-                pagination
-                getRowHeight={() => 'auto'}
-                slots={{ toolbar: CustomQuickFilter }}
-                slotProps={{
-                  toolbar: {
-                    showQuickFilter: true,
-                    printOptions: { disableToolbarButton: true },
-                    csvOptions: { disableToolbarButton: true },
-                  },
-                }}
-                initialState={{
-                  pagination: {
-                    paginationModel: { pageSize: 10, page: 0 },
-                  },
-                  filter: {
-                    filterModel: {
-                      items: [],
-                      quickFilterExcludeHiddenColumns: false,
-                      quickFilterLogicOperator: GridLogicOperator.Or,
-                    },
-                  },
-                }}
-                pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
-              />
+                  <IconCloudDownload />
+                  <span>Download Selected</span>
+                </motion.button>
+              )}
+              <motion.a
+                href='/coi'
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }}
+                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+              >
+                <IconRefresh className="hover:rotate-180 transition duration-500" />
+                <span>Refresh</span>
+              </motion.a>
+              <Link
+                to="/coi/tambah"
+                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100"
+              >
+                <IconPlus className="hover:rotate-180 transition duration-500" />
+                <span>Tambah</span>
+              </Link>
             </div>
           </div>
-          {/* GET COI  */}
+          <div>
+          <DataGrid
+            rows={coi}
+            columns={columns}
+            checkboxSelection
+            disableColumnFilter
+            disableColumnSelector
+            disableDensitySelector
+            pagination
+            getRowHeight={() => 'auto'}
+            slots={{ toolbar: CustomQuickFilter }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                printOptions: { disableToolbarButton: true },
+                csvOptions: { disableToolbarButton: true },
+              },
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10, page: 0 },
+              },
+              filter: {
+                filterModel: {
+                  items: [],
+                  quickFilterExcludeHiddenColumns: false,
+                  quickFilterLogicOperator: GridLogicOperator.Or,
+                },
+              },
+            }}
+            pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
+            onRowSelectionModelChange={(newSelectionModel) => {
+              setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
+            }}
+          />
+          </div>
         </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Coi
+export default Coi;

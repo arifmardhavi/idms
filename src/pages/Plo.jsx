@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { deletePlo, getPlo} from '../services/plo.service';
+import { deletePlo, getPlo, downloadSelectedPlo} from '../services/plo.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -13,6 +13,7 @@ import { IconPlus } from '@tabler/icons-react';
 
 const Plo = () => {
   const [plo, setPlo] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
     getPlo((data) => {
@@ -232,6 +233,26 @@ const Plo = () => {
     });
   };
 
+  const handleDownloadSelected = () => {
+    if (selectedRows.length === 0) {
+      Swal.fire({
+        title: 'Peringatan!',
+        text: 'Tidak ada file yang dipilih!',
+        icon: 'warning',
+      });
+      return;
+    }
+
+    // Panggil fungsi downloadSelectedPlo dengan ID yang dipilih
+    downloadSelectedPlo(selectedRows);
+    Swal.fire({
+      title: 'Berhasil!',
+      text: `${selectedRows.length} file berhasil didownload!`,
+      icon: 'success',
+    });
+    
+  };
+
   return (
     <div className="flex flex-col md:flex-row w-full">
         <Header />
@@ -241,6 +262,17 @@ const Plo = () => {
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">PLO</h1>
               <div className='flex flex-row justify-end items-center space-x-2'>
+                {selectedRows.length > 0 && (
+                  <motion.button
+                    onClick={handleDownloadSelected}
+                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.1 }}
+                    className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                  >
+                    <IconCloudDownload />
+                    <span>Download Selected</span>
+                  </motion.button>
+                )}
                 <motion.a
                   href='/plo'
                   whileTap={{ scale: 0.9 }}
@@ -263,6 +295,7 @@ const Plo = () => {
               <DataGrid
                 rows={plo}
                 columns={columns}
+                checkboxSelection
                 disableColumnFilter
                 disableColumnSelector
                 disableDensitySelector
@@ -289,6 +322,9 @@ const Plo = () => {
                   },
                 }}
                 pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
+                onRowSelectionModelChange={(newSelectionModel) => {
+                  setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
+                }}
               />
             </div>
           </div>

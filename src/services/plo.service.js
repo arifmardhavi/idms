@@ -65,3 +65,26 @@ export const nonactivePlo = (id, callback) => {
             console.log(err);
         }) 
 }
+
+export const downloadSelectedPlo = (selectedIds) => {
+    axios
+      .post('http://192.168.1.152:8080/api/plo/download', { ids: selectedIds })
+      .then((response) => {
+        const url = response.data.url;  // URL dari response backend
+        if (!url) {
+          alert('Gagal mendapatkan URL untuk file ZIP.');
+          return;
+        }
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'plo_certificates.zip');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('Gagal mendownload file PLO.');
+      });
+}
