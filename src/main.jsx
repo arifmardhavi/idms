@@ -2,8 +2,9 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import Unit from './pages/unit.jsx'
-import Home from './pages/home.jsx'
+import Login from './pages/Login.jsx'
+import Unit from './pages/Unit.jsx'
+import Home from './pages/Home.jsx'
 import Category from './pages/Category.jsx'
 import Type from './pages/Type.jsx'
 import Tagnumber from './pages/Tagnumber.jsx'
@@ -13,50 +14,108 @@ import AddPlo from './components/plo/AddPlo.jsx'
 import EditPlo from './components/plo/EditPlo.jsx'
 import AddCoi from './components/coi/AddCoi.jsx'
 import EditCoi from './components/coi/EditCoi.jsx'
+import ProtectedRoute from './protectedRoute.jsx'
+import User from './pages/User.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: (
+      <ProtectedRoute>
+        <Home />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/user',
+    element: (
+      <ProtectedRoute>
+        <User />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/unit',
-    element: <Unit />,
+    element: (
+      <ProtectedRoute>
+        <Unit />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/category',
-    element: <Category />,
+    element: (
+      <ProtectedRoute>
+        <Category />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/type',
-    element: <Type />,
+    element: (
+      <ProtectedRoute>
+        <Type />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/tagnumber',
-    element: <Tagnumber />,
+    element: (
+      <ProtectedRoute>
+        <Tagnumber />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/plo',
-    element: <Plo />,
+    element: (
+      <ProtectedRoute>
+        <Plo />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/coi',
-    element: <Coi />,
+    element: (
+      <ProtectedRoute>
+        <Coi />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/plo/tambah',
-    element: <AddPlo />,
+    element: (
+      <ProtectedRoute>
+        <AddPlo />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/plo/edit/:id',
-    element: <EditPlo />,
+    element: (
+      <ProtectedRoute>
+        <EditPlo />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/coi/tambah',
-    element: <AddCoi />,
+    element: (
+      <ProtectedRoute>
+        <AddCoi />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/coi/edit/:id',
-    element: <EditCoi />,
+    element: (
+      <ProtectedRoute>
+        <EditCoi />
+      </ProtectedRoute>
+    ),
   },
 ])
 

@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
+import { getCategory } from '../services/category.service';
 import { getType, addType, updateType, nonactiveType } from '../services/type.service';
-import { getUnit } from '../services/unit.service';
-import { getCategoryByUnit } from '../services/category.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -12,39 +11,23 @@ import { IconRefresh } from '@tabler/icons-react';
 
 const Type = () => {
   const [type, setType] = useState([]);
-  const [IsUnit, setIsUnit] = useState([]);
+  const [category, setCategory] = useState([]);
   const [editType, setEditType] = useState({});
   const [editMode, setEditMode] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState(''); // Untuk menyimpan unit yang dipilih
   const [filteredCategories, setFilteredCategories] = useState([]); // Kategori yang ditampilkan
 
   useEffect(() => {
     getType((data) => {
       localStorage.setItem('type', JSON.stringify(data.data));
-      setType(localStorage.getItem('type') ? JSON.parse(localStorage.getItem('type')) : data.data);
+      setType(data.data);
     });
-    getUnit((data) => {
-      setIsUnit(data.data);
+
+    getCategory((data) => {
+      localStorage.setItem('category', JSON.stringify(data.data));
+      setCategory(data.data);
     });
-    
   }, []);
 
-  const handleUnitChange = (unitId) => {
-    setSelectedUnit(unitId); // Simpan unit yang dipilih
-    if (unitId) {
-      // Memanggil API untuk mendapatkan kategori berdasarkan unit
-      getCategoryByUnit(unitId, (data) => {
-        console.log(data);
-        if (data === null) {
-          setFilteredCategories([]);
-        }else{
-          setFilteredCategories(data.data);
-        }
-      });
-    } else {
-      setFilteredCategories([]); // Kosongkan jika tidak ada unit dipilih
-    }
-  };
 
   const columns = [
     { field: 'type_name', headerName: 'Nama Tipe', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
@@ -122,12 +105,10 @@ const Type = () => {
         // Perbarui state dan localStorage
         getType((data) => {
           localStorage.setItem('type', JSON.stringify(data.data));
-          setType(localStorage.getItem('type') ? JSON.parse(localStorage.getItem('type')) : data.data);
+          setType(data.data);
         });
 
         // Reset form
-        setSelectedUnit(null);
-        setFilteredCategories([]);
         event.target.reset();
       } else {
         // Tampilkan alert error
@@ -145,8 +126,6 @@ const Type = () => {
     // Set ke mode edit
     setEditMode(true);
     setEditType(row);
-    setSelectedUnit(row.category.unit_id);
-    handleUnitChange(row.category.unit_id);
   };
 
   // update Type
@@ -171,13 +150,12 @@ const Type = () => {
         // Perbarui state dan localStorage
         getType((data) => {
           localStorage.setItem('type', JSON.stringify(data.data));
-          setType(localStorage.getItem('type') ? JSON.parse(localStorage.getItem('type')) : data.data);
+          setType(data.data);
         });
 
         // Reset mode edit
         setEditMode(false);
         setEditType({});
-        setSelectedUnit(null);
         event.target.reset();
       } else {
         // Tampilkan alert error
@@ -194,10 +172,10 @@ const Type = () => {
   const handleDelete = (row) => {
     Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: 'Data tipe akan dihapus secara permanen!',
+      text: 'Data tipe akan Dinonaktifkan!',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Ya, hapus!',
+      confirmButtonText: 'Ya, Nonaktifkan!',
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -206,20 +184,20 @@ const Type = () => {
             // Tampilkan alert sukses
             Swal.fire({
               title: 'Berhasil!',
-              text: 'Tipe berhasil dihapus!',
+              text: 'Tipe berhasil Dinonaktifkan!',
               icon: 'success',
             });
 
             // Perbarui state dan localStorage
             getType((data) => {
               localStorage.setItem('type', JSON.stringify(data.data));
-              setType(localStorage.getItem('type') ? JSON.parse(localStorage.getItem('type')) : data.data);
+              setType(data.data);
             });
           } else {
             // Tampilkan alert error
             Swal.fire({
               title: 'Gagal!',
-              text: 'Terjadi kesalahan saat menghapus tipe!',
+              text: 'Terjadi kesalahan saat Menonaktifkan tipe!',
               icon: 'error',
             });
           }
@@ -301,26 +279,6 @@ const Type = () => {
                   </div>
                   <div className='flex flex-row space-x-2'>
                     <div className='w-full'>
-                      <label className="text-sm uppercase" htmlFor="unit">
-                        Unit<sup className='text-red-500'>*</sup>
-                      </label>
-                      <select
-                        name="unit"
-                        id="unit"
-                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                        value={selectedUnit}
-                        onChange={(e) => handleUnitChange(e.target.value)} // Panggil fungsi saat unit berubah
-                        required
-                      >
-                        <option value="">Pilih Unit</option>
-                        {IsUnit.map((unit) => (
-                          <option key={unit.id} value={unit.id}>
-                            {unit.unit_name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className='w-full'>
                       <label className="text-sm uppercase" htmlFor="category">
                         Kategori<sup className='text-red-500'>*</sup>
                       </label>
@@ -332,8 +290,8 @@ const Type = () => {
                       >
                         <option value="">Pilih Kategori</option>
                         {
-                          filteredCategories.length > 0 
-                            ? filteredCategories.map((category) => (
+                          category.length > 0
+                            ? category.map((category) => (
                                 <option key={category.id} value={category.id}>
                                   {category.category_name}
                                 </option>
@@ -343,8 +301,6 @@ const Type = () => {
                       </select>
 
                     </div>
-                  </div>
-                  <div className='flex flex-row space-x-2'>
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
                       <select
@@ -404,28 +360,6 @@ const Type = () => {
                   </div>
                   <div className='flex flex-row space-x-2'>
                     <div className='w-full'>
-                      <label className="text-sm uppercase" htmlFor="unit">
-                        Unit<sup className='text-red-500'>*</sup>
-                      </label>
-                      <select
-                        name="unit"
-                        id="unit"
-                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                        value={selectedUnit || ''}
-                        onChange={(e) => {
-                          handleUnitChange(e.target.value);
-                        }}
-                        required
-                      >
-                        <option value="">Pilih Unit</option>
-                        {IsUnit.map((unit) => (
-                          <option key={unit.id} value={unit.id}>
-                            {unit.unit_name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className='w-full'>
                       <label className="text-sm uppercase" htmlFor="category">
                         Kategori<sup className='text-red-500'>*</sup>
                       </label>
@@ -434,13 +368,13 @@ const Type = () => {
                         id="category"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         required
-                        value={editType.category_id || ''}
+                        value={editType.category_id}
                         onChange={(e) => setEditType({ ...editType, category_id: e.target.value })}
                       >
                         <option value="">Pilih Kategori</option>
                         {
-                          filteredCategories.length > 0 
-                            ? filteredCategories.map((category) => (
+                          category.length > 0
+                            ? category.map((category) => (
                                 <option key={category.id} value={category.id}>
                                   {category.category_name}
                                 </option>
@@ -450,8 +384,6 @@ const Type = () => {
                       </select>
 
                     </div>
-                  </div>
-                  <div className='flex flex-row space-x-2'>
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
                       <select
@@ -492,7 +424,7 @@ const Type = () => {
                       whileTap={{ scale: 0.9 }}
                       whileHover={{ scale: 0.98 }}
                       className="w-1/5 bg-emerald-950 text-lime-300 py-2 rounded-md uppercase"
-                      onClick={() => {setSelectedUnit(''); setFilteredCategories([]); setEditMode(false); setEditType({})}}
+                      onClick={() => { setEditMode(false); setEditType({})}}
                     >
                       batal
                     </motion.button>

@@ -21,7 +21,6 @@ const Tagnumber = () => {
   const [selectedUnit, setSelectedUnit] = useState(''); // Untuk menyimpan unit yang dipilih
   const [selectedCategory, setSelectedCategory] = useState('');
   const [filteredTypes, setFilteredTypes] = useState([]); // Tipe yang ditampilkan
-  const [filteredCategories, setFilteredCategories] = useState([]); // Kategori yang ditampilkan
 
   useEffect(() => {
     getTagnumber((data) => {
@@ -39,10 +38,11 @@ const Tagnumber = () => {
   // get tag number
   const columns = [
     { field: 'tag_number', headerName: 'Tag Number', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
+    { field: 'unit', valueGetter: (params) => params.unit_name, headerName: 'Unit', width: 130, renderCell: (params) => <div className="py-4">{params.value}</div> },
+    { field: 'type', valueGetter: (params) => params.type_name, headerName: 'Tipe', width: 130, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { field: 'description', headerName: 'Deskripsi', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
-    { field: 'type', valueGetter: (params) => params.type_name, headerName: 'Tipe', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
     {
-      field: 'status', 
+      field: 'status',
       headerName: 'Status',
       valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
       renderCell: (params) => (
@@ -92,25 +92,6 @@ const Tagnumber = () => {
   );
   // get tag number 
 
-  // handle onChange input category by unit
-  const handleUnitChange = (unitId) => {
-      setSelectedUnit(unitId); // Simpan unit yang dipilih
-      setFilteredTypes([]); // Kosongkan jika ada unit yang baru dipilih
-      if (unitId) {
-        // Memanggil API untuk mendapatkan kategori berdasarkan unit
-        getCategoryByUnit(unitId, (data) => {
-          console.log(data);
-          if (data === null) {
-            setFilteredCategories([]);
-          }else{
-            setFilteredCategories(data.data);
-          }
-        });
-      } else {
-        setFilteredCategories([]); // Kosongkan jika tidak ada unit dipilih
-      }
-    };
-  // handle onChange input category by unit
 
   // handle onChange input type by category
   const handleCategoryChange = (categoryId) => {
@@ -118,7 +99,6 @@ const Tagnumber = () => {
     if (categoryId) {
       // Memanggil API untuk mendapatkan tipe berdasarkan kategori
       getTypeByCategory(categoryId, (data) => {
-        console.log(data);
         if (data === null) {
           setFilteredTypes([]);
         }else{
@@ -139,6 +119,7 @@ const Tagnumber = () => {
       description: event.target.description.value,
       status: event.target.status.value,
       type_id: event.target.type_id.value,
+      unit_id: event.target.unit.value,
     };
 
     addTagnumber(data, (res) => {
@@ -158,7 +139,6 @@ const Tagnumber = () => {
 
         // Reset form
         setFilteredTypes([]);
-        setFilteredCategories([]);
         setSelectedUnit(null);
         setSelectedCategory(null);
         event.target.reset();
@@ -179,11 +159,7 @@ const Tagnumber = () => {
     setEditMode(true);
     setEditTagnumber(row);
     // mengambil unit id 
-    IsCategory.map((item) => {
-      if (item.id === row.type.category_id) {
-        handleUnitChange(item.unit_id);
-      }
-    })
+    setSelectedUnit(row.unit_id);
     // mengambil category id
     handleCategoryChange(row.type.category_id);
   };
@@ -196,6 +172,7 @@ const Tagnumber = () => {
       description: event.target.description.value,
       status: event.target.status.value,
       type_id: event.target.type.value,
+      unit_id: event.target.unit.value,
     };
 
     updateTagnumber(editTagnumber.id, data, (res) => {
@@ -217,7 +194,6 @@ const Tagnumber = () => {
         setEditMode(false);
         setEditTagnumber({});
         setFilteredTypes([]);
-        setFilteredCategories([]);
         setSelectedUnit(null);
         setSelectedCategory(null);
         event.target.reset();
@@ -352,7 +328,7 @@ const Tagnumber = () => {
                         id="unit"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         value={selectedUnit}
-                        onChange={(e) => handleUnitChange(e.target.value)} // Panggil fungsi saat unit berubah
+                        onChange={(e) => setSelectedUnit(e.target.value)} // Panggil fungsi saat unit berubah
                         required
                       >
                         <option value="">Pilih Unit</option>
@@ -377,8 +353,8 @@ const Tagnumber = () => {
                       >
                         <option value="">Pilih Kategori</option>
                         {
-                          filteredCategories.length > 0 
-                            ? filteredCategories.map((category) => (
+                          IsCategory.length > 0 
+                            ? IsCategory.map((category) => (
                                 <option key={category.id} value={category.id}>
                                   {category.category_name}
                                 </option>
@@ -477,9 +453,9 @@ const Tagnumber = () => {
                         name="unit"
                         id="unit"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                        value={selectedUnit || ''}
+                        value={selectedUnit}
                         onChange={(e) => {
-                          handleUnitChange(e.target.value);
+                          setSelectedUnit(e.target.value);
                         }}
                         required
                       >
@@ -500,13 +476,13 @@ const Tagnumber = () => {
                         id="category"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         required
-                        value={selectedCategory || ''}
+                        value={selectedCategory}
                         onChange={(e) => handleCategoryChange(e.target.value)}
                       >
                         <option value="">Pilih Kategori</option>
                         {
-                          filteredCategories.length > 0 
-                            ? filteredCategories.map((category) => (
+                          IsCategory.length > 0 
+                            ? IsCategory.map((category) => (
                                 <option key={category.id} value={category.id}>
                                   {category.category_name}
                                 </option>
@@ -581,7 +557,7 @@ const Tagnumber = () => {
                       whileTap={{ scale: 0.9 }}
                       whileHover={{ scale: 0.98 }}
                       className="w-1/5 bg-emerald-950 text-lime-300 py-2 rounded-md uppercase"
-                      onClick={() => {setSelectedUnit(''); setFilteredCategories([]); setEditMode(false); setEditType({})}}
+                      onClick={() => {setSelectedUnit(''); setEditMode(false); setEditType({})}}
                     >
                       batal
                     </motion.button>

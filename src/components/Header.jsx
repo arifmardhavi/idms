@@ -19,6 +19,7 @@ import {
 } from '@tabler/icons-react';
 import { Icon } from "@mui/material";
 import { IconX } from "@tabler/icons-react";
+import { IconUser } from "@tabler/icons-react";
 const Header = () => {
 
   const [open, setOpen] = useState(false)
@@ -58,6 +59,11 @@ const Header = () => {
       name: "COI",  
       icon: <IconRectangularPrism stroke={2} />,
       path: "/coi"
+    },
+    {
+      name: "User",  
+      icon: <IconUser stroke={2} />,
+      path: "/user"
     }
 ]
   return (

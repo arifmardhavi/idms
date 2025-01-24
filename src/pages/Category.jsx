@@ -11,7 +11,6 @@ import { IconRefresh } from '@tabler/icons-react';
 
 const Category = () => {
   const [category, setCategory] = useState([]);
-  const [IsUnit, setIsUnit] = useState([]);
   const [editCategory, setEditCategory] = useState({});
   const [editMode, setEditMode] = useState(false);
 
@@ -29,7 +28,6 @@ const Category = () => {
   const columns = [
     { field: 'category_name', headerName: 'Nama Kategori', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { field: 'description', headerName: 'Deskripsi', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
-    { field: 'unit', valueGetter: (params) => params.unit_name , headerName: 'Unit', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { 
       field: 'status', 
       headerName: 'Status',
@@ -59,7 +57,7 @@ const Category = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
-            onClick={() => handleDelete(params.row)}
+            onClick={() => handleNonactive(params.row)}
           >
             <IconCircleMinus stroke={2} />
           </motion.button>
@@ -88,7 +86,6 @@ const handleAddCategory = (event) => {
     category_name: event.target.category_name.value,
     description: event.target.description.value,
     status: event.target.status.value,
-    unit_id: event.target.unit.value,
   };
 
   addCategory(data, (res) => {
@@ -133,7 +130,6 @@ const handleUpdateCategory = (event) => {
     category_name: event.target.category_name.value,
     description: event.target.description.value,
     status: event.target.status.value,
-    unit_id: event.target.unit.value,
   };
 
   updateCategory(editCategory.id, data, (res) => {
@@ -166,14 +162,14 @@ const handleUpdateCategory = (event) => {
   });
 };
 
-// delete category
-const handleDelete = (row) => {
+// Nonaktifkan category
+const handleNonactive = (row) => {
   Swal.fire({
     title: 'Apakah Anda yakin?',
-    text: 'Data kategori akan dihapus secara permanen!',
+    text: 'Data kategori akan Dinonaktifkan!',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Ya, hapus!',
+    confirmButtonText: 'Ya, Nonaktifkan!',
     cancelButtonText: 'Batal',
   }).then((result) => {
     if (result.isConfirmed) {
@@ -182,7 +178,7 @@ const handleDelete = (row) => {
           // Tampilkan alert sukses
           Swal.fire({
             title: 'Berhasil!',
-            text: 'Kategori berhasil dihapus!',
+            text: 'Kategori berhasil Dinonakatifkan!',
             icon: 'success',
           });
 
@@ -263,32 +259,19 @@ const handleDelete = (row) => {
             <h1 className="text-xl font-bold uppercase">Tambah Kategori</h1>
             <form method="POST" onSubmit={(event) => handleAddCategory(event)}>
               <div className="flex flex-col space-y-4">
-                <div className='w-full'>
-                  <label className="text-sm uppercase" htmlFor="category_name">
-                    Nama Kategori<sup className='text-red-500'>*</sup>
-                  </label>
-                  <input
-                    className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                    type="text"
-                    name="category_name"
-                    id="category_name"
-                    placeholder="Masukkan Nama Kategori..."
-                    required
-                  />
-                </div>
                 <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
-                    <label className="text-sm uppercase" htmlFor="unit">
-                      Unit<sup className='text-red-500'>*</sup>
+                    <label className="text-sm uppercase" htmlFor="category_name">
+                      Nama Kategori<sup className='text-red-500'>*</sup>
                     </label>
-                    <select name="unit_id" id="unit" className="w-full px-1 py-2 border border-gray-300 rounded-md">
-                      {IsUnit.map((unit) => (
-                        <option key={unit.id} value={unit.id}>
-                          {unit.unit_name}
-                        </option>
-                      ))}
-
-                    </select>
+                    <input
+                      className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                      type="text"
+                      name="category_name"
+                      id="category_name"
+                      placeholder="Masukkan Nama Kategori..."
+                      required
+                    />
                   </div>
                   <div className='w-full'>
                     <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
@@ -332,34 +315,21 @@ const handleDelete = (row) => {
             <h1 className="text-xl font-bold uppercase">Edit Kategori</h1>
             <form method="POST" onSubmit={(event) => handleUpdateCategory(event)}>
               <div className="flex flex-col space-y-4">
-                <div className='w-full'>
-                  <label className="text-sm uppercase" htmlFor="category_name">
-                    Nama Kategori<sup className='text-red-500'>*</sup>
-                  </label>
-                  <input
-                    className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                    type="text"
-                    name="category_name"
-                    id="category_name"
-                    placeholder="Masukkan Nama Kategori..."
-                    value={editCategory.category_name || ''}
-                    onChange={(e) => setEditCategory({ ...editCategory, category_name: e.target.value })}
-                    required
-                  />
-                </div>
                 <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
-                    <label className="text-sm uppercase" htmlFor="unit">
-                      Unit<sup className='text-red-500'>*</sup>
+                    <label className="text-sm uppercase" htmlFor="category_name">
+                      Nama Kategori<sup className='text-red-500'>*</sup>
                     </label>
-                    <select name="unit_id" id="unit" className="w-full px-1 py-2 border border-gray-300 rounded-md" value={editCategory.unit_id || ''} onChange={(e) => setEditCategory({ ...editCategory, unit_id: e.target.value })}>
-                      {IsUnit.map((unit) => (
-                        <option key={unit.id} value={unit.id}>
-                          {unit.unit_name}
-                        </option>
-                      ))}
-
-                    </select>
+                    <input
+                      className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                      type="text"
+                      name="category_name"
+                      id="category_name"
+                      placeholder="Masukkan Nama Kategori..."
+                      value={editCategory.category_name || ''}
+                      onChange={(e) => setEditCategory({ ...editCategory, category_name: e.target.value })}
+                      required
+                    />
                   </div>
                   <div className='w-full'>
                     <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
@@ -367,7 +337,7 @@ const handleDelete = (row) => {
                       className="w-full px-1 py-2 border border-gray-300 rounded-md"
                       name="status"
                       id="status"
-                      value={editCategory.status || ''}
+                      value={editCategory.status}
                       onChange={(e) => setEditCategory({ ...editCategory, status: e.target.value })}
                     >
                       <option value="1">Aktif</option>

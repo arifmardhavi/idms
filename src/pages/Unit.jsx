@@ -21,9 +21,28 @@ const Unit = () => {
     });
   }, []);
 
+  const gettingUnit = () => {
+    getUnit((data) => {
+      // console.log(data.data);
+      setUnit(data.data);
+      localStorage.setItem('unit', JSON.stringify(data.data));
+    });
+  }
+
   const columns = [
-    { field: 'unit_name', headerName: 'Nama Unit', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
-    { field: 'description', headerName: 'Deskripsi', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
+    { field: 'unit_name', headerName: 'Nama Unit',  renderCell: (params) => <div className="py-4">{params.value}</div> },
+    { field: 'description', headerName: 'Deskripsi', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
+    { 
+      field: 'unit_type', 
+      headerName: 'Tipe Unit',
+      width: 130,
+      valueGetter: (params) => params == 1 ? 'Pipa Penyalur' : 'Instalasi',
+      renderCell: (params) => (
+        <div className={`${params.row.unit_type == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+          {params.row.unit_type == '1' ? 'Pipa Penyalur' : 'Instalasi'}
+        </div>
+      )
+    },
     { 
       field: 'status', 
       headerName: 'Status',
@@ -52,7 +71,7 @@ const Unit = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
-            onClick={() => handleDelete(params.row)}
+            onClick={() => handleNonactive(params.row)}
           >
             <IconCircleMinus stroke={2} />
           </motion.button>
@@ -73,6 +92,7 @@ const handleAddUnit = (event) => {
   event.preventDefault();
   const data = {
     unit_name: event.target.unit_name.value,
+    unit_type: event.target.unit_type.value,
     description: event.target.description.value,
     status: event.target.status.value,
   };
@@ -86,9 +106,7 @@ const handleAddUnit = (event) => {
         icon: 'success',
       });
 
-      // Perbarui state dan localStorage
-      setUnit([...unit, res.data]);
-      localStorage.setItem('unit', JSON.stringify([...unit, res.data]));
+      gettingUnit();
 
       // Reset form
       event.target.reset();
@@ -115,6 +133,7 @@ const handleUpdateUnit = (event) => {
   event.preventDefault();
   const data = {
     unit_name: event.target.unit_name.value,
+    unit_type: event.target.unit_type.value,
     description: event.target.description.value,
     status: event.target.status.value,
   };
@@ -128,12 +147,7 @@ const handleUpdateUnit = (event) => {
         icon: 'success',
       });
 
-      // Perbarui state dan localStorage
-      setUnit(unit.map((item) => (item.id === editUnit.id ? res.data : item)));
-      localStorage.setItem(
-        'unit',
-        JSON.stringify(unit.map((item) => (item.id === editUnit.id ? res.data : item)))
-      );
+      gettingUnit();
 
       // Reset mode edit
       setEditMode(false);
@@ -150,14 +164,14 @@ const handleUpdateUnit = (event) => {
   });
 };
 
-// delete unit
-const handleDelete = (row) => {
+// Nonaktifkan unit
+const handleNonactive = (row) => {
   Swal.fire({
     title: 'Apakah Anda yakin?',
-    text: 'Data unit akan dihapus secara permanen!',
+    text: 'Data unit akan Dinonaktifkan!',
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Ya, hapus!',
+    confirmButtonText: 'Ya, Nonaktifkan!',
     cancelButtonText: 'Batal',
   }).then((result) => {
     if (result.isConfirmed) {
@@ -166,21 +180,17 @@ const handleDelete = (row) => {
           // Tampilkan alert sukses
           Swal.fire({
             title: 'Berhasil!',
-            text: 'Unit berhasil dihapus!',
+            text: 'Unit berhasil Dinonaktifkan!',
             icon: 'success',
           });
 
           // Perbarui state dan localStorage
-          setUnit(unit.filter((item) => item.id !== row.id));
-          localStorage.setItem(
-            'unit',
-            JSON.stringify(unit.filter((item) => item.id !== row.id))
-          );
+          gettingUnit();
         } else {
           // Tampilkan alert error
           Swal.fire({
             title: 'Gagal!',
-            text: 'Terjadi kesalahan saat menghapus unit!',
+            text: 'Terjadi kesalahan saat Menonaktifkan unit!',
             icon: 'error',
           });
         }
@@ -248,7 +258,7 @@ const handleDelete = (row) => {
             <h1 className="text-xl font-bold uppercase">Tambah Unit</h1>
             <form method="POST" onSubmit={(event) => handleAddUnit(event)}>
               <div className="flex flex-col space-y-4">
-                <div className='flex flex-row space-x-2'>
+                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
                     <label className="text-sm uppercase" htmlFor="unit_name">
                       Nama Unit<sup className='text-red-500'>*</sup>
@@ -262,16 +272,31 @@ const handleDelete = (row) => {
                       required
                     />
                   </div>
-                  <div className='w-full'>
-                    <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
-                    <select
-                      className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                      name="status"
-                      id="status"
-                    >
-                      <option value="1">Aktif</option>
-                      <option value="0">Nonaktif</option>
-                    </select>
+                  <div className='w-full flex flex-row space-x-2'>
+                    <div className='w-full'>
+                      <label className="text-sm uppercase" htmlFor="unit_type">
+                        Tipe Unit<sup className='text-red-500'>*</sup>
+                      </label>
+                      <select
+                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                        name="unit_type"
+                        id="unit_type"
+                      >
+                        <option value="0">Instalasi</option>
+                        <option value="1">Pipa Penyalur</option>
+                      </select>
+                    </div>
+                    <div className='w-full'>
+                      <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
+                      <select
+                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                        name="status"
+                        id="status"
+                      >
+                        <option value="1">Aktif</option>
+                        <option value="0">Nonaktif</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -304,7 +329,7 @@ const handleDelete = (row) => {
             <h1 className="text-xl font-bold uppercase">Edit Unit</h1>
             <form method="POST" onSubmit={(event) => handleUpdateUnit(event)}>
               <div className="flex flex-col space-y-4">
-                <div className='flex flex-row space-x-2'>
+                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
                     <label className="text-sm uppercase" htmlFor="unit_name">
                       Nama Unit<sup className='text-red-500'>*</sup>
@@ -320,18 +345,35 @@ const handleDelete = (row) => {
                       required
                     />
                   </div>
-                  <div className='w-full'>
-                    <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
-                    <select
-                      className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                      name="status"
-                      id="status"
-                      value={editUnit.status}
-                      onChange={(e) => setEditUnit({ ...editUnit, status: e.target.value })}
-                    >
-                      <option value="1">Aktif</option>
-                      <option value="0">Nonaktif</option>
-                    </select>
+                  <div className='w-full flex flex-row space-x-2'>
+                    <div className='w-full'>
+                      <label className="text-sm uppercase" htmlFor="unit_type">
+                        Tipe Unit<sup className='text-red-500'>*</sup>
+                      </label>
+                      <select
+                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                        name="unit_type"
+                        id="unit_type"
+                        value={editUnit.unit_type}
+                        onChange={(e) => setEditUnit({ ...editUnit, unit_type: e.target.value })}
+                      >
+                        <option value="0">Instalasi</option>
+                        <option value="1">Pipa Penyalur</option>
+                      </select>
+                    </div>
+                    <div className='w-full'>
+                      <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
+                      <select
+                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                        name="status"
+                        id="status"
+                        value={editUnit.status}
+                        onChange={(e) => setEditUnit({ ...editUnit, status: e.target.value })}
+                      >
+                        <option value="1">Aktif</option>
+                        <option value="0">Nonaktif</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div>

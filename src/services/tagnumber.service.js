@@ -2,7 +2,11 @@ import axios from "axios";
 
 export const getTagnumber = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/tagnumbers")
+        .get("http://192.168.1.152:8080/api/tagnumbers", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         })
@@ -13,7 +17,11 @@ export const getTagnumber = (callback) => {
 
 export const getTagnumberById = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/${id}`)
+        .get(`http://192.168.1.152:8080/api/tagnumbers/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })  
         .then((res) => {
             callback(res.data);
         })
@@ -24,7 +32,11 @@ export const getTagnumberById = (id, callback) => {
 
 export const getTagnumberByType = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/type/${id}`)
+        .get(`http://192.168.1.152:8080/api/tagnumbers/type/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         })
@@ -36,7 +48,11 @@ export const getTagnumberByType = (id, callback) => {
 
 export const getTagnumberByTagnumberId = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/tag_number/${id}`)
+        .get(`http://192.168.1.152:8080/api/tagnumbers/tag_number/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         })
@@ -50,6 +66,9 @@ export const getTagnumberByTagnumber = (tagname, callback) => {
     axios
         .get(`http://192.168.1.152:8080/api/tagname`, {
             params: { tag_number: tagname },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
         })
         .then((res) => {
             callback(res.data);
@@ -62,7 +81,11 @@ export const getTagnumberByTagnumber = (tagname, callback) => {
 
 export const addTagnumber = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/tagnumbers", data)
+        .post("http://192.168.1.152:8080/api/tagnumbers", data, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -73,7 +96,11 @@ export const addTagnumber = (data, callback) => {
 
 export const updateTagnumber = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/tagnumbers/${id}`, data)
+        .put(`http://192.168.1.152:8080/api/tagnumbers/${id}`, data, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -84,7 +111,11 @@ export const updateTagnumber = (id, data, callback) => {
 
 export const deleteTagnumber = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/tagnumbers/${id}`)
+        .delete(`http://192.168.1.152:8080/api/tagnumbers/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -95,7 +126,11 @@ export const deleteTagnumber = (id, callback) => {
 
 export const nonactiveTagnumber = (id, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/tagnumbers/nonactive/${id}`)
+        .put(`http://192.168.1.152:8080/api/tagnumbers/nonactive/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 

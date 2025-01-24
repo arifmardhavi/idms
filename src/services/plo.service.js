@@ -2,7 +2,11 @@ import axios from "axios";
 
 export const getPlo = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/plo")
+        .get("http://192.168.1.152:8080/api/plo", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         })
@@ -13,7 +17,11 @@ export const getPlo = (callback) => {
 
 export const getPloById = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/plo/${id}`)
+        .get(`http://192.168.1.152:8080/api/plo/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         })
@@ -24,7 +32,11 @@ export const getPloById = (id, callback) => {
 
 export const addPlo = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/plo", data)
+        .post("http://192.168.1.152:8080/api/plo", data, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -35,7 +47,11 @@ export const addPlo = (data, callback) => {
 
 export const updatePlo = (id, data, callback) => {
     axios
-        .post(`http://192.168.1.152:8080/api/plo/${id}?_method=PUT`, data)
+        .post(`http://192.168.1.152:8080/api/plo/${id}?_method=PUT`, data, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -46,7 +62,11 @@ export const updatePlo = (id, data, callback) => {
 
 export const deletePlo = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/plo/${id}`)
+        .delete(`http://192.168.1.152:8080/api/plo/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -57,7 +77,11 @@ export const deletePlo = (id, callback) => {
 
 export const nonactivePlo = (id, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/plo/nonactive/${id}`)
+        .put(`http://192.168.1.152:8080/api/plo/nonactive/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
         .then((res) => {
             callback(res.data);
         }) 
@@ -68,7 +92,11 @@ export const nonactivePlo = (id, callback) => {
 
 export const downloadSelectedPlo = (selectedIds) => {
     axios
-      .post('http://192.168.1.152:8080/api/plo/download', { ids: selectedIds })
+      .post('http://192.168.1.152:8080/api/plo/download', { ids: selectedIds }, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      })
       .then((response) => {
         const url = response.data.url;  // URL dari response backend
         if (!url) {
