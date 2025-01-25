@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
 import { deletePlo, getPlo, downloadSelectedPlo} from '../services/plo.service';
+import { getUnit } from '../services/unit.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -14,25 +15,32 @@ import { IconPlus } from '@tabler/icons-react';
 const Plo = () => {
   const [plo, setPlo] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [unit, setUnit] = useState([]);
 
   useEffect(() => {
     getPlo((data) => {
       localStorage.setItem('plo', JSON.stringify(data.data));
       setPlo(localStorage.getItem('plo') ? JSON.parse(localStorage.getItem('plo')) : data.data);
     });
+
+    getUnit((data) => {
+      localStorage.setItem('unit', JSON.stringify(data.data));
+      setUnit(localStorage.getItem('unit') ? JSON.parse(localStorage.getItem('unit')) : data.data);
+    });
   }, []);
 
   // get PLO
   const columns = [
     {
-      field: 'tag_number',
-      headerName: 'Tag Number',
-      width: 200,
-      renderCell: (params) => <div className="py-4">{params.value}</div>
+      field: 'unit',
+      headerName: 'Unit',
+      width: 130,
+      valueGetter: (params) => params.unit_name,
+      renderCell: (params) => <div className="py-4">{params.row.unit.unit_name}</div>
     },
     { field: 'no_certificate', 
       headerName: 'No Certificate', 
-      width: 150, 
+      width: 200, 
       renderCell: (params) => 
       <div className="py-4">
           <Link to={`http://192.168.1.152:8080/plo/certificates/${params.row.plo_certificate}`} target='_blank' className='text-lime-500 underline'>{params.value}</Link>
@@ -77,10 +85,10 @@ const Plo = () => {
         return <div className="py-2 pl-3"><p className={`${diffDays <= 0 ? 'text-white bg-red-600' : 'bg-lime-950 text-lime-300'} rounded-full w-fit p-2`}>{diffDays}</p></div>;
       },
     },
-    {field: 'plo_certificate', headerName: 'File', width: 50, renderCell: (params) => <div className="py-4">
+    {field: 'plo_certificate', headerName: 'PLO File', width: 100, renderCell: (params) => <div className="py-4">
       <Link to={`http://192.168.1.152:8080/plo/certificates/${params.row.plo_certificate}`} target='_blank' className='item-center text-lime-500'><IconCloudDownload stroke={2} /></Link>
     </div>},
-    {field: 'last_plo_certificate', headerName: 'File Lama', width: 80, renderCell: (params) => <div className="py-4 pl-4">
+    {field: 'plo_old_certificate', headerName: 'PLO Lama', width: 100, renderCell: (params) => <div className="py-4 pl-4">
       {params.value ?
       <Link to={`http://192.168.1.152:8080/plo/certificates/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
       :
@@ -143,7 +151,7 @@ const Plo = () => {
         }
       },
     },
-    {field: 'file_rla', headerName: 'File RLA', width: 80, renderCell: (params) => 
+    {field: 'rla_certificate', headerName: 'RLA file', width: 80, renderCell: (params) => 
     <div className="py-4 pl-4">
       {params.value ?
         <Link to={`http://192.168.1.152:8080/plo/rla/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
@@ -152,6 +160,15 @@ const Plo = () => {
       }
     </div>
     },
+    {field: 'rla_old_certificate', headerName: 'RLA lama', width: 80, renderCell: (params) => 
+      <div className="py-4 pl-4">
+        {params.value ?
+          <Link to={`http://192.168.1.152:8080/plo/rla/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
+        :
+          <p>-</p>
+        }
+      </div>
+      },
     {
       field: 'actions',
       headerName: 'Aksi',
