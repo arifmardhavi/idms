@@ -20,6 +20,7 @@ const Coi = () => {
 
   const columns = [
     { field: 'tag_number', valueGetter: (params) => params.tag_number, headerName: 'Tag Number', width: 150, renderCell: (params) => <div className="py-4">{params.value}</div> },
+    { field: 'plo', valueGetter: (params) => params.unit.unit_name, headerName: 'PLO', width: 150, renderCell: (params) => <div className="py-4">{params.value}</div> },
     { field: 'no_certificate', 
       headerName: 'No Certificate', 
       width: 150, 
@@ -67,8 +68,17 @@ const Coi = () => {
         return <div className="py-2 pl-3"><p className={`${diffDays <= 0 ? 'text-white bg-red-600' : 'bg-lime-950 text-lime-300'} rounded-full w-fit p-2`}>{diffDays}</p></div>;
       },
     },
-    {field: 'coi_certificate', headerName: 'File', width: 50, renderCell: (params) => <div className="py-4">
-      <Link to={`http://192.168.1.152:8080/coi/certificates/${params.row.coi_certificate}`} target='_blank' className='item-center text-lime-500'><IconCloudDownload stroke={2} /></Link>
+    {field: 'coi_certificate', headerName: 'COI File', width: 100, renderCell: (params) => 
+      <div className="py-4">
+        <Link to={`http://192.168.1.152:8080/coi/certificates/${params.row.coi_certificate}`} target='_blank' className='item-center text-lime-500'><IconCloudDownload stroke={2} /></Link>
+      </div>
+    },
+    {field: 'coi_old_certificate', headerName: 'COI Lama', width: 100, renderCell: (params) => <div className="py-4 pl-4">
+      {params.value ?
+      <Link to={`http://192.168.1.152:8080/coi/certificates/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
+      :
+      <p>-</p>
+    }
     </div>},
     {
       field: 'rla',
@@ -126,14 +136,23 @@ const Coi = () => {
         }
       },
     },
-    {field: 'file_rla', headerName: 'File RLA', width: 80, renderCell: (params) => 
-    <div className="py-4 pl-4">
-      {params.value ?
-        <Link to={`http://192.168.1.152:8080/coi/rla/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
-      :
-        <p>-</p>
-      }
-    </div>
+    {field: 'rla_certificate', headerName: 'RLA file', width: 80, renderCell: (params) => 
+      <div className="py-4 pl-4">
+        {params.value ?
+          <Link to={`http://192.168.1.152:8080/coi/rla/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
+        :
+          <p>-</p>
+        }
+      </div>
+    },
+    {field: 'rla_old_certificate', headerName: 'RLA lama', width: 80, renderCell: (params) => 
+      <div className="py-4 pl-4">
+        {params.value ?
+          <Link to={`http://192.168.1.152:8080/coi/rla/${params.value}`} target='_blank' className=' text-lime-500'><IconCloudDownload stroke={2} /></Link>
+        :
+          <p>-</p>
+        }
+      </div>
     },
     {
       field: 'actions',

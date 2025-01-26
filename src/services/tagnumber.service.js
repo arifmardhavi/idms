@@ -79,6 +79,22 @@ export const getTagnumberByTagnumber = (tagname, callback) => {
 
 }
 
+export const getTagnumberByTypeUnit = (typeId, UnitId, callback) => {
+    axios
+        .get(`http://192.168.1.152:8080/api/tagnumbers/typeunit/${typeId}/${UnitId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+
+}
+
 export const addTagnumber = (data, callback) => {
     axios
         .post("http://192.168.1.152:8080/api/tagnumbers", data, {

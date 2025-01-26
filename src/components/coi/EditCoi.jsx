@@ -2,118 +2,108 @@ import React, { useState, useEffect } from 'react';
 import Header from '../Header'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Breadcrumbs, Typography } from '@mui/material';
-import { IconChevronRight } from '@tabler/icons-react';
+import { IconChevronRight, IconX } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import {
   getCoiById,
   updateCoi,
+  deleteCoiFile,
 } from '../../services/coi.service';
 
-import { getUnit } from '../../services/unit.service';
-import { getCategoryByUnit } from '../../services/category.service';
+import { getPlo } from '../../services/plo.service';
+import { getCategory } from '../../services/category.service';
 import { getTypeByCategory } from '../../services/type.service';
-import { getTagnumberByType, getTagnumberByTagnumber, getTagnumberByTagnumberId } from '../../services/tagnumber.service';
+import { getTagnumberById, getTagnumberByTypeUnit } from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
 const EditCoi = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [IsRLA, setIsRLA] = useState(false);
-  const [IsUnit, setIsUnit] = useState([]);
-  const [selectedUnit, setSelectedUnit] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState([]);
-  const [selectedTagNumber, setSelectedTagNumber] = useState('');
-  const [Tagnumbers, setTagnumbers] = useState([]);
-  const [coi, setCoi] = useState({});
-  const { id } = useParams();
-  const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
+    const [IsRLA, setIsRLA] = useState(false);
+    const [UnitId, setUnitId] = useState('');
+    const [IsPlo, setIsPlo] = useState([]);
+    const [IsCategory, setIsCategory] = useState([]);
+    const [selectedPlo, setSelectedPlo] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedType, setSelectedType] = useState('');
+    const [filteredTypes, setFilteredTypes] = useState([]);
+    const [selectedTagNumber, setSelectedTagNumber] = useState('');
+    const [Tagnumbers, setTagnumbers] = useState([]);
+    const [coi, setCoi] = useState({});
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-  setIsLoading(true);
-  getUnit((data) => {
-    setIsUnit(data.data || []);
-  })
-  getCoiById(id, (data) => {
-    setCoi(data.data || {});
-    setIsRLA(!!data.data?.rla);
-    setIsLoading(false);
-  });
-}, [id]);
+    // Fetch PLO and Category on mount
+    useEffect(() => {
+        getPlo((data) => setIsPlo(data?.data || []));
+        getCategory((data) => setIsCategory(data?.data || []));
+    }, []);
 
-useEffect(() => {
-  if (coi?.tag_number_id) {
-    setIsLoading(true);
-    getTagnumberByTagnumberId(coi.tag_number_id, (data) => {
-      if (data?.data) {
-        handleUnitChange(data.data.unit_id, true);
-        handleCategoryChange(data.data.category_id, true);
-        handleTypeChange(data.data.type_id, true);
-        setSelectedTagNumber(data.data.tag_number_id);
-      }
-      setIsLoading(false);
-    });
-  }
-}, [coi?.tag_number_id]);
-
-if (isLoading) {
-  return <div>Loading...</div>;
-}
-
-if (!coi || Object.keys(coi).length === 0) {
-  return <div>Data COI tidak ditemukan.</div>;
-}
-
-
-  const handleUnitChange = (unitId, force = false) => {
-    setSelectedUnit(unitId);
-    setFilteredTypes([]);
-    setTagnumbers([]);
-    if(!force) {
-        setSelectedCategory('');
-        setSelectedType('');
-        setSelectedTagNumber('');
-    }
-    setSelectedCategory(coi.category_id || '');
-    if (unitId) {
-        getCategoryByUnit(unitId, (data) => {
-            setFilteredCategories(data?.data || []);
+    // Fetch COI by ID
+    useEffect(() => {
+        setIsLoading(true);
+        getCoiById(id, (data) => {
+            const coiData = data?.data || {};
+            setCoi(coiData);
+            setIsRLA(!!coiData.rla);
+            setSelectedTagNumber(coiData?.tag_number_id || '');
+            setUnitId(coiData?.plo?.unit_id || '');
+            setSelectedPlo(coiData?.plo?.id || '');
+            setIsLoading(false);
         });
-    } else {
-        setFilteredCategories([]);
+    }, [id]);
+
+    // Fetch Tag Number by selectedTagNumber
+    useEffect(() => {
+        if (!selectedTagNumber) return;
+
+        setIsLoading(true);
+        getTagnumberById(selectedTagNumber, (data) => {
+            handleCategoryChange(data?.data?.type?.category_id, true);
+            handleTypeChange(data?.data?.type_id, true);
+            setIsLoading(false);
+        });
+    }, [selectedTagNumber]);
+
+    // Handle Category Change
+    const handleCategoryChange = (categoryId, force = false) => {
+        setSelectedCategory(categoryId);
+        setTagnumbers([]);
+        if (!force) {
+            setSelectedType('');
+            setSelectedTagNumber('');
+        }
+
+        if (categoryId) {
+            getTypeByCategory(categoryId, (data) => {
+                setFilteredTypes(data?.data || []);
+            });
+        } else {
+            setFilteredTypes([]);
+        }
+    };
+
+    // Handle Type Change
+    const handleTypeChange = (typeId, force = false) => {
+        setSelectedType(typeId);
+        if (typeId && UnitId) {
+            getTagnumberByTypeUnit(typeId, UnitId, (data) => {
+                if (!force) {
+                    setSelectedTagNumber('');
+                }
+                setTagnumbers(data?.data || []);
+            });
+        } else {
+            setTagnumbers([]);
+        }
+    };
+
+    // Loading and Error Handling
+    if (isLoading) {
+        return <div>Loading...</div>;
     }
-  };
 
-  const handleCategoryChange = (categoryId, force = false) => {
-      setSelectedCategory(categoryId);
-      setSelectedType(coi.type_id || '');
-      setTagnumbers([]);
-      if(!force) {
-          setSelectedType('');
-          setSelectedTagNumber('');
-      }
-      if (categoryId) {
-          getTypeByCategory(categoryId, (data) => {
-              setFilteredTypes(data?.data || []);
-              
-          });
-      } else {
-          setFilteredTypes([]);
-      }
-  };
-
-  const handleTypeChange = (typeId, tagname='') => {
-      setSelectedType(typeId);
-      setSelectedTagNumber(tagname);
-      if (typeId) {
-          getTagnumberByType(typeId, (data) => {
-              setTagnumbers(data?.data || []);
-              
-          });
-      } else {
-          setTagnumbers([]);
-      }
-  };
+    if (!coi || Object.keys(coi).length === 0) {
+        return <div>Data COI tidak ditemukan.</div>;
+    }
 
   const handleUpdateCoi = (e) => {
     e.preventDefault();
@@ -122,6 +112,7 @@ if (!coi || Object.keys(coi).length === 0) {
     if(e.target.coi_certificate.files[0]){
       formData.append('coi_certificate', e.target.coi_certificate.files[0] || null);
     }
+    formData.append('plo_id', e.target.plo_id.value);
     formData.append('tag_number_id', e.target.tag_number.value);
     formData.append('no_certificate', e.target.no_certificate.value);
     formData.append('issue_date', e.target.issue_date.value);
@@ -154,6 +145,44 @@ if (!coi || Object.keys(coi).length === 0) {
         }
     });
   };
+
+    const handledeleteFile = (file) => {
+        Swal.fire({
+            title: 'Konfirmasi Hapus',
+            text: 'Apakah Anda yakin ingin menghapus file ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Jika pengguna mengonfirmasi
+                console.log(file);
+                console.log(id);
+                deleteCoiFile(id, file, (res) => {
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'File berhasil dihapus!',
+                            icon: 'success',
+                        });
+                        getCoiById(id, (data) => {
+                            setCoi(data.data);
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'File gagal dihapus!',
+                            icon: 'error',
+                        });
+                    }
+                });
+            }
+        });
+    };
+
   
   return (
     <div className="flex flex-col md:flex-row w-full">
@@ -176,17 +205,17 @@ if (!coi || Object.keys(coi).length === 0) {
                         <div className='w-full'>
                             <label htmlFor="unit" className="text-emerald-950">Unit <sup className='text-red-500'>*</sup></label>
                             <select
-                                name="unit_id"
-                                id="unit"
+                                name="plo_id"
+                                id="plo"
                                 className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                value={selectedUnit}
-                                onChange={(e) => handleUnitChange(e.target.value)}
+                                value={selectedPlo}
+                                onChange={(e) => {setSelectedPlo(e.target.value); setUnitId(e.target.options[e.target.selectedIndex].getAttribute('unit'));}} // Panggil fungsi saat unit berubah
                                 required
-                            >
-                                <option value="">Pilih Unit</option>
-                                {IsUnit.map((unit) => (
-                                    <option key={unit.id} value={unit.id}>
-                                        {unit.unit_name}
+                                >
+                                <option value="">Pilih Plo</option>
+                                {IsPlo.map((plo) => (
+                                    <option key={plo.id} value={plo.id} unit={plo.unit_id}>
+                                    {plo.unit.unit_name}
                                     </option>
                                 ))}
                             </select>
@@ -199,16 +228,17 @@ if (!coi || Object.keys(coi).length === 0) {
                                 className="w-full px-1 py-2 border border-gray-300 rounded-md"
                                 value={selectedCategory}
                                 onChange={(e) => handleCategoryChange(e.target.value)}
+                                
                             >
                                 <option value="">Pilih Kategori</option>
                                 {
-                                    filteredCategories.length > 0 
-                                        ? filteredCategories.map((category) => (
-                                            <option key={category.id} value={category.id}>
-                                                {category.category_name}
-                                            </option>
-                                        ))
-                                    : <option value="" disabled>Kategori tidak ditemukan</option>
+                                IsCategory.length > 0 
+                                    ? IsCategory.map((category) => (
+                                        <option key={category.id} value={category.id}>
+                                        {category.category_name}
+                                        </option>
+                                    ))
+                                    : <option value="" disabled>Tidak ada kategori</option>
                                 }
                             </select>
                         </div>
@@ -266,17 +296,58 @@ if (!coi || Object.keys(coi).length === 0) {
                                 required
                             />
                         </div>
+                    </div>
+                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                         <div className='w-full'>
-                            <label className='text-emerald-950'>COI Certificate</label>
-                            <input
-                                type="file"
-                                name="coi_certificate"
-                                id="coi_certificate"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            />
+                            <div className='mb-2'>
+                                <label className='text-emerald-950'>COI Certificate</label>
+                                <input
+                                    type="file"
+                                    name="coi_certificate"
+                                    id="coi_certificate"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                />
+                            </div>
+                            <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1' >
+                                {coi.coi_certificate ? (
+                                    <>
+                                        <Link to={`http://192.168.1.152:8080/coi/certificates/${coi.coi_certificate}`} target="_blank" className='text-emerald-950 hover:underline cursor-pointer'>{coi.coi_certificate}</Link>
+                                        <IconX onClick={() => handledeleteFile({coi_certificate: coi.coi_certificate})} className='text-red-500 cursor-pointer hover:rotate-90 transition duration-500 '/>
+                                    </>
+                                )
+                                : (
+                                    <span>-</span>
+                                )
+                                }
+
+                            </div>
+                        </div>
+                        <div className='w-full'>
+                            <div className='mb-2'>
+                                <label className='text-emerald-950'>COI Old Certificate</label>
+                                <input
+                                    type="file"
+                                    name="coi_old_certificate"
+                                    id="coi_old_certificate"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                />
+                            </div>
+                            <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1' >
+                                {coi.coi_old_certificate ? (
+                                    <>
+                                        <Link to={`http://192.168.1.152:8080/coi/certificates/${coi.coi_old_certificate}`} target="_blank" className='text-emerald-950 hover:underline cursor-pointer'>{coi.coi_old_certificate}</Link>
+                                        <IconX onClick={() => handledeleteFile({coi_old_certificate: coi.coi_old_certificate})} className='text-red-500 cursor-pointer hover:rotate-90 transition duration-500 '/>
+                                    </>
+                                )
+                                : (
+                                    <span>-</span>
+                                )
+                                }
+                            </div>
                         </div>
                     </div>
-                        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                    <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                        <div className='w-full flex flex-row space-x-2'>
                             <div className="w-full">
                                 <label className="text-emerald-950">Issue Date <sup className="text-red-500">*</sup></label>
                                 <input
@@ -300,7 +371,7 @@ if (!coi || Object.keys(coi).length === 0) {
                                 />
                             </div>
                         </div>
-                        <div className="w-full">
+                        <div className="w-full md:w-1/3">
                             <label htmlFor="rla" className="text-emerald-950">RLA</label>
                             <select
                                 name="rla"
@@ -314,41 +385,81 @@ if (!coi || Object.keys(coi).length === 0) {
                                 <option value="0">No</option>
                             </select>
                         </div>
-                        {IsRLA && (
-                            <div className="space-y-2">
-                                <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-                                    <div className="w-full">
-                                        <label className="text-emerald-950">RLA Issue Date</label>
-                                        <input
-                                            type="date"
-                                            name="rla_issue"
-                                            id="rla_issue"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                            defaultValue={coi.rla_issue}
-                                        />
-                                    </div>
-                                    <div className="w-full">
-                                        <label className="text-emerald-950">RLA Overdue Date</label>
-                                        <input
-                                            type="date"
-                                            name="rla_overdue"
-                                            id="rla_overdue"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                            defaultValue={coi.rla_overdue}
-                                        />
-                                    </div>
+                    </div>
+                    {IsRLA && (
+                        <div className="space-y-2">
+                            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                                <div className="w-full">
+                                    <label className="text-emerald-950">RLA Issue Date</label>
+                                    <input
+                                        type="date"
+                                        name="rla_issue"
+                                        id="rla_issue"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                        defaultValue={coi.rla_issue}
+                                    />
                                 </div>
                                 <div className="w-full">
-                                    <label className="text-emerald-950">RLA File</label>
+                                    <label className="text-emerald-950">RLA Overdue Date</label>
                                     <input
-                                        type="file"
-                                        name="file_rla"
-                                        id="file_rla"
+                                        type="date"
+                                        name="rla_overdue"
+                                        id="rla_overdue"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                        defaultValue={coi.rla_overdue}
                                     />
                                 </div>
                             </div>
-                        )}
+                            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                                <div className="w-full">
+                                <div className='mb-2'>
+                                        <label className='text-emerald-950'>RLA Certificate</label>
+                                        <input
+                                            type="file"
+                                            name="rla_certificate"
+                                            id="rla_certificate"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                        />
+                                    </div>
+                                    <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1' >
+                                        {coi.rla_certificate ? (
+                                            <>
+                                                <Link to={`http://192.168.1.152:8080/coi/rla/${coi.rla_certificate}`} target="_blank" className='text-emerald-950 hover:underline cursor-pointer'>{coi.rla_certificate}</Link>
+                                                <IconX onClick={() => handledeleteFile({rla_certificate: coi.rla_certificate})} className='text-red-500 cursor-pointer hover:rotate-90 transition duration-500 '/>
+                                            </>
+                                        )
+                                        : (
+                                            <span>-</span>
+                                        )
+                                        }
+                                    </div>
+                                </div>
+                                <div className="w-full">
+                                    <div className='mb-2'>
+                                        <label className='text-emerald-950'>RLA Old Certificate</label>
+                                        <input
+                                            type="file"
+                                            name="rla_old_certificate"
+                                            id="rla_old_certificate"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                        />
+                                    </div>
+                                    <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1' >
+                                        {coi.rla_old_certificate ? (
+                                            <>
+                                                <Link to={`http://192.168.1.152:8080/coi/rla/${coi.rla_old_certificate}`} target="_blank" className='text-emerald-950 hover:underline cursor-pointer'>{coi.rla_old_certificate}</Link>
+                                                <IconX onClick={() => handledeleteFile({rla_old_certificate: coi.rla_old_certificate})} className='text-red-500 cursor-pointer hover:rotate-90 transition duration-500 '/>
+                                            </>
+                                        )
+                                        : (
+                                            <span>-</span>
+                                        )
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <div className="w-full flex flex-row space-x-2 py-2">
                     <motion.button

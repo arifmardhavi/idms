@@ -101,5 +101,19 @@ export const downloadSelectedCoi = (selectedIds) => {
         alert('Gagal mendownload file COI.');
       });
 }
-  
+
+export const deleteCoiFile = (id, data, callback) => {
+    axios
+        .put(`http://192.168.1.152:8080/api/coi/deletefile/${id}`, data, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
+        .then((res) => {
+            callback(res.data);
+        }) 
+        .catch((err) => {
+            console.log(err);
+        }) 
+}
 

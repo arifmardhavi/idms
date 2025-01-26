@@ -5,49 +5,37 @@ import { Link, useNavigate } from 'react-router-dom'
 import { IconChevronRight } from '@tabler/icons-react'
 import { useState, useEffect } from 'react'
 import { addCoi } from '../../services/coi.service'
-import { getUnit } from '../../services/unit.service'
-import { getCategoryByUnit } from '../../services/category.service';
+import { getPlo } from '../../services/plo.service'
+import { getCategory } from '../../services/category.service';
 import { getTypeByCategory } from '../../services/type.service';
-import { getTagnumberByType } from '../../services/tagnumber.service'
+import { getTagnumberByTypeUnit } from '../../services/tagnumber.service'
 import Swal from 'sweetalert2';
 import * as motion from 'motion/react-client';
 
 const AddCoi = () => {
     const navigate = useNavigate();
     const [IsRLA, setIsRLA] = useState(false)
-    const [IsUnit, setIsUnit] = useState([]);
-    const [selectedUnit, setSelectedUnit] = useState('');
-    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [UnitId, setUnitId] = useState('');
+    const [IsPlo, setIsPlo] = useState([]);
+    const [IsCategory, setIsCategory] = useState([]);
+    const [selectedPlo, setSelectedPlo] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [filteredTypes, setFilteredTypes] = useState([]);
     const [selectedType, setSelectedType] = useState('');
     const [Tagnumbers, setTagnumbers] = useState([]);
 
     useEffect(() => {
-        getUnit((data) => {
-            setIsUnit(data.data);
+        getPlo((data) => {
+            setIsPlo(data.data);
         });
+
+        getCategory((data) => {
+            setIsCategory(data.data);
+        });
+
     }, []);
 
-    // handle onChange input category by unit
-    const handleUnitChange = (unitId) => {
-        setSelectedUnit(unitId); // Simpan unit yang dipilih
-        setFilteredTypes([]); // Kosongkan jika ada unit yang baru dipilih
-        setTagnumbers([]); // Kosongkan jika ada unit yang baru dipilih
-        if (unitId) {
-        // Memanggil API untuk mendapatkan kategori berdasarkan unit
-        getCategoryByUnit(unitId, (data) => {
-            console.log(data);
-            if (data === null) {
-            setFilteredCategories([]);
-            }else{
-            setFilteredCategories(data.data);
-            }
-        });
-        } else {
-        setFilteredCategories([]); // Kosongkan jika tidak ada unit dipilih
-        }
-    };
+    
     // handle onChange input category by unit
     const handleCategoryChange = (categoryId) => {
         setSelectedCategory(categoryId); // Simpan kategori yang dipilih
@@ -56,7 +44,6 @@ const AddCoi = () => {
         if (categoryId) {
         // Memanggil API untuk mendapatkan tipe berdasarkan kategori
         getTypeByCategory(categoryId, (data) => {
-            console.log(data);
             if (data === null) {
             setFilteredTypes([]);
             }else{
@@ -71,10 +58,9 @@ const AddCoi = () => {
     // handle onChange input type by category
     const handleTypeChange = (typeId) => {
         setSelectedType(typeId); // Simpan tipe yang dipilih
-        if (typeId) {
+        if (typeId && UnitId != '') {
         // Memanggil API untuk mendapatkan tagnumber berdasarkan tipe
-        getTagnumberByType(typeId, (data) => {
-            console.log(data);
+        getTagnumberByTypeUnit(typeId, UnitId, (data) => {
             if (data === null) {
             setTagnumbers([]);
             }else{
@@ -90,6 +76,7 @@ const AddCoi = () => {
         e.preventDefault();
 
         const formData = new FormData(); // Buat instance FormData
+        formData.append('plo_id', e.target.plo_id.value);
         formData.append('tag_number_id', e.target.tag_number_id.value);
         formData.append('no_certificate', e.target.no_certificate.value);
         formData.append('coi_certificate', e.target.coi_certificate.files[0]);
@@ -144,19 +131,19 @@ const AddCoi = () => {
                         <div className="flex flex-col space-y-2">
                             <div className='flex flex-row space-x-2'>
                                 <div className='w-full' >
-                                    <label htmlFor="unit" className="text-emerald-950">Unit <sup className='text-red-500'>*</sup></label>
+                                    <label htmlFor="plo" className="text-emerald-950">Plo <sup className='text-red-500'>*</sup></label>
                                     <select
-                                        name="unit_id"
-                                        id="unit"
+                                        name="plo_id"
+                                        id="plo"
                                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                        value={selectedUnit}
-                                        onChange={(e) => handleUnitChange(e.target.value)} // Panggil fungsi saat unit berubah
+                                        value={selectedPlo}
+                                        onChange={(e) => {setSelectedPlo(e.target.value); setUnitId(e.target.options[e.target.selectedIndex].getAttribute('unit'));}} // Panggil fungsi saat unit berubah
                                         required
                                         >
-                                        <option value="">Pilih Unit</option>
-                                        {IsUnit.map((unit) => (
-                                            <option key={unit.id} value={unit.id}>
-                                            {unit.unit_name}
+                                        <option value="">Pilih Plo</option>
+                                        {IsPlo.map((plo) => (
+                                            <option key={plo.id} value={plo.id} unit={plo.unit_id}>
+                                            {plo.unit.unit_name}
                                             </option>
                                         ))}
                                     </select>
@@ -173,8 +160,8 @@ const AddCoi = () => {
                                     >
                                         <option value="">Pilih Kategori</option>
                                         {
-                                        filteredCategories.length > 0 
-                                            ? filteredCategories.map((category) => (
+                                        IsCategory.length > 0 
+                                            ? IsCategory.map((category) => (
                                                 <option key={category.id} value={category.id}>
                                                 {category.category_name}
                                                 </option>
@@ -195,15 +182,26 @@ const AddCoi = () => {
                                         onChange={(e) => handleTypeChange(e.target.value)}
                                         
                                     >
-                                        <option value="">Pilih Tipe</option>
                                         {
-                                        filteredTypes.length > 0 
-                                            ? filteredTypes.map((type) => (
-                                                <option key={type.id} value={type.id}>
-                                                {type.type_name}
-                                                </option>
-                                            ))
-                                            : <option value="" disabled>Tidak ada Tipe</option>
+                                            selectedPlo == '' ?  (
+                                                <option value="" disabled selected>Pilih Plo terlebih dahulu</option>
+                                            )
+                                            : (
+                                                <option value="" >Pilih Tipe</option>
+                                            ) 
+                                            
+                                        }
+                                        {
+                                        selectedPlo == '' ?    
+                                            ""
+                                        : 
+                                            filteredTypes.length > 0 
+                                                ? filteredTypes.map((type) => (
+                                                    <option key={type.id} value={type.id}>
+                                                    {type.type_name}
+                                                    </option>
+                                                ))
+                                                : <option value="" disabled>Tidak ada Tipe</option>
                                         }
                                     </select>
                                 </div>
