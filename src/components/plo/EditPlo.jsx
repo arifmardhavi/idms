@@ -155,7 +155,7 @@ const EditPlo = () => {
                                             <option value="">Pilih Unit</option>
                                             {IsUnit.map((unit) => (
                                                 <option key={unit.id} value={unit.id}>
-                                                    {unit.unit_name}
+                                                    {unit.unit_name} - {unit.unit_type == '1' ? 'Pipa Penyalur' : 'Instalasi'}
                                                 </option>
                                             ))}
                                         </select>
