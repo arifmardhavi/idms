@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getCoi = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/coi", {
+        .get("http://127.0.0.1:8000/api/coi", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getCoi = (callback) => {
 
 export const getCoiById = (id, callback) => {
     axios   
-        .get(`http://192.168.1.152:8080/api/coi/${id}`, {
+        .get(`http://127.0.0.1:8000/api/coi/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getCoiById = (id, callback) => {
 
 export const addCoi = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/coi", data, {
+        .post("http://127.0.0.1:8000/api/coi", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -47,7 +47,7 @@ export const addCoi = (data, callback) => {
 
 export const updateCoi = (id, data, callback) => {
     axios
-        .post(`http://192.168.1.152:8080/api/coi/${id}?_method=PUT`, data, {
+        .post(`http://127.0.0.1:8000/api/coi/${id}?_method=PUT`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -62,7 +62,7 @@ export const updateCoi = (id, data, callback) => {
 
 export const deleteCoi = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/coi/${id}`, {
+        .delete(`http://127.0.0.1:8000/api/coi/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -77,7 +77,7 @@ export const deleteCoi = (id, callback) => {
 
 export const downloadSelectedCoi = (selectedIds) => {
     axios
-      .post('http://192.168.1.152:8080/api/coi/download', { ids: selectedIds }, {
+      .post('http://127.0.0.1:8000/api/coi/download', { ids: selectedIds }, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -104,7 +104,7 @@ export const downloadSelectedCoi = (selectedIds) => {
 
 export const deleteCoiFile = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/coi/deletefile/${id}`, data, {
+        .put(`http://127.0.0.1:8000/api/coi/deletefile/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

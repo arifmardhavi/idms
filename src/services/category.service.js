@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getCategory = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/categories", {
+        .get("http://127.0.0.1:8000/api/categories", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getCategory = (callback) => {
 
 export const getCategoryById = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/categories/${id}`, {
+        .get(`http://127.0.0.1:8000/api/categories/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getCategoryById = (id, callback) => {
 
 export const getCategoryByUnit = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/categories/unit/${id}`, {
+        .get(`http://127.0.0.1:8000/api/categories/unit/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -48,7 +48,7 @@ export const getCategoryByUnit = (id, callback) => {
 
 export const addCategory = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/categories", data, {
+        .post("http://127.0.0.1:8000/api/categories", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -63,7 +63,7 @@ export const addCategory = (data, callback) => {
 
 export const updateCategory = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/categories/${id}`, data, {
+        .put(`http://127.0.0.1:8000/api/categories/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -78,7 +78,7 @@ export const updateCategory = (id, data, callback) => {
 
 export const deleteCategory = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/categories/${id}`, {
+        .delete(`http://127.0.0.1:8000/api/categories/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -93,7 +93,7 @@ export const deleteCategory = (id, callback) => {
 
 export const nonactiveCategory = (id, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/categories/nonactive/${id}`, {
+        .put(`http://127.0.0.1:8000/api/categories/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

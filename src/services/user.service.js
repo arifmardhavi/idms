@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getUser = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/users", {
+        .get("http://127.0.0.1:8000/api/users", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getUser = (callback) => {
 
 export const getUserById = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/users/${id}`, {
+        .get(`http://127.0.0.1:8000/api/users/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getUserById = (id, callback) => {
 
 export const addUser = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/users", data, {
+        .post("http://127.0.0.1:8000/api/users", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -47,7 +47,7 @@ export const addUser = (data, callback) => {
 
 export const updateUser = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/users/${id}`, data, {
+        .put(`http://127.0.0.1:8000/api/users/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -62,7 +62,7 @@ export const updateUser = (id, data, callback) => {
 
 export const deleteUser = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/users/${id}`, {
+        .delete(`http://127.0.0.1:8000/api/users/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -77,7 +77,7 @@ export const deleteUser = (id, callback) => {
 
 export const nonactiveUser = (id, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/users/nonactive/${id}`, {
+        .put(`http://127.0.0.1:8000/api/users/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

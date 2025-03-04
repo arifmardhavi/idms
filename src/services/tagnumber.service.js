@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getTagnumber = (callback) => {
     axios
-        .get("http://192.168.1.152:8080/api/tagnumbers", {
+        .get("http://127.0.0.1:8000/api/tagnumbers", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getTagnumber = (callback) => {
 
 export const getTagnumberById = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/${id}`, {
+        .get(`http://127.0.0.1:8000/api/tagnumbers/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getTagnumberById = (id, callback) => {
 
 export const getTagnumberByType = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/type/${id}`, {
+        .get(`http://127.0.0.1:8000/api/tagnumbers/type/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -48,7 +48,7 @@ export const getTagnumberByType = (id, callback) => {
 
 export const getTagnumberByTagnumberId = (id, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/tag_number/${id}`, {
+        .get(`http://127.0.0.1:8000/api/tagnumbers/tag_number/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -64,7 +64,7 @@ export const getTagnumberByTagnumberId = (id, callback) => {
 
 export const getTagnumberByTagnumber = (tagname, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagname`, {
+        .get(`http://127.0.0.1:8000/api/tagname`, {
             params: { tag_number: tagname },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -81,7 +81,7 @@ export const getTagnumberByTagnumber = (tagname, callback) => {
 
 export const getTagnumberByTypeUnit = (typeId, UnitId, callback) => {
     axios
-        .get(`http://192.168.1.152:8080/api/tagnumbers/typeunit/${typeId}/${UnitId}`, {
+        .get(`http://127.0.0.1:8000/api/tagnumbers/typeunit/${typeId}/${UnitId}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -97,7 +97,7 @@ export const getTagnumberByTypeUnit = (typeId, UnitId, callback) => {
 
 export const addTagnumber = (data, callback) => {
     axios
-        .post("http://192.168.1.152:8080/api/tagnumbers", data, {
+        .post("http://127.0.0.1:8000/api/tagnumbers", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -112,7 +112,7 @@ export const addTagnumber = (data, callback) => {
 
 export const updateTagnumber = (id, data, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/tagnumbers/${id}`, data, {
+        .put(`http://127.0.0.1:8000/api/tagnumbers/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -127,7 +127,7 @@ export const updateTagnumber = (id, data, callback) => {
 
 export const deleteTagnumber = (id, callback) => {
     axios
-        .delete(`http://192.168.1.152:8080/api/tagnumbers/${id}`, {
+        .delete(`http://127.0.0.1:8000/api/tagnumbers/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -142,7 +142,7 @@ export const deleteTagnumber = (id, callback) => {
 
 export const nonactiveTagnumber = (id, callback) => {
     axios
-        .put(`http://192.168.1.152:8080/api/tagnumbers/nonactive/${id}`, {
+        .put(`http://127.0.0.1:8000/api/tagnumbers/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
