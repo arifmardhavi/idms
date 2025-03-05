@@ -22,6 +22,7 @@ import { IconDatabaseCog } from '@tabler/icons-react';
 import { IconFiles } from '@tabler/icons-react';
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const [openMobile, setOpenMobile] = useState(false);
   const [activeTab, setActiveTab] = useState('');
 
   const handleClick = (tabName) => {
@@ -88,8 +89,8 @@ const Header = () => {
       {/* dekstop */}
       <div
         className={`${
-          open ? 'block absolute' : 'hidden md:flex flex-col'
-        } fixed w-60 min-h-screen space-y-2 bg-emerald-950 text-white shadow-lg px-2 py-4 z-50`}
+          openMobile ? 'block' : 'hidden md:flex flex-col'
+        } fixed w-60 min-h-screen h-full space-y-2 bg-emerald-950 text-white shadow-lg px-2 py-4 z-50`}
       >
         <div className='flex flex-row justify-center items-center space-x-2'>
           <img
@@ -102,6 +103,7 @@ const Header = () => {
         <div className='flex flex-col space-y-2'>
           <AnimatePresence className='text-xs'>
             <motion.div
+              key={1}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -109,6 +111,7 @@ const Header = () => {
               className='flex flex-col space-y-2'
             >
               <motion.div
+                key={2}
                 // whileHover={{ scale: 0.95 }}
                 whileTap={{ scale: 0.9 }}
                 initial={{ opacity: 0, scale: 0 }}
@@ -323,17 +326,17 @@ const Header = () => {
           <span className='text-xl font-bold'>IDMS</span>
         </div>
         <motion.div whileTap={{ scale: 0.8 }}>
-          {open ? (
+          {openMobile ? (
             <IconX
               className={`cursor-pointer w-10 h-10 text-lime-300`}
               stroke={1}
-              onClick={() => setOpen(false)}
+              onClick={() => setOpenMobile(false)}
             />
           ) : (
             <IconArticle
               className={`cursor-pointer w-10 h-10 text-white`}
               stroke={1}
-              onClick={() => setOpen(true)}
+              onClick={() => setOpenMobile(true)}
             />
           )}
         </motion.div>

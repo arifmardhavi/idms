@@ -85,7 +85,7 @@ const AddCoi = () => {
     if (IsRLA) {
       formData.append('rla_issue', e.target.rla_issue.value);
       formData.append('rla_overdue', e.target.rla_overdue.value);
-      formData.append('file_rla', e.target.file_rla.files[0]);
+      formData.append('rla_certificate', e.target.rla_certificate.files[0]);
     }
 
     addCoi(formData, (res) => {
@@ -145,6 +145,8 @@ const AddCoi = () => {
                       value={selectedPlo}
                       onChange={(e) => {
                         setSelectedPlo(e.target.value);
+                        setSelectedType('');
+                        setTagnumbers([]);
                         setUnitId(
                           e.target.options[e.target.selectedIndex].getAttribute(
                             'unit'
@@ -354,7 +356,7 @@ const AddCoi = () => {
                       </label>
                       <input
                         type='file'
-                        name='file_rla'
+                        name='rla_certificate'
                         id='rla_certificate'
                         className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       />

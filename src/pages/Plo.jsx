@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { useEffect, useState } from 'react';
 import * as motion from 'motion/react-client';
 import {
   DataGrid,
@@ -11,7 +11,6 @@ import {
   getPlo,
   downloadSelectedPlo,
 } from '../services/plo.service';
-import { getUnit } from '../services/unit.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -21,9 +20,9 @@ import { IconCloudDownload } from '@tabler/icons-react';
 import { IconPlus } from '@tabler/icons-react';
 
 const Plo = () => {
-  const [plo, setPlo] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [unit, setUnit] = useState([]);
+  const [plo, setPlo] = useState([]);
+  // const [unit, setUnit] = useState([]);
 
   useEffect(() => {
     getPlo((data) => {
@@ -35,14 +34,6 @@ const Plo = () => {
       );
     });
 
-    getUnit((data) => {
-      localStorage.setItem('unit', JSON.stringify(data.data));
-      setUnit(
-        localStorage.getItem('unit')
-          ? JSON.parse(localStorage.getItem('unit'))
-          : data.data
-      );
-    });
   }, []);
 
   // get PLO

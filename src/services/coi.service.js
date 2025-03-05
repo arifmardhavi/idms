@@ -117,3 +117,18 @@ export const deleteCoiFile = (id, data, callback) => {
         }) 
 }
 
+export const coiCountDueDays = (callback) => {
+    axios
+        .get("http://127.0.0.1:8000/api/coi_countduedays", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+

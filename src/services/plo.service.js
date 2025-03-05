@@ -131,3 +131,18 @@ export const deletePloFile = (id, data, callback) => {
             console.log(err);
         }) 
 }
+
+export const ploCountDueDays = (callback) => {
+    axios
+        .get("http://127.0.0.1:8000/api/plo_countduedays", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+        })
+        .then((res) => {
+            callback(res.data);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
