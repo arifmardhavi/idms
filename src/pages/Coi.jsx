@@ -100,21 +100,17 @@ const Coi = () => {
       headerName: 'Due Days',
       width: 80,
       renderCell: (params) => {
-        const overdueDate = new Date(params.row.overdue_date); // Mengonversi overdue_date ke Date
-        const currentDate = new Date(); // Mendapatkan tanggal saat ini
-
-        // Menghitung selisih dalam milidetik
-        const diffTime = overdueDate - currentDate;
-        // Mengonversi selisih milidetik ke hari
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = params.value;
 
         return (
           <div className='py-2 pl-3'>
             <p
               className={`${
                 diffDays <= 0
-                  ? 'text-white bg-red-600'
-                  : 'bg-lime-950 text-lime-300'
+                ? 'text-white bg-red-600' // Expired
+                : diffDays < 180
+                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
+                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
             >
               {diffDays}
@@ -215,36 +211,25 @@ const Coi = () => {
       headerName: 'RLA Due',
       width: 80,
       renderCell: (params) => {
-        if (params.row.rla_overdue) {
-          const overdueDate = new Date(params.row.rla_overdue); // Mengonversi overdue_date ke Date
-          const currentDate = new Date(); // Mendapatkan tanggal saat ini
+        const diffDays = params.value;
 
-          // Menghitung selisih dalam milidetik
-          const diffTime = overdueDate - currentDate;
-          // Mengonversi selisih milidetik ke hari
-          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-          return (
-            <div className='py-2 pl-3'>
-              <p
-                className={`${
-                  diffDays <= 0
-                    ? 'text-white bg-red-600'
-                    : 'bg-lime-950 text-lime-300'
-                } rounded-full w-fit p-2`}
-              >
-                {diffDays}
-              </p>
-            </div>
-          );
-        } else {
-          return (
-            <div className='py-2 pl-3'>
-              <p className='bg-lime-950 text-lime-300 rounded-full w-fit p-2'>
-                -
-              </p>
-            </div>
-          );
-        }
+        return (
+          <div className='py-2 pl-3'>
+            <p
+              className={`${
+                params.row.rla == 0
+                ? 'text-emerald-950'
+                : diffDays <= 0
+                ? 'text-white bg-red-600' // Expired
+                : diffDays < 180
+                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
+                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
+              } rounded-full w-fit p-2`}
+            >
+              {params.row.rla == 0 ? '-' : diffDays}
+            </p>
+          </div>
+        );
       },
     },
     {
