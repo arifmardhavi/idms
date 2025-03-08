@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import {
@@ -12,7 +12,6 @@ import {
   updateCategory,
   nonactiveCategory,
 } from '../services/category.service';
-import { getUnit } from '../services/unit.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
@@ -31,9 +30,6 @@ const Category = () => {
           ? JSON.parse(localStorage.getItem('category'))
           : data.data
       );
-    });
-    getUnit((data) => {
-      setIsUnit(data.data);
     });
   }, []);
 
@@ -80,6 +76,7 @@ const Category = () => {
           >
             <IconPencil stroke={2} />
           </motion.button>
+          {params.row.status == 1 ? 
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
@@ -88,6 +85,7 @@ const Category = () => {
           >
             <IconCircleMinus stroke={2} />
           </motion.button>
+          : ''}
         </div>
       ),
     },

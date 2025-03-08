@@ -1,8 +1,8 @@
 import axios from "axios";
-
+const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
 export const getType = (callback) => {
     axios
-        .get("http://127.0.0.1:8000/api/types", {
+        .get(path + "types", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getType = (callback) => {
 
 export const getTypeById = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/types/${id}`, {
+        .get(path + `types/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getTypeById = (id, callback) => {
 
 export const getTypeByCategory = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/types/category/${id}`, {
+        .get(path + `types/category/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -48,7 +48,7 @@ export const getTypeByCategory = (id, callback) => {
 
 export const addType = (data, callback) => {
     axios
-        .post("http://127.0.0.1:8000/api/types", data, {
+        .post(path + "types", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -63,7 +63,7 @@ export const addType = (data, callback) => {
 
 export const updateType = (id, data, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/types/${id}`, data, {
+        .put(path + `types/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -78,7 +78,7 @@ export const updateType = (id, data, callback) => {
 
 export const deleteType = (id, callback) => {
     axios
-        .delete(`http://127.0.0.1:8000/api/types/${id}`, {
+        .delete(path + `types/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -93,7 +93,7 @@ export const deleteType = (id, callback) => {
 
 export const nonactiveType = (id, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/types/nonactive/${id}`, {
+        .put(path + `types/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

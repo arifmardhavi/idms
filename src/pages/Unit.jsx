@@ -67,14 +67,17 @@ const Unit = () => {
           >
             <IconPencil stroke={2} />
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
-            onClick={() => handleNonactive(params.row)}
-          >
-            <IconCircleMinus stroke={2} />
-          </motion.button>
+          {params.row.status == 1 ? 
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+              onClick={() => handleNonactive(params.row)}
+            >
+              <IconCircleMinus stroke={2} />
+            </motion.button>
+            : ''
+          }
         </div>
       ),
     },

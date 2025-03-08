@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
 import { getTagnumber, addTagnumber, updateTagnumber, nonactiveTagnumber } from '../services/tagnumber.service';
 import { getUnit } from '../services/unit.service';
 import { getCategory } from '../services/category.service';
-import { getCategoryByUnit } from '../services/category.service';
 import { getTypeByCategory } from '../services/type.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
@@ -65,14 +64,17 @@ const Tagnumber = () => {
           >
             <IconPencil stroke={2} />
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
-            onClick={() => handleDelete(params.row)}
-          >
-            <IconCircleMinus stroke={2} />
-          </motion.button>
+          {params.row.status == 1 ? 
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+              onClick={() => handleNonactive(params.row)}
+            >
+              <IconCircleMinus stroke={2} />
+            </motion.button>
+            : ''
+          }
         </div>
       ),
     },
@@ -96,17 +98,21 @@ const Tagnumber = () => {
   // handle onChange input type by category
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId); // Simpan kategori yang dipilih
+    console.log("category : ", categoryId);
     if (categoryId) {
       // Memanggil API untuk mendapatkan tipe berdasarkan kategori
       getTypeByCategory(categoryId, (data) => {
         if (data === null) {
           setFilteredTypes([]);
+          // console.log("kesana");
         }else{
           setFilteredTypes(data.data);
+          // console.log(data.data);
         }
       });
     } else {
       setFilteredTypes([]); // Kosongkan jika tidak ada unit dipilih
+      // console.log("kesini");
     }
   }
   // handle onChange input type by category
@@ -209,13 +215,13 @@ const Tagnumber = () => {
   };
 
   // delete tagnumber
-  const handleDelete = (row) => {
+  const handleNonactive = (row) => {
     Swal.fire({
       title: 'Apakah Anda yakin?',
-      text: 'Data tag number akan dihapus secara permanen!',
+      text: 'Data tag number akan Dinonaktifkan!',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Ya, hapus!',
+      confirmButtonText: 'Ya, Nonaktifkan!',
       cancelButtonText: 'Batal',
     }).then((result) => {
       if (result.isConfirmed) {
@@ -224,7 +230,7 @@ const Tagnumber = () => {
             // Tampilkan alert sukses
             Swal.fire({
               title: 'Berhasil!',
-              text: 'Tag Number berhasil dihapus!',
+              text: 'Tag Number berhasil Dinonaktifkan!',
               icon: 'success',
             });
 

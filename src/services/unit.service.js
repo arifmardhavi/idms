@@ -1,8 +1,8 @@
 import axios from "axios";
-
+const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
 export const getUnit = (callback) => {
     axios
-        .get("http://127.0.0.1:8000/api/units", {
+        .get(path + "units", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getUnit = (callback) => {
 
 export const getUnitById = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/units/${id}`, {
+        .get(path + `units/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getUnitById = (id, callback) => {
 
 export const addUnit = (data, callback) => {
     axios
-        .post("http://127.0.0.1:8000/api/units", data, {
+        .post(path + "units", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -47,7 +47,7 @@ export const addUnit = (data, callback) => {
 
 export const updateUnit = (id, data, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/units/${id}`, data, {
+        .put(path + `units/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -62,7 +62,7 @@ export const updateUnit = (id, data, callback) => {
 
 export const deleteUnit = (id, callback) => {
     axios
-        .delete(`http://127.0.0.1:8000/api/units/${id}`, {
+        .delete(path + `units/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -77,7 +77,7 @@ export const deleteUnit = (id, callback) => {
 
 export const nonactiveUnit = (id, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/units/nonactive/${id}`, {
+        .put(path + `units/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

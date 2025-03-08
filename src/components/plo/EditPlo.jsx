@@ -51,12 +51,12 @@ const EditPlo = () => {
     if (e.target.plo_certificate.files[0]) {
       formData.append('plo_certificate', e.target.plo_certificate.files[0]);
     }
-    if (e.target.plo_old_certificate.files[0]) {
-      formData.append(
-        'plo_old_certificate',
-        e.target.plo_old_certificate.files[0]
-      );
-    }
+    // if (e.target.plo_old_certificate.files[0]) {
+    //   formData.append(
+    //     'plo_old_certificate',
+    //     e.target.plo_old_certificate.files[0]
+    //   );
+    // }
     formData.append('issue_date', e.target.issue_date.value);
     formData.append('overdue_date', e.target.overdue_date.value);
     formData.append('rla', e.target.rla.value);
@@ -67,12 +67,12 @@ const EditPlo = () => {
       if (e.target.rla_certificate.files[0]) {
         formData.append('rla_certificate', e.target.rla_certificate.files[0]);
       }
-      if (e.target.rla_old_certificate.files[0]) {
-        formData.append(
-          'rla_old_certificate',
-          e.target.rla_old_certificate.files[0]
-        );
-      }
+      // if (e.target.rla_old_certificate.files[0]) {
+      //   formData.append(
+      //     'rla_old_certificate',
+      //     e.target.rla_old_certificate.files[0]
+      //   );
+      // }
     }
 
     updatePlo(id, formData, (res) => {
@@ -212,7 +212,7 @@ const EditPlo = () => {
                       {plo.plo_certificate ? (
                         <>
                           <Link
-                            to={`http://192.168.1.152:8080/plo/certificates/${plo.plo_certificate}`}
+                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${plo.plo_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -248,7 +248,7 @@ const EditPlo = () => {
                       {plo.plo_old_certificate ? (
                         <>
                           <Link
-                            to={`http://192.168.1.152:8080/plo/certificates/${plo.plo_old_certificate}`}
+                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${plo.plo_old_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -360,7 +360,7 @@ const EditPlo = () => {
                           {plo.rla_certificate ? (
                             <>
                               <Link
-                                to={`http://192.168.1.152:8080/plo/rla/${plo.rla_certificate}`}
+                                to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${plo.rla_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
                               >
@@ -396,7 +396,7 @@ const EditPlo = () => {
                           {plo.rla_old_certificate ? (
                             <>
                               <Link
-                                to={`http://192.168.1.152:8080/plo/rla/${plo.rla_old_certificate}`}
+                                to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${plo.rla_old_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
                               >

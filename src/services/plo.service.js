@@ -1,8 +1,8 @@
 import axios from "axios";
-
+const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
 export const getPlo = (callback) => {
     axios
-        .get("http://127.0.0.1:8000/api/plo", {
+        .get(path + "plo", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getPlo = (callback) => {
 
 export const getPloById = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/plo/${id}`, {
+        .get(path + `plo/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getPloById = (id, callback) => {
 
 export const addPlo = (data, callback) => {
     axios
-        .post("http://127.0.0.1:8000/api/plo", data, {
+        .post(path + "plo", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -47,7 +47,7 @@ export const addPlo = (data, callback) => {
 
 export const updatePlo = (id, data, callback) => {
     axios
-        .post(`http://127.0.0.1:8000/api/plo/${id}?_method=PUT`, data, {
+        .post(path + `plo/${id}?_method=PUT`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -62,7 +62,7 @@ export const updatePlo = (id, data, callback) => {
 
 export const deletePlo = (id, callback) => {
     axios
-        .delete(`http://127.0.0.1:8000/api/plo/${id}`, {
+        .delete(path + `plo/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -77,7 +77,7 @@ export const deletePlo = (id, callback) => {
 
 export const nonactivePlo = (id, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/plo/nonactive/${id}`, {
+        .put(path + `plo/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -92,7 +92,7 @@ export const nonactivePlo = (id, callback) => {
 
 export const downloadSelectedPlo = (selectedIds) => {
     axios
-      .post('http://127.0.0.1:8000/api/plo/download', { ids: selectedIds }, {
+      .post(path + 'plo/download', { ids: selectedIds }, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -119,7 +119,7 @@ export const downloadSelectedPlo = (selectedIds) => {
 
 export const deletePloFile = (id, data, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/plo/deletefile/${id}`, data, {
+        .put(path + `plo/deletefile/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -134,7 +134,7 @@ export const deletePloFile = (id, data, callback) => {
 
 export const ploCountDueDays = (callback) => {
     axios
-        .get("http://127.0.0.1:8000/api/plo_countduedays", {
+        .get(path + "plo_countduedays", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

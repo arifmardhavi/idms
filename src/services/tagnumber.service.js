@@ -1,8 +1,8 @@
 import axios from "axios";
-
+const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
 export const getTagnumber = (callback) => {
     axios
-        .get("http://127.0.0.1:8000/api/tagnumbers", {
+        .get(path + "tagnumbers", {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -17,7 +17,7 @@ export const getTagnumber = (callback) => {
 
 export const getTagnumberById = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/tagnumbers/${id}`, {
+        .get(path + `tagnumbers/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -32,7 +32,7 @@ export const getTagnumberById = (id, callback) => {
 
 export const getTagnumberByType = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/tagnumbers/type/${id}`, {
+        .get(path + `tagnumbers/type/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -48,7 +48,7 @@ export const getTagnumberByType = (id, callback) => {
 
 export const getTagnumberByTagnumberId = (id, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/tagnumbers/tag_number/${id}`, {
+        .get(path + `tagnumbers/tag_number/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -64,7 +64,7 @@ export const getTagnumberByTagnumberId = (id, callback) => {
 
 export const getTagnumberByTagnumber = (tagname, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/tagname`, {
+        .get(path + `tagname`, {
             params: { tag_number: tagname },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -81,7 +81,7 @@ export const getTagnumberByTagnumber = (tagname, callback) => {
 
 export const getTagnumberByTypeUnit = (typeId, UnitId, callback) => {
     axios
-        .get(`http://127.0.0.1:8000/api/tagnumbers/typeunit/${typeId}/${UnitId}`, {
+        .get(path + `tagnumbers/typeunit/${typeId}/${UnitId}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -97,7 +97,7 @@ export const getTagnumberByTypeUnit = (typeId, UnitId, callback) => {
 
 export const addTagnumber = (data, callback) => {
     axios
-        .post("http://127.0.0.1:8000/api/tagnumbers", data, {
+        .post(path + "tagnumbers", data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -112,7 +112,7 @@ export const addTagnumber = (data, callback) => {
 
 export const updateTagnumber = (id, data, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/tagnumbers/${id}`, data, {
+        .put(path + `tagnumbers/${id}`, data, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -127,7 +127,7 @@ export const updateTagnumber = (id, data, callback) => {
 
 export const deleteTagnumber = (id, callback) => {
     axios
-        .delete(`http://127.0.0.1:8000/api/tagnumbers/${id}`, {
+        .delete(path + `tagnumbers/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -142,7 +142,7 @@ export const deleteTagnumber = (id, callback) => {
 
 export const nonactiveTagnumber = (id, callback) => {
     axios
-        .put(`http://127.0.0.1:8000/api/tagnumbers/nonactive/${id}`, {
+        .put(path + `tagnumbers/nonactive/${id}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },

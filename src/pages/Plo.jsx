@@ -54,7 +54,7 @@ const Plo = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://192.168.1.152:8080/plo/certificates/${params.row.plo_certificate}`}
+            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -122,7 +122,7 @@ const Plo = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://192.168.1.152:8080/plo/certificates/${params.row.plo_certificate}`}
+            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -139,7 +139,7 @@ const Plo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://192.168.1.152:8080/plo/certificates/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -236,7 +236,7 @@ const Plo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://192.168.1.152:8080/plo/rla/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -256,7 +256,7 @@ const Plo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://192.168.1.152:8080/plo/rla/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >

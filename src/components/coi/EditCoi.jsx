@@ -128,8 +128,8 @@ const EditCoi = () => {
     if (IsRLA) {
       formData.append('rla_issue', e.target.rla_issue.value);
       formData.append('rla_overdue', e.target.rla_overdue.value);
-      if (e.target.file_rla.files[0]) {
-        formData.append('file_rla', e.target.file_rla.files[0] || null);
+      if (e.target.rla_certificate.files[0]) {
+        formData.append('rla_certificate', e.target.rla_certificate.files[0] || null);
       }
     }
 
@@ -352,7 +352,7 @@ const EditCoi = () => {
                       {coi.coi_certificate ? (
                         <>
                           <Link
-                            to={`http://192.168.1.152:8080/coi/certificates/${coi.coi_certificate}`}
+                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${coi.coi_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -388,7 +388,7 @@ const EditCoi = () => {
                       {coi.coi_old_certificate ? (
                         <>
                           <Link
-                            to={`http://192.168.1.152:8080/coi/certificates/${coi.coi_old_certificate}`}
+                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${coi.coi_old_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -500,7 +500,7 @@ const EditCoi = () => {
                           {coi.rla_certificate ? (
                             <>
                               <Link
-                                to={`http://192.168.1.152:8080/coi/rla/${coi.rla_certificate}`}
+                                to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${coi.rla_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
                               >
@@ -536,7 +536,7 @@ const EditCoi = () => {
                           {coi.rla_old_certificate ? (
                             <>
                               <Link
-                                to={`http://192.168.1.152:8080/coi/rla/${coi.rla_old_certificate}`}
+                                to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${coi.rla_old_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
                               >

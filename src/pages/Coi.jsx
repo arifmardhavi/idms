@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import {
@@ -58,7 +58,7 @@ const Coi = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://192.168.1.152:8080/coi/certificates/${params.row.coi_certificate}`}
+            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -126,7 +126,7 @@ const Coi = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://192.168.1.152:8080/coi/certificates/${params.row.coi_certificate}`}
+            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -143,7 +143,7 @@ const Coi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://192.168.1.152:8080/coi/certificates/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -240,7 +240,7 @@ const Coi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://192.168.1.152:8080/coi/rla/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -260,7 +260,7 @@ const Coi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://192.168.1.152:8080/coi/rla/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
