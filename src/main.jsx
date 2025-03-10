@@ -18,6 +18,10 @@ import ProtectedRoute from './protectedRoute.jsx';
 import User from './pages/User.jsx';
 import DashboardPlo from './components/plo/DashboardPlo.jsx';
 import DashboardCoi from './components/coi/DashboardCoi.jsx';
+import Skhp from './pages/Skhp.jsx';
+import DashboardSkhp from './components/skhp/DashboardSkhp.jsx';
+import AddSkhp from './components/skhp/AddSkhp.jsx';
+import EditSkhp from './components/skhp/EditSkhp.jsx';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -88,6 +92,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/skhp',
+    element: (
+      <ProtectedRoute>
+        <Skhp />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/plo/dashboard',
     element: (
       <ProtectedRoute>
@@ -100,6 +112,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <DashboardCoi />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/skhp/dashboard',
+    element: (
+      <ProtectedRoute>
+        <DashboardSkhp />
       </ProtectedRoute>
     ),
   },
@@ -132,6 +152,22 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <EditCoi />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/skhp/tambah',
+    element: (
+      <ProtectedRoute>
+        <AddSkhp />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/skhp/edit/:id',
+    element: (
+      <ProtectedRoute>
+        <EditSkhp />
       </ProtectedRoute>
     ),
   },

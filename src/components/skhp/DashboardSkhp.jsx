@@ -9,22 +9,22 @@ import { Breadcrumbs, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { IconCloudDownload, IconChevronRight } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
-import { getCoi, coiCountDueDays } from "../../services/coi.service";
+import { getSkhp, skhpCountDueDays } from "../../services/skhp.service";
 
 
-const DashboardCoi = () => {
-  const [coi, setCoi] = useState([]);
-  const [countcoi, setCountCoi] = useState({});
+const DashboardSkhp = () => {
+  const [skhp, setSkhp] = useState([]);
+  const [countskhp, setCountSkhp] = useState({});
 
   useEffect(() => {
-    getCoi((data) => {
-      localStorage.setItem("coi", JSON.stringify(data.data));
-      setCoi(data.data || []);
+    getSkhp((data) => {
+      localStorage.setItem("skhp", JSON.stringify(data.data));
+      setSkhp(data.data || []);
     });
 
-    coiCountDueDays((data) => {
-      localStorage.setItem("countcoi", JSON.stringify(data.data));
-      setCountCoi(data.data || {});
+    skhpCountDueDays((data) => {
+      localStorage.setItem("countskhp", JSON.stringify(data.data));
+      setCountSkhp(data.data || {});
     });
   }, []);
 
@@ -44,13 +44,13 @@ const DashboardCoi = () => {
       renderCell: (params) => <div className='py-4'>{params.value}</div>,
     },
     {
-      field: 'no_certificate',
-      headerName: 'No Certificate',
+      field: 'no_skhp',
+      headerName: 'No SKHP',
       width: 150,
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
+            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.row.file_skhp}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -112,13 +112,13 @@ const DashboardCoi = () => {
       },
     },
     {
-      field: 'coi_certificate',
-      headerName: 'COI File',
+      field: 'file_skhp',
+      headerName: 'File SKHP',
       width: 100,
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
+            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.row.file_skhp}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -128,131 +128,14 @@ const DashboardCoi = () => {
       ),
     },
     {
-      field: 'coi_old_certificate',
-      headerName: 'COI Lama',
+      field: 'file_old_skhp',
+      headerName: 'SKHP LAMA',
       width: 100,
       renderCell: (params) => (
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.value}`}
-              target='_blank'
-              className=' text-lime-500'
-            >
-              <IconCloudDownload stroke={2} />
-            </Link>
-          ) : (
-            <p>-</p>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: 'rla',
-      headerName: 'RLA',
-      width: 70,
-      valueGetter: (params) => (params == 1 ? 'YES' : 'NO'),
-      renderCell: (params) => (
-        <div className='py-4'>
-          <span
-            className={`${
-              params.row.rla == 0
-                ? 'text-lime-300 bg-emerald-950'
-                : 'bg-lime-400 text-emerald-950'
-            } rounded-lg w-fit px-2 py-1`}
-          >
-            {params.row.rla == 0 ? 'NO' : 'YES'}
-          </span>
-        </div>
-      ),
-    },
-    {
-      field: 'rla_issue',
-      headerName: 'RLA Issue',
-      width: 150,
-      renderCell: (params) => (
-        <div className='py-4'>
-          {params.value
-            ? new Intl.DateTimeFormat('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              }).format(new Date(params.value))
-            : '-'}
-        </div>
-      ),
-    },
-    {
-      field: 'rla_overdue',
-      headerName: 'RLA Overdue',
-      width: 150,
-      renderCell: (params) => (
-        <div className='py-4'>
-          {params.value
-            ? new Intl.DateTimeFormat('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              }).format(new Date(params.value))
-            : '-'}
-        </div>
-      ),
-    },
-    {
-      field: 'rla_due_days',
-      headerName: 'RLA Due',
-      width: 80,
-      renderCell: (params) => {
-        const diffDays = params.value;
-
-        return (
-          <div className='py-2 pl-3'>
-            <p
-              className={`${
-                params.row.rla == 0
-                ? 'text-emerald-950'
-                : diffDays <= 0
-                ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
-                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
-              } rounded-full w-fit p-2`}
-            >
-              {params.row.rla == 0 ? '-' : diffDays}
-            </p>
-          </div>
-        );
-      },
-    },
-    {
-      field: 'rla_certificate',
-      headerName: 'RLA file',
-      width: 80,
-      renderCell: (params) => (
-        <div className='py-4 pl-4'>
-          {params.value ? (
-            <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
-              target='_blank'
-              className=' text-lime-500'
-            >
-              <IconCloudDownload stroke={2} />
-            </Link>
-          ) : (
-            <p>-</p>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: 'rla_old_certificate',
-      headerName: 'RLA lama',
-      width: 80,
-      renderCell: (params) => (
-        <div className='py-4 pl-4'>
-          {params.value ? (
-            <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
+              to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -280,32 +163,15 @@ const DashboardCoi = () => {
   );
   
 
-  const dataPieCoi = [
-    { label: "> 9 Bulan", value: countcoi.coi_more_than_nine_months || 0, color: "#06d6a0" },
-    { label: "< 9 Bulan", value: countcoi.coi_less_than_nine_months || 0, color: "#ffd166" },
-    { label: "Expired", value: countcoi.coi_expired || 0, color: "#ef476f" },
-  ];
-
-  const dataPieRla = [
-    { label: "> 9 Bulan", value: countcoi.rla_more_than_nine_months || 0, color: "#06d6a0" },
-    { label: "< 9 Bulan", value: countcoi.rla_less_than_nine_months || 0, color: "#ffd166" },
-    { label: "Expired", value: countcoi.rla_expired || 0, color: "#ef476f" }, 
+  const dataPieSkhp = [
+    { label: "> 6 Bulan", value: countskhp.skhp_more_than_six_months || 0, color: "#06d6a0" },
+    { label: "< 6 Bulan", value: countskhp.skhp_less_than_six_months || 0, color: "#ffd166" },
+    { label: "Expired", value: countskhp.skhp_expired || 0, color: "#ef476f" },
   ];
 
 
   
-  const sizingcoi = {
-    margin: {left: 90},
-    legend: {
-      direction: 'column',
-      position: { vertical: 'middle', horizontal: 'right' },
-      padding: 0,
-      labelStyle: {
-        fontSize: 12,
-      },
-    },
-  };
-  const sizingrla = {
+  const sizingskhp = {
     margin: {left: 90},
     legend: {
       direction: 'column',
@@ -334,21 +200,21 @@ const DashboardCoi = () => {
           >
             Home
           </Link>
-          <Link className='hover:underline text-emerald-950' to='/coi'>
-            COI
+          <Link className='hover:underline text-emerald-950' to='/skhp'>
+            SKHP
           </Link>
-          <Typography className='text-lime-500'>Dashboard COI</Typography>
+          <Typography className='text-lime-500'>Dashboard SKHP</Typography>
         </Breadcrumbs>
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-col md:flex-row justify-evenly'>
             <div className="flex flex-col items-center">
-              <span>COI</span>
+              <span>SKHP</span>
               <PieChart
                 series={[
                   {
                     outerRadius: 90,
-                    data: dataPieCoi, arcLabel: (params) => `${params.value}`,
+                    data: dataPieSkhp, arcLabel: (params) => `${params.value}`,
                     highlightScope: { fade: 'global', highlight: 'item' },
                     faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
                   },
@@ -361,38 +227,16 @@ const DashboardCoi = () => {
                     fontSize: 14,
                   },
                 }}
-                {...sizingcoi}
-              />
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <span>RLA</span>
-              <PieChart
-                series={[
-                  {
-                    outerRadius: 90,
-                    data: dataPieRla, arcLabel: (params) => `${params.value}`,
-                    highlightScope: { fade: 'global', highlight: 'item' },
-                    faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                  },
-                ]}
-                sx={{
-                  [`& .${pieArcLabelClasses.root}`]: {
-                    fill: 'white',
-                    fontSize: 14,
-                  },
-                }}
-                width={350}
-                height={200}
-                {...sizingrla}
+                {...sizingskhp}
               />
             </div>
           </div>
         </div>
-        {/* TABLE coi */}
+        {/* TABLE skhp */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
             <DataGrid
-              rows={coi}
+              rows={skhp}
               columns={columns}
               // checkboxSelection
               disableColumnFilter
@@ -430,4 +274,4 @@ const DashboardCoi = () => {
   );
 };
 
-export default DashboardCoi;
+export default DashboardSkhp;

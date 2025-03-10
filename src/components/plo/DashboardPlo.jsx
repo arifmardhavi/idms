@@ -276,14 +276,14 @@ const DashboardPlo = () => {
   
 
   const dataPiePlo = [
-    { label: "> 6 Bulan", value: countplo.plo_more_than_six_months || 0, color: "#06d6a0" },
-    { label: "< 6 Bulan", value: countplo.plo_less_than_six_months || 0, color: "#ffd166" },
+    { label: "> 9 Bulan", value: countplo.plo_more_than_nine_months || 0, color: "#06d6a0" },
+    { label: "< 9 Bulan", value: countplo.plo_less_than_nine_months || 0, color: "#ffd166" },
     { label: "Expired", value: countplo.plo_expired || 0, color: "#ef476f" },
   ];
 
   const dataPieRla = [
-    { label: "> 6 Bulan", value: countplo.rla_more_than_six_months || 0, color: "#06d6a0" },
-    { label: "< 6 Bulan", value: countplo.rla_less_than_six_months || 0, color: "#ffd166" },
+    { label: "> 9 Bulan", value: countplo.rla_more_than_nine_months || 0, color: "#06d6a0" },
+    { label: "< 9 Bulan", value: countplo.rla_less_than_nine_months || 0, color: "#ffd166" },
     { label: "Expired", value: countplo.rla_expired || 0, color: "#ef476f" }, 
   ];
 

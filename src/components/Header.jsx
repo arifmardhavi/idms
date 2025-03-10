@@ -20,6 +20,7 @@ import { IconX } from '@tabler/icons-react';
 import { IconUser } from '@tabler/icons-react';
 import { IconDatabaseCog } from '@tabler/icons-react';
 import { IconFiles } from '@tabler/icons-react';
+import { IconFileAnalytics } from '@tabler/icons-react';
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [openMobile, setOpenMobile] = useState(false);
@@ -76,6 +77,12 @@ const Header = () => {
       icon: <IconRectangularPrism stroke={2} />,
       tab: 'regulatorycompliance',
       path: '/coi',
+    },
+    {
+      name: 'SKHP',
+      icon: <IconFileAnalytics stroke={2} />,
+      tab: 'regulatorycompliance',
+      path: '/skhp',
     },
     {
       name: 'User',
