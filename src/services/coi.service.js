@@ -1,134 +1,32 @@
-import axios from "axios";
-const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
-export const getCoi = (callback) => {
-    axios
-        .get(path + "coi", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-};
+import { apiGet, apiPost, apiPut, apiDelete } from "./config";
 
-export const getCoiById = (id, callback) => {
-    axios   
-        .get(path + `coi/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-}
+const endpoint = "coi";
 
-export const addCoi = (data, callback) => {
-    axios
-        .post(path + "coi", data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
+export const getCoi = async () => await apiGet(endpoint);
+export const getCoiById = async (id) => await apiGet(`${endpoint}/${id}`);
+export const addCoi = async (data) => await apiPost(endpoint, data);
+export const updateCoi = async (id, data) => await apiPost(`${endpoint}/${id}?_method=PUT`, data);
+export const deleteCoi = async (id) => await apiDelete(`${endpoint}/${id}`);
+export const deleteCoiFile = async (id, data) => await apiPut(`${endpoint}/deletefile/${id}`, data);
+export const coiCountDueDays = async () => await apiGet("coi_countduedays");
 
-export const updateCoi = (id, data, callback) => {
-    axios
-        .post(path + `coi/${id}?_method=PUT`, data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
-
-export const deleteCoi = (id, callback) => {
-    axios
-        .delete(path + `coi/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
-
-export const downloadSelectedCoi = (selectedIds) => {
-    axios
-      .post(path + 'coi/download', { ids: selectedIds }, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      })
-      .then((response) => {
-        const url = response.data.url;  // URL dari response backend
+export const downloadSelectedCoi = async (selectedIds) => {
+    try {
+        const response = await apiPost(`${endpoint}/download`, { ids: selectedIds });
+        const url = response?.url;
         if (!url) {
-          alert('Gagal mendapatkan URL untuk file ZIP.');
-          return;
+            alert("Gagal mendapatkan URL untuk file ZIP.");
+            return;
         }
         
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', 'coi_certificates.zip');
+        link.setAttribute("download", "coi_certificates.zip");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      })
-      .catch((error) => {
+    } catch (error) {
         console.error(error);
-        alert('Gagal mendownload file COI.');
-      });
-}
-
-export const deleteCoiFile = (id, data, callback) => {
-    axios
-        .put(path + `coi/deletefile/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
-
-export const coiCountDueDays = (callback) => {
-    axios
-        .get(path + "coi_countduedays", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+        alert("Gagal mendownload file COI.");
+    }
 };
-

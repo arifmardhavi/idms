@@ -15,6 +15,7 @@ const DashboardPlo = () => {
 
   const [plo, setPlo] = useState([]);
   const [countplo, setCountPlo] = useState({});
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
     getPlo((data) => {
@@ -45,7 +46,7 @@ const DashboardPlo = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.row.plo_certificate}`}
+            to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -113,7 +114,7 @@ const DashboardPlo = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.row.plo_certificate}`}
+            to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -130,7 +131,7 @@ const DashboardPlo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.value}`}
+              to={`${base_public_url}plo/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -227,7 +228,7 @@ const DashboardPlo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${params.value}`}
+              to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -247,7 +248,7 @@ const DashboardPlo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${params.value}`}
+              to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -359,7 +360,7 @@ const DashboardPlo = () => {
               />
             </div>
             <div className="flex flex-col items-center text-center">
-              <span>RLA</span>
+              <span>RLA Equipment</span>
               <PieChart
                 series={[
                   {

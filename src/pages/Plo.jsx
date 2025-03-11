@@ -22,19 +22,61 @@ import { IconPlus } from '@tabler/icons-react';
 const Plo = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [plo, setPlo] = useState([]);
-  // const [unit, setUnit] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getPlo((data) => {
-      localStorage.setItem('plo', JSON.stringify(data.data));
-      setPlo(
-        localStorage.getItem('plo')
-          ? JSON.parse(localStorage.getItem('plo'))
-          : data.data
-      );
+    fetchPlo();
+  }, []);
+
+  const fetchPlo = async () => {
+    try {
+      setLoading(true);
+      const data = await getPlo();
+      setPlo(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (row) => {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data PLO akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
     });
 
-  }, []);
+    if (result.isConfirmed) {
+      try {
+        const res = await deletePlo(row.id);
+        if (res.success) {
+          Swal.fire("Berhasil!", "PLO berhasil dihapus!", "success");
+          fetchPlo();
+        } else {
+          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus PLO!", "error");
+        }
+      } catch (error) {
+        console.log(error);
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus PLO!", "error");
+      }
+    }
+  };
+
+  const handleDownloadSelected = () => {
+    if (selectedRows.length === 0) {
+      Swal.fire("Peringatan!", "Tidak ada file yang dipilih!", "warning");
+      return;
+    }
+
+    downloadSelectedPlo(selectedRows);
+    Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+  };
+
 
   // get PLO
   const columns = [
@@ -54,7 +96,7 @@ const Plo = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.row.plo_certificate}`}
+            to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -122,7 +164,7 @@ const Plo = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.row.plo_certificate}`}
+            to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -139,7 +181,7 @@ const Plo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${params.value}`}
+              to={`${base_public_url}plo/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -236,7 +278,7 @@ const Plo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${params.value}`}
+              to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -256,7 +298,7 @@ const Plo = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${params.value}`}
+              to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -311,67 +353,6 @@ const Plo = () => {
   );
   // get PLO
 
-  // delete PLO
-  const handleDelete = (row) => {
-    Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data PLO akan dihapus secara permanen!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deletePlo(row.id, (res) => {
-          if (res.success) {
-            // Tampilkan alert sukses
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'PLO berhasil dihapus!',
-              icon: 'success',
-            });
-
-            // Perbarui state dan localStorage
-            getPlo((data) => {
-              localStorage.setItem('plo', JSON.stringify(data.data));
-              setPlo(
-                localStorage.getItem('plo')
-                  ? JSON.parse(localStorage.getItem('plo'))
-                  : data.data
-              );
-            });
-          } else {
-            // Tampilkan alert error
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'Terjadi kesalahan saat menghapus PLO!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
-
-  const handleDownloadSelected = () => {
-    if (selectedRows.length === 0) {
-      Swal.fire({
-        title: 'Peringatan!',
-        text: 'Tidak ada file yang dipilih!',
-        icon: 'warning',
-      });
-      return;
-    }
-
-    // Panggil fungsi downloadSelectedPlo dengan ID yang dipilih
-    downloadSelectedPlo(selectedRows);
-    Swal.fire({
-      title: 'Berhasil!',
-      text: `${selectedRows.length} file berhasil didownload!`,
-      icon: 'success',
-    });
-  };
-
   return (
     <div className='flex flex-col md:flex-row w-full'>
       <Header />
@@ -417,7 +398,7 @@ const Plo = () => {
             </div>
           </div>
           <div>
-            <DataGrid
+          {loading ? <p>Loading...</p> :<DataGrid
               rows={plo}
               columns={columns}
               checkboxSelection
@@ -450,7 +431,7 @@ const Plo = () => {
               onRowSelectionModelChange={(newSelectionModel) => {
                 setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
               }}
-            />
+            />}
           </div>
         </div>
         {/* GET PLO  */}

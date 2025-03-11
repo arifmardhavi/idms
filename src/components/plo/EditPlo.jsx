@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../Header';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Breadcrumbs, Typography } from '@mui/material';
@@ -10,12 +10,6 @@ import {
   deletePloFile,
 } from '../../services/plo.service';
 import { getUnit } from '../../services/unit.service';
-import { getCategoryByUnit } from '../../services/category.service';
-import { getTypeByCategory } from '../../services/type.service';
-import {
-  getTagnumberByType,
-  getTagnumberByTagnumber,
-} from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
 import { IconX } from '@tabler/icons-react';
 
@@ -27,108 +21,95 @@ const EditPlo = () => {
   const [IsUnit, setIsUnit] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState('');
   const [plo, setPlo] = useState({});
+  const [validation, setValidation] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getUnit((data) => {
+    fetchUnits();
+    fetchPloDetails();
+  }, [id]);
+
+  const fetchUnits = async () => {
+    try {
+      const data = await getUnit();
       setIsUnit(data.data);
-    });
-  }, []);
+    } catch (error) {
+      console.error("Error fetching units:", error);
+    }
+  };
 
-  useEffect(() => {
-    // Fetch PLO details
-    getPloById(id, (data) => {
+  const fetchPloDetails = async () => {
+    try {
+      const data = await getPloById(id);
       setPlo(data.data);
       setIsRLA(!!data.data.rla);
       setSelectedUnit(data.data.unit_id);
-    });
-  }, [id]);
+    } catch (error) {
+      console.error("Error fetching PLO details:", error);
+    }
+  };
 
-  const handleUpdatePlo = (e) => {
+  const handleUpdatePlo = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('unit_id', e.target.unit_id.value);
-    formData.append('no_certificate', e.target.no_certificate.value);
-    if (e.target.plo_certificate.files[0]) {
-      formData.append('plo_certificate', e.target.plo_certificate.files[0]);
-    }
-    // if (e.target.plo_old_certificate.files[0]) {
-    //   formData.append(
-    //     'plo_old_certificate',
-    //     e.target.plo_old_certificate.files[0]
-    //   );
-    // }
-    formData.append('issue_date', e.target.issue_date.value);
-    formData.append('overdue_date', e.target.overdue_date.value);
-    formData.append('rla', e.target.rla.value);
+    setIsSubmitting(true);
 
-    if (IsRLA) {
-      formData.append('rla_issue', e.target.rla_issue.value);
-      formData.append('rla_overdue', e.target.rla_overdue.value);
-      if (e.target.rla_certificate.files[0]) {
-        formData.append('rla_certificate', e.target.rla_certificate.files[0]);
+    try {
+      const formData = new FormData(e.target);
+      
+      if (!e.target.plo_certificate.files[0]) {
+        formData.delete("plo_certificate");
       }
-      // if (e.target.rla_old_certificate.files[0]) {
-      //   formData.append(
-      //     'rla_old_certificate',
-      //     e.target.rla_old_certificate.files[0]
-      //   );
-      // }
-    }
-
-    updatePlo(id, formData, (res) => {
+      
+      if (IsRLA && !e.target.rla_certificate.files[0]) {
+        formData.delete("rla_certificate");
+      }
+      
+      const res = await updatePlo(id, formData);
       if (res.success) {
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'PLO berhasil diperbarui!',
-          icon: 'success',
-        });
+        Swal.fire("Berhasil!", "PLO berhasil diperbarui!", "success");
         navigate('/plo');
       } else {
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'PLO gagal diperbarui!',
-          icon: 'error',
-        });
+        Swal.fire("Gagal!", "PLO gagal diperbarui!", "error");
       }
-    });
+    } catch (error) {
+      console.error("Error updating PLO:", error);
+      console.log(error.response.data.errors);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire("Error!", "Terjadi kesalahan saat memperbarui PLO!", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handledeleteFile = (file) => {
     Swal.fire({
-      title: 'Konfirmasi Hapus',
-      text: 'Apakah Anda yakin ingin menghapus file PLO ini?',
-      icon: 'warning',
+      title: "Konfirmasi Hapus",
+      text: "Apakah Anda yakin ingin menghapus file PLO ini?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Ya, Hapus',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, Hapus",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // Jika pengguna mengonfirmasi
-        console.log(file);
-        console.log(id);
-        deletePloFile(id, file, (res) => {
+        try {
+          const res = await deletePloFile(id, file);
           if (res.success) {
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'File berhasil dihapus!',
-              icon: 'success',
-            });
-            getPloById(id, (data) => {
-              setPlo(data.data);
-            });
+            Swal.fire("Berhasil!", "File berhasil dihapus!", "success");
+            fetchPloDetails();
           } else {
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'File gagal dihapus!',
-              icon: 'error',
-            });
+            Swal.fire("Gagal!", "File gagal dihapus!", "error");
           }
-        });
+        } catch (error) {
+          console.error("Error deleting file:", error);
+          Swal.fire("Error!", "Terjadi kesalahan saat menghapus file!", "error");
+        }
       }
     });
   };
+
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -179,6 +160,13 @@ const EditPlo = () => {
                         </option>
                       ))}
                     </select>
+                    {validation.unit_id && (
+                        validation.unit_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                   </div>
                 </div>
                 <div className='w-full'>
@@ -194,6 +182,13 @@ const EditPlo = () => {
                     defaultValue={plo.no_certificate}
                     required
                   />
+                  {validation.no_certificate && (
+                    validation.no_certificate.map((item, index) => (
+                      <div key={index}>
+                        <small className="text-red-600 text-sm">{item}</small>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
@@ -212,7 +207,7 @@ const EditPlo = () => {
                       {plo.plo_certificate ? (
                         <>
                           <Link
-                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${plo.plo_certificate}`}
+                            to={`${base_public_url}plo/certificates/${plo.plo_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -248,7 +243,7 @@ const EditPlo = () => {
                       {plo.plo_old_certificate ? (
                         <>
                           <Link
-                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/certificates/${plo.plo_old_certificate}`}
+                            to={`${base_public_url}plo/certificates/${plo.plo_old_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -283,6 +278,13 @@ const EditPlo = () => {
                         defaultValue={plo.issue_date}
                         required
                       />
+                      {validation.issue_date && (
+                        validation.issue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
@@ -296,6 +298,13 @@ const EditPlo = () => {
                         defaultValue={plo.overdue_date}
                         required
                       />
+                      {validation.overdue_date && (
+                        validation.overdue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div className='w-full md:w-1/3'>
@@ -313,6 +322,13 @@ const EditPlo = () => {
                       <option value='1'>Available</option>
                       <option value='0'>N/A</option>
                     </select>
+                    {validation.rla && (
+                        validation.rla.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                   </div>
                 </div>
                 {IsRLA && (
@@ -329,6 +345,13 @@ const EditPlo = () => {
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg'
                           defaultValue={plo.rla_issue}
                         />
+                        {validation.rla_issue && (
+                          validation.rla_issue.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
                       </div>
                       <div className='w-full'>
                         <label className='text-emerald-950'>
@@ -341,6 +364,13 @@ const EditPlo = () => {
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg'
                           defaultValue={plo.rla_overdue}
                         />
+                        {validation.rla_overdue && (
+                          validation.rla_overdue.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -355,12 +385,19 @@ const EditPlo = () => {
                             id='rla_certificate'
                             className='w-full px-3 py-2 border border-gray-300 rounded-lg'
                           />
+                          {validation.rla_certificate && (
+                            validation.rla_certificate.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
                         </div>
                         <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
                           {plo.rla_certificate ? (
                             <>
                               <Link
-                                to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${plo.rla_certificate}`}
+                                to={`${base_public_url}plo/rla/${plo.rla_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
                               >
@@ -396,7 +433,7 @@ const EditPlo = () => {
                           {plo.rla_old_certificate ? (
                             <>
                               <Link
-                                to={`http://ptmksmvmidmsru7.pertamina.com:4444/plo/rla/${plo.rla_old_certificate}`}
+                                to={`${base_public_url}plo/rla/${plo.rla_old_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
                               >
@@ -425,10 +462,15 @@ const EditPlo = () => {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 0.98 }}
-                  className='w-full bg-emerald-950 text-white py-2 rounded-md uppercase'
                   type='submit'
+                  className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting} // Disable tombol jika sedang submit
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Submit'}
                 </motion.button>
                 <button
                   type='button'

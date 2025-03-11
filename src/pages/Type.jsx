@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import {
@@ -23,19 +23,109 @@ const Type = () => {
   const [category, setCategory] = useState([]);
   const [editType, setEditType] = useState({});
   const [editMode, setEditMode] = useState(false);
-  const [filteredCategories, setFilteredCategories] = useState([]); // Kategori yang ditampilkan
+  const [loading, setLoading] = useState(false); // Loading state
+  const [validation, setValidation] =useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    getType((data) => {
-      localStorage.setItem('type', JSON.stringify(data.data));
+    fetchTypes();
+    fetchCategories();
+  }, []);
+
+  const fetchTypes = async () => {
+    try {
+      setLoading(true);
+      const data = await getType();
       setType(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await getCategory();
+      setCategory(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // add type
+  const handleAddType = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+
+    try {
+      await addType(data);
+      Swal.fire("Berhasil!", "Tipe berhasil ditambahkan!", "success");
+      fetchTypes();
+      event.target.reset();
+      setValidation([]);
+    } catch (error) {
+      console.log(error.response.data.errors);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire("Gagal!", "Terjadi kesalahan saat menambahkan tipe!", "error");
+    }
+    setIsSubmitting(false);
+  };
+
+  // edit type
+  const handleEdit = (row) => {
+    // Set ke mode edit
+    setEditMode(true);
+    setEditType(row);
+  };
+
+  // update Type
+  const handleUpdateType = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+
+    try {
+      await updateType(editType.id, data);
+      Swal.fire("Berhasil!", "Tipe berhasil diperbarui!", "success");
+      fetchTypes();
+      setEditMode(false);
+      setEditType(null);
+      setValidation([]);
+    } catch (error) {
+      console.log(error.response.data.errors);
+    setValidation(error.response?.data.errors || []);
+      Swal.fire("Gagal!", "Terjadi kesalahan saat memperbarui tipe!", "error");
+    }
+  };
+
+  // delete Type
+  const handleNonactive = async (type) => {
+    const confirm = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data tipe akan dinonaktifkan!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Nonaktifkan!",
+      cancelButtonText: "Batal",
     });
 
-    getCategory((data) => {
-      localStorage.setItem('category', JSON.stringify(data.data));
-      setCategory(data.data);
-    });
-  }, []);
+    if (confirm.isConfirmed) {
+      try {
+        await nonactiveType(type.id);
+        Swal.fire("Berhasil!", "Tipe berhasil dinonaktifkan!", "success");
+        fetchTypes();
+      } catch (error) {
+        console.log(error);
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menonaktifkan tipe!", "error");
+      }
+    }
+  };
 
   const columns = [
     {
@@ -115,129 +205,6 @@ const Type = () => {
       }
     />
   );
-
-  // add type
-  const handleAddType = (event) => {
-    event.preventDefault();
-    const data = {
-      type_name: event.target.type_name.value,
-      description: event.target.description.value,
-      status: event.target.status.value,
-      category_id: event.target.category.value,
-    };
-
-    addType(data, (res) => {
-      if (res.success) {
-        // Tampilkan alert sukses
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Tipe berhasil ditambahkan!',
-          icon: 'success',
-        });
-
-        // Perbarui state dan localStorage
-        getType((data) => {
-          localStorage.setItem('type', JSON.stringify(data.data));
-          setType(data.data);
-        });
-
-        // Reset form
-        event.target.reset();
-      } else {
-        // Tampilkan alert error
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'Terjadi kesalahan saat menambahkan Tipe!',
-          icon: 'error',
-        });
-      }
-    });
-  };
-
-  // edit type
-  const handleEdit = (row) => {
-    // Set ke mode edit
-    setEditMode(true);
-    setEditType(row);
-  };
-
-  // update Type
-  const handleUpdateType = (event) => {
-    event.preventDefault();
-    const data = {
-      type_name: event.target.type_name.value,
-      description: event.target.description.value,
-      status: event.target.status.value,
-      category_id: event.target.category.value,
-    };
-
-    updateType(editType.id, data, (res) => {
-      if (res.success) {
-        // Tampilkan alert sukses
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Tipe berhasil diperbarui!',
-          icon: 'success',
-        });
-
-        // Perbarui state dan localStorage
-        getType((data) => {
-          localStorage.setItem('type', JSON.stringify(data.data));
-          setType(data.data);
-        });
-
-        // Reset mode edit
-        setEditMode(false);
-        setEditType({});
-        event.target.reset();
-      } else {
-        // Tampilkan alert error
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'Terjadi kesalahan saat memperbarui tipe!',
-          icon: 'error',
-        });
-      }
-    });
-  };
-
-  // delete Type
-  const handleNonactive = (row) => {
-    Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data tipe akan Dinonaktifkan!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, Nonaktifkan!',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        nonactiveType(row.id, (res) => {
-          if (res.success) {
-            // Tampilkan alert sukses
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'Tipe berhasil Dinonaktifkan!',
-              icon: 'success',
-            });
-
-            // Perbarui state dan localStorage
-            getType((data) => {
-              localStorage.setItem('type', JSON.stringify(data.data));
-              setType(data.data);
-            });
-          } else {
-            // Tampilkan alert error
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'Terjadi kesalahan saat Menonaktifkan tipe!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
   return (
     <div className='flex flex-col md:flex-row w-full'>
       <Header />
@@ -257,7 +224,7 @@ const Type = () => {
             </motion.a>
           </div>
           <div>
-            <DataGrid
+          {loading ? <p>Loading...</p> : <DataGrid
               rows={type}
               columns={columns}
               disableColumnFilter
@@ -286,7 +253,7 @@ const Type = () => {
                 },
               }}
               pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
-            />
+            />}
           </div>
         </div>
         {/* Get Type */}
@@ -309,6 +276,13 @@ const Type = () => {
                     placeholder='Masukkan Nama Tipe...'
                     required
                   />
+                  {validation.type_name && (
+                    validation.type_name.map((item, index) => (
+                      <div key={index}>
+                        <small className="text-red-600 text-sm">{item}</small>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
@@ -334,6 +308,13 @@ const Type = () => {
                         </option>
                       )}
                     </select>
+                    {validation.category_id && (
+                      validation.category_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='status'>
@@ -347,6 +328,13 @@ const Type = () => {
                       <option value='1'>Aktif</option>
                       <option value='0'>Nonaktif</option>
                     </select>
+                    {validation.status && (
+                      validation.status.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div>
@@ -359,13 +347,25 @@ const Type = () => {
                     id='description'
                     rows={4}
                   ></textarea>
+                  {validation.description && (
+                      validation.description.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                 </div>
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 0.98 }}
-                  className='w-full bg-emerald-950 text-white py-2 rounded-md uppercase'
+                  className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting}
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </motion.button>
               </div>
             </form>
@@ -389,10 +389,7 @@ const Type = () => {
                     name='type_name'
                     id='type_name'
                     placeholder='Masukkan Nama Tipe...'
-                    value={editType.type_name || ''}
-                    onChange={(e) =>
-                      setEditType({ ...editType, type_name: e.target.value })
-                    }
+                    defaultValue={editType.type_name}
                     required
                   />
                 </div>
@@ -406,13 +403,7 @@ const Type = () => {
                       id='category'
                       className='w-full px-1 py-2 border border-gray-300 rounded-md'
                       required
-                      value={editType.category_id}
-                      onChange={(e) =>
-                        setEditType({
-                          ...editType,
-                          category_id: e.target.value,
-                        })
-                      }
+                      defaultValue={editType.category_id}
                     >
                       <option value=''>Pilih Kategori</option>
                       {category.length > 0 ? (
@@ -436,10 +427,7 @@ const Type = () => {
                       className='w-full px-1 py-2 border border-gray-300 rounded-md'
                       name='status'
                       id='status'
-                      value={editType.status || '0'}
-                      onChange={(e) =>
-                        setEditType({ ...editType, status: e.target.value })
-                      }
+                      defaultValue={editType.status}
                     >
                       <option value='1'>Aktif</option>
                       <option value='0'>Nonaktif</option>
@@ -455,20 +443,22 @@ const Type = () => {
                     name='description'
                     id='description'
                     rows={4}
-                    value={editType.description || ''}
-                    onChange={(e) =>
-                      setEditType({ ...editType, description: e.target.value })
-                    }
+                    defaultValue={editType.description}
                   ></textarea>
                 </div>
                 <div className='flex flex-row space-x-2'>
                   <motion.button
                     whileTap={{ scale: 0.8 }}
                     whileHover={{ scale: 0.98 }}
-                    className='w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase'
                     type='submit'
+                    className={`w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-emerald-950 text-white'
+                    }`}
+                    disabled={isSubmitting}
                   >
-                    Edit
+                    {isSubmitting ? 'Processing...' : 'Update'}
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.9 }}

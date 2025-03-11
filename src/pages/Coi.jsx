@@ -24,17 +24,62 @@ import { Link } from 'react-router-dom';
 const Coi = () => {
   const [coi, setCoi] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getCoi((data) => {
-      localStorage.setItem('coi', JSON.stringify(data.data));
-      setCoi(
-        localStorage.getItem('coi')
-          ? JSON.parse(localStorage.getItem('coi'))
-          : data.data
-      );
-    });
+    fetchCoi();
   }, []);
+
+  const fetchCoi = async () => {
+    try {
+      setLoading(true);
+      const data = await getCoi();
+      localStorage.setItem("coi", JSON.stringify(data.data));
+      setCoi(data.data);
+    } catch (error) {
+      console.error("Error fetching COI:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (row) => {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data COI akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await deleteCoi(row.id);
+        if (res.success) {
+          Swal.fire("Berhasil!", "COI berhasil dihapus!", "success");
+          fetchCoi();
+        } else {
+          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus COI!", "error");
+        }
+      } catch (error) {
+        console.error("Error deleting COI:", error);
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus COI!", "error");
+      }
+    }
+  };
+
+  const handleDownloadSelected = () => {
+    if (selectedRows.length === 0) {
+      Swal.fire("Peringatan!", "Tidak ada file yang dipilih!", "warning");
+      return;
+    }
+
+    downloadSelectedCoi(selectedRows);
+    Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+  };
+
 
   const columns = [
     {
@@ -58,7 +103,7 @@ const Coi = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
+            to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -126,7 +171,7 @@ const Coi = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
+            to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -143,7 +188,7 @@ const Coi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.value}`}
+              to={`${base_public_url}coi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -240,7 +285,7 @@ const Coi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
+              to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -260,7 +305,7 @@ const Coi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
+              to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -314,61 +359,6 @@ const Coi = () => {
     />
   );
 
-  const handleDelete = (row) => {
-    Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data COI akan dihapus secara permanen!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteCoi(row.id, (res) => {
-          if (res.success) {
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'COI berhasil dihapus!',
-              icon: 'success',
-            });
-            getCoi((data) => {
-              localStorage.setItem('coi', JSON.stringify(data.data));
-              setCoi(
-                localStorage.getItem('coi')
-                  ? JSON.parse(localStorage.getItem('coi'))
-                  : data.data
-              );
-            });
-          } else {
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'Terjadi kesalahan saat menghapus COI!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
-
-  const handleDownloadSelected = () => {
-    if (selectedRows.length === 0) {
-      Swal.fire({
-        title: 'Peringatan!',
-        text: 'Tidak ada file yang dipilih!',
-        icon: 'warning',
-      });
-      return;
-    }
-
-    // Panggil fungsi downloadSelectedCoi dengan ID yang dipilih
-    downloadSelectedCoi(selectedRows);
-    Swal.fire({
-      title: 'Berhasil!',
-      text: `${selectedRows.length} file berhasil didownload!`,
-      icon: 'success',
-    });
-  };
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -414,7 +404,7 @@ const Coi = () => {
             </div>
           </div>
           <div>
-            <DataGrid
+          {loading ? <p>Loading...</p> : <DataGrid
               rows={coi}
               columns={columns}
               checkboxSelection
@@ -447,7 +437,7 @@ const Coi = () => {
               onRowSelectionModelChange={(newSelectionModel) => {
                 setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
               }}
-            />
+            />}
           </div>
         </div>
       </div>

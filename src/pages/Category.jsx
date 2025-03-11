@@ -21,17 +21,92 @@ const Category = () => {
   const [category, setCategory] = useState([]);
   const [editCategory, setEditCategory] = useState({});
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [validation, setValidation] =useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    getCategory((data) => {
-      localStorage.setItem('category', JSON.stringify(data.data));
-      setCategory(
-        localStorage.getItem('category')
-          ? JSON.parse(localStorage.getItem('category'))
-          : data.data
-      );
-    });
+    fetchCategories();
   }, []);
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await getCategory();
+      setCategory(data.data);
+    }catch (err){
+      console.log(err);
+
+    }finally {
+      setLoading(false);
+    }
+  };
+
+  // add category
+  const handleAddCategory = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    try {
+      await addCategory(data);
+      Swal.fire('Berhasil!', 'Kategori berhasil ditambahkan!', 'success');
+      fetchCategories();
+      event.target.reset();
+    } catch (error) {
+      setValidation(error.response.data);
+      Swal.fire('Gagal!', 'Terjadi kesalahan saat menambahkan kategori!', 'error');
+    }
+    setIsSubmitting(false);
+  };
+
+  // edit category
+  const handleEdit = (row) => {
+    // Set ke mode edit
+    setEditMode(true);
+    setEditCategory(row);
+  };
+
+  // update category
+  const handleUpdateCategory = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+
+    try {
+      await updateCategory(editCategory.id, data);
+      Swal.fire('Berhasil!', 'Kategori berhasil diperbarui!', 'success');
+      fetchCategories();
+      setEditMode(false);
+      setEditCategory(null);
+      setValidation([]);
+    } catch (error) {
+      console.log(error.response.data.errors);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire('Gagal!', 'Terjadi kesalahan saat memperbarui kategori!', 'error');
+    }
+  };
+  // Nonaktifkan category
+  const handleNonactive = async (category) => {
+    const confirm = await Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: 'Data kategori akan dinonaktifkan!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Nonaktifkan!',
+      cancelButtonText: 'Batal',
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await nonactiveCategory(category.id);
+        Swal.fire('Berhasil!', 'Kategori berhasil dinonaktifkan!', 'success');
+        fetchCategories();
+      } catch (error) {
+        console.log(error);
+        Swal.fire('Gagal!', 'Terjadi kesalahan saat menonaktifkan kategori!', 'error');
+      }
+    }
+  };
 
   const columns = [
     {
@@ -76,7 +151,7 @@ const Category = () => {
           >
             <IconPencil stroke={2} />
           </motion.button>
-          {params.row.status == 1 ? 
+          {params.row.status == 1 && 
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
@@ -85,7 +160,7 @@ const Category = () => {
           >
             <IconCircleMinus stroke={2} />
           </motion.button>
-          : ''}
+          }
         </div>
       ),
     },
@@ -103,139 +178,6 @@ const Category = () => {
       }
     />
   );
-
-  // add category
-  const handleAddCategory = (event) => {
-    event.preventDefault();
-    const data = {
-      category_name: event.target.category_name.value,
-      description: event.target.description.value,
-      status: event.target.status.value,
-    };
-
-    addCategory(data, (res) => {
-      if (res.success) {
-        // Tampilkan alert sukses
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Kategori berhasil ditambahkan!',
-          icon: 'success',
-        });
-
-        // Perbarui state dan localStorage
-        getCategory((data) => {
-          localStorage.setItem('category', JSON.stringify(data.data));
-          setCategory(
-            localStorage.getItem('category')
-              ? JSON.parse(localStorage.getItem('category'))
-              : data.data
-          );
-        });
-
-        // Reset form
-        event.target.reset();
-      } else {
-        // Tampilkan alert error
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'Terjadi kesalahan saat menambahkan kategori!',
-          icon: 'error',
-        });
-      }
-    });
-  };
-
-  // edit category
-  const handleEdit = (row) => {
-    // Set ke mode edit
-    setEditMode(true);
-    setEditCategory(row);
-  };
-
-  // update category
-  const handleUpdateCategory = (event) => {
-    event.preventDefault();
-    const data = {
-      category_name: event.target.category_name.value,
-      description: event.target.description.value,
-      status: event.target.status.value,
-    };
-
-    updateCategory(editCategory.id, data, (res) => {
-      if (res.success) {
-        // Tampilkan alert sukses
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Kategori berhasil diperbarui!',
-          icon: 'success',
-        });
-
-        // Perbarui state dan localStorage
-        getCategory((data) => {
-          localStorage.setItem('category', JSON.stringify(data.data));
-          setCategory(
-            localStorage.getItem('category')
-              ? JSON.parse(localStorage.getItem('category'))
-              : data.data
-          );
-        });
-
-        // Reset mode edit
-        setEditMode(false);
-        setEditCategory({});
-        event.target.reset();
-      } else {
-        // Tampilkan alert error
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'Terjadi kesalahan saat memperbarui kategori!',
-          icon: 'error',
-        });
-      }
-    });
-  };
-
-  // Nonaktifkan category
-  const handleNonactive = (row) => {
-    Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data kategori akan Dinonaktifkan!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, Nonaktifkan!',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        nonactiveCategory(row.id, (res) => {
-          if (res.success) {
-            // Tampilkan alert sukses
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'Kategori berhasil Dinonakatifkan!',
-              icon: 'success',
-            });
-
-            // Perbarui state dan localStorage
-            getCategory((data) => {
-              localStorage.setItem('category', JSON.stringify(data.data));
-              setCategory(
-                localStorage.getItem('category')
-                  ? JSON.parse(localStorage.getItem('category'))
-                  : data.data
-              );
-            });
-          } else {
-            // Tampilkan alert error
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'Terjadi kesalahan saat menghapus kategori!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -256,7 +198,7 @@ const Category = () => {
             </motion.a>
           </div>
           <div>
-            <DataGrid
+          {loading ? <p>Loading...</p> : <DataGrid
               rows={category}
               columns={columns}
               disableColumnFilter
@@ -285,7 +227,7 @@ const Category = () => {
                 },
               }}
               pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
-            />
+            /> }
           </div>
         </div>
         {/* Get Category */}
@@ -312,6 +254,13 @@ const Category = () => {
                       placeholder='Masukkan Nama Kategori...'
                       required
                     />
+                    {validation.category_name && (
+                      validation.category_name.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='status'>
@@ -325,6 +274,13 @@ const Category = () => {
                       <option value='1'>Aktif</option>
                       <option value='0'>Nonaktif</option>
                     </select>
+                    {validation.status && (
+                      validation.status.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div>
@@ -341,9 +297,14 @@ const Category = () => {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 0.98 }}
-                  className='w-full bg-emerald-950 text-white py-2 rounded-md uppercase'
+                  className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting}
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </motion.button>
               </div>
             </form>
@@ -374,15 +335,16 @@ const Category = () => {
                       name='category_name'
                       id='category_name'
                       placeholder='Masukkan Nama Kategori...'
-                      value={editCategory.category_name || ''}
-                      onChange={(e) =>
-                        setEditCategory({
-                          ...editCategory,
-                          category_name: e.target.value,
-                        })
-                      }
+                      defaultValue={editCategory.category_name}
                       required
                     />
+                    {validation.category_name && (
+                      validation.category_name.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='status'>
@@ -392,17 +354,18 @@ const Category = () => {
                       className='w-full px-1 py-2 border border-gray-300 rounded-md'
                       name='status'
                       id='status'
-                      value={editCategory.status}
-                      onChange={(e) =>
-                        setEditCategory({
-                          ...editCategory,
-                          status: e.target.value,
-                        })
-                      }
+                      defaultValue={editCategory.status}
                     >
                       <option value='1'>Aktif</option>
                       <option value='0'>Nonaktif</option>
                     </select>
+                    {validation.status && (
+                      validation.status.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div>
@@ -414,23 +377,22 @@ const Category = () => {
                     name='description'
                     id='description'
                     rows={4}
-                    value={editCategory.description || ''}
-                    onChange={(e) =>
-                      setEditCategory({
-                        ...editCategory,
-                        description: e.target.value,
-                      })
-                    }
+                    defaultValue={editCategory.description}
                   ></textarea>
                 </div>
                 <div className='flex flex-row space-x-2'>
                   <motion.button
-                    whileTap={{ scale: 0.8 }}
+                    whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
-                    className='w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase'
                     type='submit'
+                    className={`w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-emerald-950 text-white'
+                    }`}
+                    disabled={isSubmitting}
                   >
-                    Edit
+                    {isSubmitting ? 'Processing...' : 'Update'}
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.9 }}

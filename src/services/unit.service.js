@@ -1,91 +1,32 @@
-import axios from "axios";
-const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
-export const getUnit = (callback) => {
-    axios
-        .get(path + "units", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+import { 
+    apiGet, 
+    apiPost, 
+    apiPut, 
+    apiDelete, 
+} from "./config";
+
+const endpoint = "units";
+
+export const getUnit = async () => {
+    return await apiGet(endpoint);
 };
 
-export const getUnitById = (id, callback) => {
-    axios
-        .get(path + `units/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+export const getUnitById = async (id) => {
+    return await apiGet(`${endpoint}/${id}`);
 };
 
-export const addUnit = (data, callback) => {
-    axios
-        .post(path + "units", data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
+export const addUnit = async (data) => {
+    return await apiPost(endpoint, data);
+};
 
-export const updateUnit = (id, data, callback) => {
-    axios
-        .put(path + `units/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
+export const updateUnit = async (id, data) => {
+    return await apiPut(`${endpoint}/${id}`, data);
+};
 
-export const deleteUnit = (id, callback) => {
-    axios
-        .delete(path + `units/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
+export const deleteUnit = async (id) => {
+    return await apiDelete(`${endpoint}/${id}`);
+};
 
-export const nonactiveUnit = (id, callback) => {
-    axios
-        .put(path + `units/nonactive/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
+export const nonactiveUnit = async (id) => {
+    return await apiPut(`${endpoint}/nonactive/${id}`, {});
+};

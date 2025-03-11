@@ -13,26 +13,154 @@ import { IconRefresh } from '@tabler/icons-react';
 
 const Tagnumber = () => {
   const [tagnumber, setTagnumber] = useState([]);
-  const [IsUnit, setIsUnit] = useState([]);
-  const [IsCategory, setIsCategory] = useState([]);
-  const [editTagnumber, setEditTagnumber] = useState({});
-  const [editMode, setEditMode] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState(''); // Untuk menyimpan unit yang dipilih
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState([]); // Tipe yang ditampilkan
+const [IsUnit, setIsUnit] = useState([]);
+const [IsCategory, setIsCategory] = useState([]);
+const [editTagnumber, setEditTagnumber] = useState({});
+const [editMode, setEditMode] = useState(false);
+const [selectedUnit, setSelectedUnit] = useState("");
+const [selectedCategory, setSelectedCategory] = useState("");
+const [filteredTypes, setFilteredTypes] = useState([]);
+const [loading, setLoading] = useState(false);
+const [validation, setValidation] = useState([]);
+const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    getTagnumber((data) => {
-      localStorage.setItem('tagnumber', JSON.stringify(data.data));
-      setTagnumber(localStorage.getItem('tagnumber') ? JSON.parse(localStorage.getItem('tagnumber')) : data.data);
-    });
-    getUnit((data) => {
-      setIsUnit(data.data);
-    });
-    getCategory((data) => {
-      setIsCategory(data.data);
-    });
-  }, []);
+useEffect(() => {
+  fetchTagnumber();
+  fetchUnits();
+  fetchCategories();
+}, []);
+
+const fetchTagnumber = async () => {
+  try {
+    setLoading(true);
+    const data = await getTagnumber();
+    setTagnumber(data.data);
+    localStorage.setItem("tagnumber", JSON.stringify(data.data));
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchUnits = async () => {
+  try {
+    setLoading(true);
+    const data = await getUnit();
+    setIsUnit(data.data);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchCategories = async () => {
+  try {
+    setLoading(true);
+    const data = await getCategory();
+    setIsCategory(data.data);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleCategoryChange = async (categoryId) => {
+  setSelectedCategory(categoryId);
+  if (!categoryId) return setFilteredTypes([]);
+
+  try {
+    const data = await getTypeByCategory(categoryId);
+    setFilteredTypes(data ? data.data : []);
+  } catch (error) {
+    console.log(error);
+    setFilteredTypes([]);
+  }
+};
+
+const handleAddTagnumber = async (event) => {
+  event.preventDefault();
+  setIsSubmitting(true);
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData);
+
+  try {
+    await addTagnumber(data);
+    Swal.fire("Berhasil!", "Tag Number berhasil ditambahkan!", "success");
+    fetchTagnumber();
+    event.target.reset();
+    setFilteredTypes([]);
+    setSelectedUnit("");
+    setSelectedCategory("");
+    setValidation([]);
+  } catch (error) {
+    console.log(error.response.data.errors);
+    setValidation(error.response?.data.errors || []);
+    Swal.fire("Gagal!", "Terjadi kesalahan saat menambahkan Tag Number!", "error");
+  }
+
+  setIsSubmitting(false);
+};
+
+const handleEdit = (row) => {
+  setEditMode(true);
+  setEditTagnumber(row);
+  setSelectedUnit(row.unit_id);
+  handleCategoryChange(row.type.category_id);
+};
+
+const handleUpdateTagnumber = async (event) => {
+  event.preventDefault();
+  setIsSubmitting(true);
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData);
+
+  try {
+    await updateTagnumber(editTagnumber.id, data);
+    Swal.fire("Berhasil!", "Tag Number berhasil diperbarui!", "success");
+    fetchTagnumber();
+    setEditMode(false);
+    setEditTagnumber({});
+    setFilteredTypes([]);
+    setSelectedUnit("");
+    setSelectedCategory("");
+    event.target.reset();
+    setValidation([]);
+  } catch (error) {
+    console.log(error.response.data.errors);
+    setValidation(error.response?.data.errors || []);
+    Swal.fire("Gagal!", "Terjadi kesalahan saat memperbarui Tag Number!", "error");
+  }
+
+  setIsSubmitting(false);
+};
+
+const handleNonactive = async (row) => {
+  const confirm = await Swal.fire({
+    title: "Apakah Anda yakin?",
+    text: "Data tag number akan dinonaktifkan!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Ya, Nonaktifkan!",
+    cancelButtonText: "Batal",
+  });
+
+  if (confirm.isConfirmed) {
+    try {
+      await nonactiveTagnumber(row.id);
+      Swal.fire("Berhasil!", "Tag Number berhasil dinonaktifkan!", "success");
+      fetchTagnumber();
+    } catch (error) {
+      console.log(error);
+      Swal.fire("Gagal!", "Terjadi kesalahan saat menonaktifkan Tag Number!", "error");
+    }
+  }
+};
+
 
   // get tag number
   const columns = [
@@ -81,176 +209,22 @@ const Tagnumber = () => {
   ];
 
   const CustomQuickFilter = () => (
-    <GridToolbarQuickFilter
-      placeholder="Cari data disini..."
-      className="text-lime-300 px-4 py-4 border outline-none"
-      quickFilterParser={(searchInput) =>
-        searchInput
-          .split(',')
-          .map((value) => value.trim())
-          .filter((value) => value !== '')
+  <GridToolbarQuickFilter
+    placeholder="Cari data disini..."
+    className="text-lime-300 px-4 py-4 border outline-none"
+    quickFilterParser={(searchInput) => {
+      if (searchInput.includes('||')) {
+        return searchInput.split('||').map(value => value.trim()).filter(value => value !== '');
+      } else {
+        return searchInput.split(',').map(value => value.trim()).filter(value => value !== '');
       }
-    />
-  );
+    }}
+  />
+);
+
   // get tag number 
 
 
-  // handle onChange input type by category
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId); // Simpan kategori yang dipilih
-    console.log("category : ", categoryId);
-    if (categoryId) {
-      // Memanggil API untuk mendapatkan tipe berdasarkan kategori
-      getTypeByCategory(categoryId, (data) => {
-        if (data === null) {
-          setFilteredTypes([]);
-          // console.log("kesana");
-        }else{
-          setFilteredTypes(data.data);
-          // console.log(data.data);
-        }
-      });
-    } else {
-      setFilteredTypes([]); // Kosongkan jika tidak ada unit dipilih
-      // console.log("kesini");
-    }
-  }
-  // handle onChange input type by category
-
-  // add tagnumber
-  const handleAddTagnumber = (event) => {
-    event.preventDefault();
-    const data = {
-      tag_number: event.target.tag_number.value,
-      description: event.target.description.value,
-      status: event.target.status.value,
-      type_id: event.target.type_id.value,
-      unit_id: event.target.unit.value,
-    };
-
-    addTagnumber(data, (res) => {
-      if (res.success) {
-        // Tampilkan alert sukses
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Tag Number berhasil ditambahkan!',
-          icon: 'success',
-        });
-
-        // Perbarui state dan localStorage
-        getTagnumber((data) => {
-          localStorage.setItem('tagnumber', JSON.stringify(data.data));
-          setTagnumber(localStorage.getItem('tagnumber') ? JSON.parse(localStorage.getItem('tagnumber')) : data.data);
-        });
-
-        // Reset form
-        setFilteredTypes([]);
-        setSelectedUnit(null);
-        setSelectedCategory(null);
-        event.target.reset();
-      } else {
-        // Tampilkan alert error
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'Terjadi kesalahan saat menambahkan Tag Number!',
-          icon: 'error',
-        });
-      }
-    });
-  };
-
-  // edit tagnumber
-  const handleEdit = (row) => {
-    // Set ke mode edit
-    setEditMode(true);
-    setEditTagnumber(row);
-    // mengambil unit id 
-    setSelectedUnit(row.unit_id);
-    // mengambil category id
-    handleCategoryChange(row.type.category_id);
-  };
-
-  // update tagnumber
-  const handleUpdateTagnumber = (event) => {
-    event.preventDefault();
-    const data = {
-      tag_number: event.target.tag_number.value,
-      description: event.target.description.value,
-      status: event.target.status.value,
-      type_id: event.target.type.value,
-      unit_id: event.target.unit.value,
-    };
-
-    updateTagnumber(editTagnumber.id, data, (res) => {
-      if (res.success) {
-        // Tampilkan alert sukses
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Tag Number berhasil diperbarui!',
-          icon: 'success',
-        });
-
-        // Perbarui state dan localStorage
-        getTagnumber((data) => {
-          localStorage.setItem('tagnumber', JSON.stringify(data.data));
-          setTagnumber(localStorage.getItem('tagnumber') ? JSON.parse(localStorage.getItem('tagnumber')) : data.data);
-        });
-
-        // Reset mode edit
-        setEditMode(false);
-        setEditTagnumber({});
-        setFilteredTypes([]);
-        setSelectedUnit(null);
-        setSelectedCategory(null);
-        event.target.reset();
-      } else {
-        // Tampilkan alert error
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'Terjadi kesalahan saat memperbarui tag number!',
-          icon: 'error',
-        });
-      }
-    });
-  };
-
-  // delete tagnumber
-  const handleNonactive = (row) => {
-    Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data tag number akan Dinonaktifkan!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, Nonaktifkan!',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        nonactiveTagnumber(row.id, (res) => {
-          if (res.success) {
-            // Tampilkan alert sukses
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'Tag Number berhasil Dinonaktifkan!',
-              icon: 'success',
-            });
-
-            // Perbarui state dan localStorage
-            getTagnumber((data) => {
-              localStorage.setItem('tagnumber', JSON.stringify(data.data));
-              setTagnumber(localStorage.getItem('tagnumber') ? JSON.parse(localStorage.getItem('tagnumber')) : data.data);
-            });
-          } else {
-            // Tampilkan alert error
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'Terjadi kesalahan saat menghapus tag number!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
 
   return (
     <div className="flex flex-col md:flex-row w-full">
@@ -271,7 +245,7 @@ const Tagnumber = () => {
               </motion.a>
             </div>
             <div>
-              <DataGrid
+            {loading ? <p>Loading...</p> :<DataGrid
                 rows={tagnumber}
                 columns={columns}
                 disableColumnFilter
@@ -295,12 +269,12 @@ const Tagnumber = () => {
                     filterModel: {
                       items: [],
                       quickFilterExcludeHiddenColumns: false,
-                      quickFilterLogicOperator: GridLogicOperator.Or,
+                      quickFilterLogicOperator: GridLogicOperator.And,
                     },
                   },
                 }}
                 pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
-              />
+              />}
             </div>
           </div>
           {/* Get Tag Number */}
@@ -323,6 +297,13 @@ const Tagnumber = () => {
                       placeholder="Masukkan Tag Number..."
                       required
                     />
+                    {validation.tag_number && (
+                    validation.tag_number.map((item, index) => (
+                      <div key={index}>
+                        <small className="text-red-600 text-sm">{item}</small>
+                      </div>
+                    ))
+                  )}
                   </div>
                   <div className='flex flex-row space-x-2'>
                     <div className='w-full'>
@@ -330,7 +311,7 @@ const Tagnumber = () => {
                         Unit<sup className='text-red-500'>*</sup>
                       </label>
                       <select
-                        name="unit"
+                        name="unit_id"
                         id="unit"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         value={selectedUnit}
@@ -344,6 +325,13 @@ const Tagnumber = () => {
                           </option>
                         ))}
                       </select>
+                      {validation.unit_id && (
+                        validation.unit_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label className="text-sm uppercase" htmlFor="category">
@@ -368,6 +356,13 @@ const Tagnumber = () => {
                             : <option value="" disabled>Tidak ada kategori</option>
                         }
                       </select>
+                      {validation.category_id && (
+                        validation.category_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div className='flex flex-row space-x-2'>
@@ -392,6 +387,13 @@ const Tagnumber = () => {
                             : <option value="" disabled>Tidak ada Tipe</option>
                         }
                       </select>
+                      {validation.type_id && (
+                        validation.type_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
@@ -403,6 +405,13 @@ const Tagnumber = () => {
                         <option value="1">Aktif</option>
                         <option value="0">Nonaktif</option>
                       </select>
+                      {validation.status && (
+                        validation.status.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div>
@@ -415,13 +424,25 @@ const Tagnumber = () => {
                       id="description"
                       rows={4}
                     ></textarea>
+                    {validation.description && (
+                        validation.description.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                   </div>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
-                    className="w-full bg-emerald-950 text-white py-2 rounded-md uppercase"
+                    className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-emerald-950 text-white'
+                    }`}
+                    disabled={isSubmitting}
                   >
-                    Submit
+                    {isSubmitting ? 'Processing...' : 'Save'}
                   </motion.button>
                 </div>
               </form>
@@ -449,6 +470,13 @@ const Tagnumber = () => {
                       onChange={(e) => setEditTagnumber({ ...editTagnumber, tag_number: e.target.value })}
                       required
                     />
+                    {validation.tag_number && (
+                      validation.tag_number.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='flex flex-row space-x-2'>
                     <div className='w-full'>
@@ -456,7 +484,7 @@ const Tagnumber = () => {
                         Unit<sup className='text-red-500'>*</sup>
                       </label>
                       <select
-                        name="unit"
+                        name="unit_id"
                         id="unit"
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         value={selectedUnit}
@@ -472,6 +500,13 @@ const Tagnumber = () => {
                           </option>
                         ))}
                       </select>
+                      {validation.unit_id && (
+                        validation.unit_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label className="text-sm uppercase" htmlFor="category">
@@ -496,6 +531,13 @@ const Tagnumber = () => {
                             : <option value="" disabled>Tidak ada kategori</option>
                         }
                       </select>
+                      {validation.category_id && (
+                        validation.category_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div className='flex flex-row space-x-2'>
@@ -522,6 +564,13 @@ const Tagnumber = () => {
                             : <option value="" disabled>Tidak ada Tipe</option>
                         }
                       </select>
+                      {validation.type_id && (
+                        validation.type_id.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
@@ -535,6 +584,13 @@ const Tagnumber = () => {
                         <option value="1">Aktif</option>
                         <option value="0">Nonaktif</option>
                       </select>
+                      {validation.status && (
+                        validation.status.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div>
@@ -549,21 +605,33 @@ const Tagnumber = () => {
                       value={editTagnumber.description || ''}
                       onChange={(e) => setEditTagnumber({ ...editTagnumber, description: e.target.value })}
                     ></textarea>
+                    {validation.description && (
+                        validation.description.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                   </div>
                   <div className='flex flex-row space-x-2' >
                     <motion.button
-                      whileTap={{ scale: 0.8 }}
+                      whileTap={{ scale: 0.9 }}
                       whileHover={{ scale: 0.98 }}
-                      className="w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase"
                       type='submit'
+                      className={`w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase ${
+                        isSubmitting
+                          ? 'bg-gray-500 cursor-not-allowed'
+                          : 'bg-emerald-950 text-white'
+                      }`}
+                      disabled={isSubmitting}
                     >
-                      Edit
+                      {isSubmitting ? 'Processing...' : 'Update'}
                     </motion.button>
                     <motion.button
                       whileTap={{ scale: 0.9 }}
                       whileHover={{ scale: 0.98 }}
                       className="w-1/5 bg-emerald-950 text-lime-300 py-2 rounded-md uppercase"
-                      onClick={() => {setSelectedUnit(''); setEditMode(false); setEditType({})}}
+                      onClick={() => {setSelectedUnit(''); setEditMode(false); setValidation([]) ;setEditTagnumber({})}}
                     >
                       batal
                     </motion.button>

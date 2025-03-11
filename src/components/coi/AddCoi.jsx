@@ -1,4 +1,3 @@
-import React from 'react';
 import Header from '../Header';
 import { Breadcrumbs, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,97 +14,111 @@ import * as motion from 'motion/react-client';
 const AddCoi = () => {
   const navigate = useNavigate();
   const [IsRLA, setIsRLA] = useState(false);
-  const [UnitId, setUnitId] = useState('');
-  const [IsPlo, setIsPlo] = useState([]);
-  const [IsCategory, setIsCategory] = useState([]);
+  const [unitId, setUnitId] = useState('');
+  const [ploList, setPloList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
   const [selectedPlo, setSelectedPlo] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [filteredTypes, setFilteredTypes] = useState([]);
   const [selectedType, setSelectedType] = useState('');
-  const [Tagnumbers, setTagnumbers] = useState([]);
+  const [TagNumbers, setTagNumbers] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validation, setValidation] = useState([]);
 
   useEffect(() => {
-    getPlo((data) => {
-      setIsPlo(data.data);
-    });
-
-    getCategory((data) => {
-      setIsCategory(data.data);
-    });
+    fetchPlo();
+    fetchCategories();
   }, []);
 
-  // handle onChange input category by unit
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId); // Simpan kategori yang dipilih
+  const fetchPlo = async () => {
+    try {
+      const data = await getPlo();
+      setPloList(data.data);
+    } catch (error) {
+      console.error("Error fetching PLO:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategory();
+      setCategoryList(data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleCategoryChange = async (categoryId) => {
+    setSelectedCategory(categoryId);
     setSelectedType('');
-    setTagnumbers([]); // Kosongkan jika ada kategori yang baru dipilih
+    setTagNumbers([]);
+    
     if (categoryId) {
-      // Memanggil API untuk mendapatkan tipe berdasarkan kategori
-      getTypeByCategory(categoryId, (data) => {
-        if (data === null) {
-          setFilteredTypes([]);
-        } else {
-          setFilteredTypes(data.data);
-        }
-      });
+      try {
+        const data = await getTypeByCategory(categoryId);
+        setFilteredTypes(data?.data || []);
+      } catch (error) {
+        console.error("Error fetching types:", error);
+        setFilteredTypes([]);
+      }
     } else {
-      setFilteredTypes([]); // Kosongkan jika tidak ada unit dipilih
+      setFilteredTypes([]);
     }
   };
 
-  // handle onChange input type by category
-  const handleTypeChange = (typeId) => {
-    setSelectedType(typeId); // Simpan tipe yang dipilih
-    if (typeId && UnitId != '') {
-      // Memanggil API untuk mendapatkan tagnumber berdasarkan tipe
-      getTagnumberByTypeUnit(typeId, UnitId, (data) => {
-        if (data === null) {
-          setTagnumbers([]);
-        } else {
-          setTagnumbers(data.data);
-        }
-      });
+  const handleTypeChange = async (typeId) => {
+    setSelectedType(typeId);
+    
+    if (typeId && unitId) {
+      try {
+        const data = await getTagnumberByTypeUnit(typeId, unitId);
+        setTagNumbers(data?.data || []);
+      } catch (error) {
+        console.error("Error fetching tag numbers:", error);
+        setTagNumbers([]);
+      }
     } else {
-      setTagnumbers([]); // Kosongkan jika tidak ada unit dipilih
+      setTagNumbers([]);
     }
   };
 
-  const handleAddCoi = (e) => {
+  const handleAddCoi = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const formData = new FormData(); // Buat instance FormData
-    formData.append('plo_id', e.target.plo_id.value);
-    formData.append('tag_number_id', e.target.tag_number_id.value);
-    formData.append('no_certificate', e.target.no_certificate.value);
-    formData.append('coi_certificate', e.target.coi_certificate.files[0]);
-    formData.append('issue_date', e.target.issue_date.value);
-    formData.append('overdue_date', e.target.overdue_date.value);
-    formData.append('rla', e.target.rla.value);
+    try {
+      const formData = new FormData();
+      formData.append('plo_id', e.target.plo_id.value);
+      formData.append('tag_number_id', e.target.tag_number_id.value);
+      formData.append('no_certificate', e.target.no_certificate.value);
+      formData.append('coi_certificate', e.target.coi_certificate.files[0]);
+      formData.append('issue_date', e.target.issue_date.value);
+      formData.append('overdue_date', e.target.overdue_date.value);
+      formData.append('rla', e.target.rla.value);
 
-    if (IsRLA) {
-      formData.append('rla_issue', e.target.rla_issue.value);
-      formData.append('rla_overdue', e.target.rla_overdue.value);
-      formData.append('rla_certificate', e.target.rla_certificate.files[0]);
-    }
+      if (IsRLA) {
+        formData.append('rla_issue', e.target.rla_issue.value);
+        formData.append('rla_overdue', e.target.rla_overdue.value);
+        formData.append('rla_certificate', e.target.rla_certificate.files[0]);
+      }
 
-    addCoi(formData, (res) => {
+      const res = await addCoi(formData);
       if (res.success) {
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'COI berhasil ditambahkan!',
-          icon: 'success',
-        });
-        // Redirect to COI page
+        Swal.fire("Berhasil!", "COI berhasil ditambahkan!", "success");
         navigate('/coi');
       } else {
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'COI gagal ditambahkan!',
-          icon: 'error',
-        });
+        setValidation(res.response?.data.errors || []);
+        Swal.fire("Gagal!", "COI gagal ditambahkan!", "error");
       }
-    });
+    } catch (error) {
+      console.error("Error adding COI:", error);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire("Error!", "Terjadi kesalahan saat menambahkan COI!", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -146,7 +159,7 @@ const AddCoi = () => {
                       onChange={(e) => {
                         setSelectedPlo(e.target.value);
                         setSelectedType('');
-                        setTagnumbers([]);
+                        setTagNumbers([]);
                         setUnitId(
                           e.target.options[e.target.selectedIndex].getAttribute(
                             'unit'
@@ -156,12 +169,19 @@ const AddCoi = () => {
                       required
                     >
                       <option value=''>Pilih Plo</option>
-                      {IsPlo.map((plo) => (
+                      {ploList.map((plo) => (
                         <option key={plo.id} value={plo.id} unit={plo.unit_id}>
                           {plo.unit.unit_name}
                         </option>
                       ))}
                     </select>
+                    {validation.plo_id && (
+                      validation.plo_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='category' className='text-emerald-950'>
@@ -175,8 +195,8 @@ const AddCoi = () => {
                       onChange={(e) => handleCategoryChange(e.target.value)}
                     >
                       <option value=''>Pilih Kategori</option>
-                      {IsCategory.length > 0 ? (
-                        IsCategory.map((category) => (
+                      {categoryList.length > 0 ? (
+                        categoryList.map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.category_name}
                           </option>
@@ -187,6 +207,13 @@ const AddCoi = () => {
                         </option>
                       )}
                     </select>
+                    {validation.category_id && (
+                      validation.category_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-row space-x-2'>
@@ -222,6 +249,13 @@ const AddCoi = () => {
                         </option>
                       )}
                     </select>
+                    {validation.type_id && (
+                      validation.type_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='tag_number' className='text-emerald-950'>
@@ -233,8 +267,8 @@ const AddCoi = () => {
                       className='w-full px-1 py-2 border border-gray-300 rounded-md'
                     >
                       <option value=''>Pilih Tag Number</option>
-                      {Tagnumbers.length > 0 ? (
-                        Tagnumbers.map((tagnumber) => (
+                      {TagNumbers.length > 0 ? (
+                        TagNumbers.map((tagnumber) => (
                           <option key={tagnumber.id} value={tagnumber.id}>
                             {tagnumber.tag_number}
                           </option>
@@ -245,6 +279,13 @@ const AddCoi = () => {
                         </option>
                       )}
                     </select>
+                    {validation.tag_number_id && (
+                      validation.tag_number_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -260,6 +301,13 @@ const AddCoi = () => {
                       className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       required
                     />
+                    {validation.no_certificate && (
+                      validation.no_certificate.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label
@@ -275,6 +323,13 @@ const AddCoi = () => {
                       className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       required
                     />
+                    {validation.coi_certificate && (
+                      validation.coi_certificate.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -290,6 +345,13 @@ const AddCoi = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         required
                       />
+                      {validation.issue_date && (
+                        validation.issue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
@@ -302,6 +364,13 @@ const AddCoi = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         required
                       />
+                      {validation.overdue_date && (
+                        validation.overdue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div className='w-full md:w-1/3'>
@@ -319,6 +388,13 @@ const AddCoi = () => {
                       <option value='0'>N/A</option>
                       <option value='1'>Available</option>
                     </select>
+                    {validation.rla && (
+                      validation.rla.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 {IsRLA && (
@@ -334,6 +410,13 @@ const AddCoi = () => {
                           id='rla_issue'
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         />
+                        {validation.rla_issue && (
+                          validation.rla_issue.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
                       </div>
                       <div className='w-full'>
                         <label htmlFor='rla_due' className='text-emerald-950'>
@@ -345,6 +428,13 @@ const AddCoi = () => {
                           id='rla_due'
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         />
+                        {validation.rla_overdue && (
+                          validation.rla_overdue.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                     <div className='w-full'>
@@ -360,6 +450,13 @@ const AddCoi = () => {
                         id='rla_certificate'
                         className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       />
+                      {validation.rla_certificate && (
+                        validation.rla_certificate.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}
@@ -368,10 +465,15 @@ const AddCoi = () => {
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   whileHover={{ scale: 0.99 }}
-                  className='w-full bg-emerald-950 text-white py-2 rounded-md uppercase'
                   type='submit'
+                  className={`w-full px-4 py-2 rounded-lg ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting} // Disable tombol jika sedang submit
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </motion.button>
                 <button
                   type='button'

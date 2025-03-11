@@ -1,134 +1,32 @@
-import axios from "axios";
-const path = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
-export const getSkhp = (callback) => {
-    axios
-        .get(path + "skhp", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-};
+import { apiGet, apiPost, apiPut, apiDelete } from "./config";
 
-export const getSkhpById = (id, callback) => {
-    axios   
-        .get(path + `skhp/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-}
+const endpoint = "skhp";
 
-export const addSkhp = (data, callback) => {
-    axios
-        .post(path + "skhp", data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
+export const getSkhp = async () => await apiGet(endpoint);
+export const getSkhpById = async (id) => await apiGet(`${endpoint}/${id}`);
+export const addSkhp = async (data) => await apiPost(endpoint, data);
+export const updateSkhp = async (id, data) => await apiPost(`${endpoint}/${id}?_method=PUT`, data);
+export const deleteSkhp = async (id) => await apiDelete(`${endpoint}/${id}`);
+export const deleteSkhpFile = async (id, data) => await apiPut(`${endpoint}/deletefile/${id}`, data);
+export const skhpCountDueDays = async () => await apiGet("skhp_countduedays");
 
-export const updateSkhp = (id, data, callback) => {
-    axios
-        .post(path + `skhp/${id}?_method=PUT`, data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
-
-export const deleteSkhp = (id, callback) => {
-    axios
-        .delete(path + `skhp/${id}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
-
-export const downloadSelectedSkhp = (selectedIds) => {
-    axios
-      .post(path + 'skhp/download', { ids: selectedIds }, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      })
-      .then((response) => {
-        const url = response.data.url;  // URL dari response backend
+export const downloadSelectedSkhp = async (selectedIds) => {
+    try {
+        const response = await apiPost(`${endpoint}/download`, { ids: selectedIds });
+        const url = response?.url;
         if (!url) {
-          alert('Gagal mendapatkan URL untuk file ZIP.');
-          return;
+            alert("Gagal mendapatkan URL untuk file ZIP.");
+            return;
         }
         
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', 'file_skhp.zip');
+        link.setAttribute("download", "file_skhp.zip");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      })
-      .catch((error) => {
+    } catch (error) {
         console.error(error);
-        alert('Gagal mendownload file skhp.');
-      });
-}
-
-export const deleteSkhpFile = (id, data, callback) => {
-    axios
-        .put(path + `skhp/deletefile/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        }) 
-        .catch((err) => {
-            console.log(err);
-        }) 
-}
-
-export const skhpCountDueDays = (callback) => {
-    axios
-        .get(path + "skhp_countduedays", {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-        })
-        .then((res) => {
-            callback(res.data);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+        alert("Gagal mendownload file SKHP.");
+    }
 };
-

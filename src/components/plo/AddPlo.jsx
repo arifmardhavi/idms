@@ -1,4 +1,3 @@
-import React from 'react';
 import Header from '../Header';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -7,9 +6,6 @@ import { IconChevronRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { addPlo } from '../../services/plo.service';
 import { getUnit } from '../../services/unit.service';
-import { getCategory } from '../../services/category.service';
-import { getTypeByCategory } from '../../services/type.service';
-import { getTagnumberByType } from '../../services/tagnumber.service';
 import Swal from 'sweetalert2';
 
 const AddPlo = () => {
@@ -17,48 +13,60 @@ const AddPlo = () => {
   const [IsRLA, setIsRLA] = useState(false);
   const [IsUnit, setIsUnit] = useState([]);
   const [selectedUnit, setSelectedUnit] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validation, setValidation] = useState([]);
 
   useEffect(() => {
-    getUnit((data) => {
-      setIsUnit(data.data);
-    });
+    fetchUnits();
   }, []);
 
-  const handleAddPlo = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(); // Buat instance FormData
-    formData.append('unit_id', e.target.unit_id.value);
-    formData.append('no_certificate', e.target.no_certificate.value);
-    formData.append('plo_certificate', e.target.plo_certificate.files[0]);
-    formData.append('issue_date', e.target.issue_date.value);
-    formData.append('overdue_date', e.target.overdue_date.value);
-    formData.append('rla', e.target.rla.value);
-
-    if (IsRLA) {
-      formData.append('rla_issue', e.target.rla_issue.value);
-      formData.append('rla_overdue', e.target.rla_overdue.value);
-      formData.append('rla_certificate', e.target.rla_certificate.files[0]);
+  const fetchUnits = async () => {
+    try {
+      const data = await getUnit();
+      setIsUnit(data.data);
+    } catch (error) {
+      console.error("Error fetching units:", error);
     }
+  };
 
-    addPlo(formData, (res) => {
+  const handleAddPlo = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('unit_id', e.target.unit_id.value);
+      formData.append('no_certificate', e.target.no_certificate.value);
+      formData.append('plo_certificate', e.target.plo_certificate.files[0]);
+      formData.append('issue_date', e.target.issue_date.value);
+      formData.append('overdue_date', e.target.overdue_date.value);
+      formData.append('rla', e.target.rla.value);
+
+      if (IsRLA) {
+        formData.append('rla_issue', e.target.rla_issue.value);
+        formData.append('rla_overdue', e.target.rla_overdue.value);
+        formData.append('rla_certificate', e.target.rla_certificate.files[0]);
+      }
+
+      const res = await addPlo(formData);
       if (res.success) {
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'PLO berhasil ditambahkan!',
-          icon: 'success',
-        });
-        // Redirect to PLO page
+        Swal.fire("Berhasil!", "PLO berhasil ditambahkan!", "success");
         navigate('/plo');
       } else {
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'PLO gagal ditambahkan!',
-          icon: 'error',
-        });
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+        Swal.fire("Gagal!", "PLO gagal ditambahkan!", "error");
       }
-    });
+    } catch (error) {
+      console.error("Error adding PLO:", error);
+      console.log(error.response.data.errors);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire("Error!", "Terjadi kesalahan saat menambahkan PLO!", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -150,6 +158,13 @@ const AddPlo = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         required
                       />
+                      {validation.overdue_date && (
+                        validation.overdue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -165,6 +180,13 @@ const AddPlo = () => {
                       className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       required
                     />
+                    {validation.plo_certificate && (
+                      validation.plo_certificate.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label className='text-emerald-950' htmlFor='rla'>
@@ -196,6 +218,13 @@ const AddPlo = () => {
                           id='rla_issue'
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         />
+                        {validation.rla_issue && (
+                          validation.rla_issue.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
                       </div>
                       <div className='w-full'>
                         <label htmlFor='rla_due' className='text-emerald-950'>
@@ -207,6 +236,13 @@ const AddPlo = () => {
                           id='rla_due'
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         />
+                        {validation.rla_overdue && (
+                          validation.rla_overdue.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                     <div className='w-full'>
@@ -219,14 +255,26 @@ const AddPlo = () => {
                         id='rla_certificate'
                         className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       />
+                      {validation.rla_certificate && (
+                        validation.rla_certificate.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}
                 <button
                   type='submit'
-                  className='w-full bg-emerald-950 text-white px-4 py-2 rounded-lg'
+                  className={`w-full px-4 py-2 rounded-lg ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting} // Disable tombol jika sedang submit
                 >
-                  Save
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </button>
               </div>
             </form>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
@@ -12,22 +12,25 @@ const Unit = () => {
   const [unit, setUnit] = useState([]);
   const [editUnit, setEditUnit] = useState({});
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
+  const [validation, setValidation] =useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    getUnit((data) => {
-      // console.log(data.data);
-      setUnit(data.data);
-      localStorage.setItem('unit', JSON.stringify(data.data));
-    });
+    fetchUnits();
   }, []);
 
-  const gettingUnit = () => {
-    getUnit((data) => {
-      // console.log(data.data);
+  const fetchUnits = async () => {
+    try {
+      setLoading(true);
+      const data = await getUnit();
       setUnit(data.data);
-      localStorage.setItem('unit', JSON.stringify(data.data));
-    });
-  }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     { field: 'unit_name', headerName: 'Nama Unit',  renderCell: (params) => <div className="py-4">{params.value}</div> },
@@ -91,38 +94,24 @@ const Unit = () => {
   );
 
   // add unit
-const handleAddUnit = (event) => {
-  event.preventDefault();
-  const data = {
-    unit_name: event.target.unit_name.value,
-    unit_type: event.target.unit_type.value,
-    description: event.target.description.value,
-    status: event.target.status.value,
-  };
-
-  addUnit(data, (res) => {
-    if (res.success) {
-      // Tampilkan alert sukses
-      Swal.fire({
-        title: 'Berhasil!',
-        text: 'Unit berhasil ditambahkan!',
-        icon: 'success',
-      });
-
-      gettingUnit();
-
-      // Reset form
+  const handleAddUnit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    try {
+      await addUnit(data);
+      Swal.fire('Berhasil!', 'Unit berhasil ditambahkan!', 'success');
+      fetchUnits();
       event.target.reset();
-    } else {
-      // Tampilkan alert error
-      Swal.fire({
-        title: 'Gagal!',
-        text: 'Terjadi kesalahan saat menambahkan unit!',
-        icon: 'error',
-      });
+      setValidation([]);
+    } catch (error) {
+      console.log(error.response.data.errors);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire('Gagal!', 'Terjadi kesalahan saat menambahkan unit!', 'error');
     }
-  });
-};
+    setIsSubmitting(false);
+  };
 
 // edit unit
 const handleEdit = (row) => {
@@ -132,74 +121,47 @@ const handleEdit = (row) => {
 };
 
 // update unit
-const handleUpdateUnit = (event) => {
+const handleUpdateUnit = async (event) => {
   event.preventDefault();
-  const data = {
-    unit_name: event.target.unit_name.value,
-    unit_type: event.target.unit_type.value,
-    description: event.target.description.value,
-    status: event.target.status.value,
-  };
-
-  updateUnit(editUnit.id, data, (res) => {
-    if (res.success) {
-      // Tampilkan alert sukses
-      Swal.fire({
-        title: 'Berhasil!',
-        text: 'Unit berhasil diperbarui!',
-        icon: 'success',
-      });
-
-      gettingUnit();
-
-      // Reset mode edit
-      setEditMode(false);
-      setEditUnit({});
-      event.target.reset();
-    } else {
-      // Tampilkan alert error
-      Swal.fire({
-        title: 'Gagal!',
-        text: 'Terjadi kesalahan saat memperbarui unit!',
-        icon: 'error',
-      });
-    }
-  });
+  setIsSubmitting(true);
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData);
+  try {
+    await updateUnit(editUnit.id, data);
+    Swal.fire('Berhasil!', 'Unit berhasil diperbarui!', 'success');
+    fetchUnits();
+    setEditMode(false);
+    setEditUnit(null);
+    setValidation([]);
+  } catch (error) {
+    console.log(error.response.data.errors);
+    setValidation(error.response?.data.errors || []);
+    Swal.fire('Gagal!', 'Terjadi kesalahan saat memperbarui unit!', 'error');
+  }
+  setIsSubmitting(false);
 };
 
 // Nonaktifkan unit
-const handleNonactive = (row) => {
-  Swal.fire({
+const handleNonactive = async (unit) => {
+  const confirm = await Swal.fire({
     title: 'Apakah Anda yakin?',
-    text: 'Data unit akan Dinonaktifkan!',
+    text: 'Data unit akan dinonaktifkan!',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonText: 'Ya, Nonaktifkan!',
     cancelButtonText: 'Batal',
-  }).then((result) => {
-    if (result.isConfirmed) {
-      nonactiveUnit(row.id, (res) => {
-        if (res.success) {
-          // Tampilkan alert sukses
-          Swal.fire({
-            title: 'Berhasil!',
-            text: 'Unit berhasil Dinonaktifkan!',
-            icon: 'success',
-          });
-
-          // Perbarui state dan localStorage
-          gettingUnit();
-        } else {
-          // Tampilkan alert error
-          Swal.fire({
-            title: 'Gagal!',
-            text: 'Terjadi kesalahan saat Menonaktifkan unit!',
-            icon: 'error',
-          });
-        }
-      });
-    }
   });
+
+  if (confirm.isConfirmed) {
+    try {
+      await nonactiveUnit(unit.id);
+      Swal.fire('Berhasil!', 'Unit berhasil dinonaktifkan!', 'success');
+      fetchUnits();
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Gagal!', 'Terjadi kesalahan saat menonaktifkan unit!', 'error');
+    }
+  }
 };
 
   return (
@@ -221,7 +183,7 @@ const handleNonactive = (row) => {
             </motion.a>
           </div>
           <div>
-            <DataGrid
+          {loading ? <p>Loading...</p> : <DataGrid
               rows={unit}
               columns={columns}
               disableColumnFilter
@@ -250,7 +212,7 @@ const handleNonactive = (row) => {
                 },
               }}
               pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
-            />
+            />}
           </div>
         </div>
         {/* Get Unit */}
@@ -274,6 +236,13 @@ const handleNonactive = (row) => {
                       placeholder="Masukkan Nama Unit..."
                       required
                     />
+                    {validation.unit_name && (
+                      validation.unit_name.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full flex flex-row space-x-2'>
                     <div className='w-full'>
@@ -288,6 +257,13 @@ const handleNonactive = (row) => {
                         <option value="0">Instalasi</option>
                         <option value="1">Pipa Penyalur</option>
                       </select>
+                      {validation.unit_type && (
+                        validation.unit_type.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
@@ -299,6 +275,13 @@ const handleNonactive = (row) => {
                         <option value="1">Aktif</option>
                         <option value="0">Nonaktif</option>
                       </select>
+                      {validation.status && (
+                        validation.status.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -316,9 +299,14 @@ const handleNonactive = (row) => {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 0.98 }}
-                  className="w-full bg-emerald-950 text-white py-2 rounded-md uppercase"
+                  className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting}
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </motion.button>
               </div>
             </form>
@@ -343,10 +331,16 @@ const handleNonactive = (row) => {
                       name="unit_name"
                       id="unit_name"
                       placeholder="Masukkan Nama Unit..." 
-                      value={editUnit.unit_name}
-                      onChange={(e) => setEditUnit({ ...editUnit, unit_name: e.target.value })}
+                      defaultValue={editUnit.unit_name}
                       required
                     />
+                    {validation.unit_name && (
+                      validation.unit_name.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full flex flex-row space-x-2'>
                     <div className='w-full'>
@@ -357,12 +351,18 @@ const handleNonactive = (row) => {
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         name="unit_type"
                         id="unit_type"
-                        value={editUnit.unit_type}
-                        onChange={(e) => setEditUnit({ ...editUnit, unit_type: e.target.value })}
+                        defaultValue={editUnit.unit_type}
                       >
                         <option value="0">Instalasi</option>
                         <option value="1">Pipa Penyalur</option>
                       </select>
+                      {validation.unit_type && (
+                        validation.unit_type.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
@@ -370,12 +370,18 @@ const handleNonactive = (row) => {
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         name="status"
                         id="status"
-                        value={editUnit.status}
-                        onChange={(e) => setEditUnit({ ...editUnit, status: e.target.value })}
+                        defaultValue={editUnit.status}
                       >
                         <option value="1">Aktif</option>
                         <option value="0">Nonaktif</option>
                       </select>
+                      {validation.status && (
+                        validation.status.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -388,24 +394,35 @@ const handleNonactive = (row) => {
                     name="description"
                     id="description"
                     rows={4}
-                    value={editUnit.description}
-                    onChange={(e) => setEditUnit({ ...editUnit, description: e.target.value })}
+                    defaultValue={editUnit.description}
                   ></textarea>
+                  {validation.description && (
+                    validation.description.map((item, index) => (
+                      <div key={index}>
+                        <small className="text-red-600 text-sm">{item}</small>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div className='flex flex-row space-x-2' >
                   <motion.button
                     whileTap={{ scale: 0.8 }}
                     whileHover={{ scale: 0.98 }}
-                    className="w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase"
                     type='submit'
+                    className={`w-4/5 bg-lime-400 text-emerald-950 py-2 rounded-md uppercase ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-emerald-950 text-white'
+                    }`}
+                    disabled={isSubmitting}
                   >
-                    Edit
+                    {isSubmitting ? 'Processing...' : 'Update'}
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
                     className="w-1/5 bg-emerald-950 text-lime-300 py-2 rounded-md uppercase"
-                    onClick={() => {setEditMode(false); setEditCategory({})}}
+                    onClick={() => {setEditMode(false); setEditUnit({})}}
                   >
                     batal
                   </motion.button>
