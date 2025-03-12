@@ -24,17 +24,61 @@ import { Link } from 'react-router-dom';
 const Skhp = () => {
   const [skhp, setSkhp] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getSkhp((data) => {
-      localStorage.setItem('skhp', JSON.stringify(data.data));
-      setSkhp(
-        localStorage.getItem('skhp')
-          ? JSON.parse(localStorage.getItem('skhp'))
-          : data.data
-      );
-    });
+    fetchSkhp();
   }, []);
+
+  const fetchSkhp = async () => {
+    try {
+      setLoading(true);
+      const data = await getSkhp();
+      setSkhp(data.data);
+    } catch (error) {
+      console.error("Error fetching SKHP:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (row) => {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data SKHP akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const res = await deleteSkhp(row.id);
+        if (res.success) {
+          Swal.fire("Berhasil!", "SKHP berhasil dihapus!", "success");
+          fetchSkhp();
+        } else {
+          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus SKHP!", "error");
+        }
+      } catch (error) {
+        console.error("Error deleting SKHP:", error);
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus SKHP!", "error");
+      }
+    }
+  };
+
+  const handleDownloadSelected = () => {
+    if (selectedRows.length === 0) {
+      Swal.fire("Peringatan!", "Tidak ada file yang dipilih!", "warning");
+      return;
+    }
+
+    downloadSelectedSkhp(selectedRows);
+    Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+  };
+
 
   const columns = [
     {
@@ -51,7 +95,7 @@ const Skhp = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.row.file_skhp}`}
+            to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -119,7 +163,7 @@ const Skhp = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.row.file_skhp}`}
+            to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -136,7 +180,7 @@ const Skhp = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.value}`}
+              to={`${base_public_url}skhp/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -190,62 +234,6 @@ const Skhp = () => {
     />
   );
 
-  const handleDelete = (row) => {
-    Swal.fire({
-      title: 'Apakah Anda yakin?',
-      text: 'Data SKHP akan dihapus secara permanen!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteSkhp(row.id, (res) => {
-          if (res.success) {
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'Skhp berhasil dihapus!',
-              icon: 'success',
-            });
-            getSkhp((data) => {
-              localStorage.setItem('skhp', JSON.stringify(data.data));
-              setSkhp(
-                localStorage.getItem('skhp')
-                  ? JSON.parse(localStorage.getItem('skhp'))
-                  : data.data
-              );
-            });
-          } else {
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'Terjadi kesalahan saat menghapus skhp!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
-
-  const handleDownloadSelected = () => {
-    if (selectedRows.length === 0) {
-      Swal.fire({
-        title: 'Peringatan!',
-        text: 'Tidak ada file yang dipilih!',
-        icon: 'warning',
-      });
-      return;
-    }
-
-    // Panggil fungsi downloadSelectedskhp dengan ID yang dipilih
-    downloadSelectedSkhp(selectedRows);
-    Swal.fire({
-      title: 'Berhasil!',
-      text: `${selectedRows.length} file berhasil didownload!`,
-      icon: 'success',
-    });
-  };
-
   return (
     <div className='flex flex-col md:flex-row w-full'>
       <Header />
@@ -290,7 +278,7 @@ const Skhp = () => {
             </div>
           </div>
           <div>
-            <DataGrid
+          {loading ? <p>Loading...</p> : <DataGrid
               rows={skhp}
               columns={columns}
               checkboxSelection
@@ -323,7 +311,7 @@ const Skhp = () => {
               onRowSelectionModelChange={(newSelectionModel) => {
                 setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
               }}
-            />
+            />}
           </div>
         </div>
       </div>

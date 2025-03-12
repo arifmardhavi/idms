@@ -36,6 +36,7 @@ const EditCoi = () => {
   const [Tagnumbers, setTagNumbers] = useState([]);
   const [coi, setCoi] = useState({});
   const [validation, setValidation] = useState([]);
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
   
   useEffect(() => {
     fetchPlo();
@@ -389,7 +390,7 @@ const EditCoi = () => {
                         {coi.coi_certificate ? (
                           <>
                             <Link
-                              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${coi.coi_certificate}`}
+                              to={`${base_public_url}coi/certificates/${coi.coi_certificate}`}
                               target='_blank'
                               className='text-emerald-950 hover:underline cursor-pointer'
                             >
@@ -425,7 +426,7 @@ const EditCoi = () => {
                         {coi.coi_old_certificate ? (
                           <>
                             <Link
-                              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${coi.coi_old_certificate}`}
+                              to={`${base_public_url}coi/certificates/${coi.coi_old_certificate}`}
                               target='_blank'
                               className='text-emerald-950 hover:underline cursor-pointer'
                             >
@@ -579,7 +580,7 @@ const EditCoi = () => {
                             {coi.rla_certificate ? (
                               <>
                                 <Link
-                                  to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${coi.rla_certificate}`}
+                                  to={`${base_public_url}coi/rla/${coi.rla_certificate}`}
                                   target='_blank'
                                   className='text-emerald-950 hover:underline cursor-pointer'
                                 >
@@ -615,7 +616,7 @@ const EditCoi = () => {
                             {coi.rla_old_certificate ? (
                               <>
                                 <Link
-                                  to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${coi.rla_old_certificate}`}
+                                  to={`${base_public_url}coi/rla/${coi.rla_old_certificate}`}
                                   target='_blank'
                                   className='text-emerald-950 hover:underline cursor-pointer'
                                 >

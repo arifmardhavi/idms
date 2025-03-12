@@ -35,7 +35,6 @@ const Coi = () => {
     try {
       setLoading(true);
       const data = await getCoi();
-      localStorage.setItem("coi", JSON.stringify(data.data));
       setCoi(data.data);
     } catch (error) {
       console.error("Error fetching COI:", error);
@@ -153,7 +152,7 @@ const Coi = () => {
               className={`${
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
@@ -266,7 +265,7 @@ const Coi = () => {
                 ? 'text-emerald-950'
                 : diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}

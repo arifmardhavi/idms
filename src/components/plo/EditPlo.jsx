@@ -23,7 +23,7 @@ const EditPlo = () => {
   const [plo, setPlo] = useState({});
   const [validation, setValidation] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_SERVER_URL;
 
   useEffect(() => {
     fetchUnits();

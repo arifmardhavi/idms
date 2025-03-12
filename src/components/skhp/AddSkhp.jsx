@@ -13,91 +13,104 @@ import * as motion from 'motion/react-client';
 
 const AddSkhp = () => {
   const navigate = useNavigate();
-  const [UnitId, setUnitId] = useState('');
-  const [IsPlo, setIsPlo] = useState([]);
-  const [IsCategory, setIsCategory] = useState([]);
+  const [unitId, setUnitId] = useState('');
+  const [ploList, setPloList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
   const [selectedPlo, setSelectedPlo] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [filteredTypes, setFilteredTypes] = useState([]);
   const [selectedType, setSelectedType] = useState('');
   const [Tagnumbers, setTagnumbers] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validation, setValidation] = useState([]);
 
   useEffect(() => {
-    getPlo((data) => {
-      setIsPlo(data.data);
-    });
-
-    getCategory((data) => {
-      setIsCategory(data.data);
-    });
+    fetchPlo();
+    fetchCategories();
   }, []);
 
-  // handle onChange input category by unit
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId); // Simpan kategori yang dipilih
+  const fetchPlo = async () => {
+    try {
+      const data = await getPlo();
+      setPloList(data.data);
+    } catch (error) {
+      console.error("Error fetching PLO:", error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategory();
+      setCategoryList(data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleCategoryChange = async (categoryId) => {
+    setSelectedCategory(categoryId);
     setSelectedType('');
-    setTagnumbers([]); // Kosongkan jika ada kategori yang baru dipilih
-    if (categoryId) {
-      // Memanggil API untuk mendapatkan tipe berdasarkan kategori
-      getTypeByCategory(categoryId, (data) => {
-        if (data === null) {
-          setFilteredTypes([]);
-        } else {
-          setFilteredTypes(data.data);
-        }
-      });
-    } else {
-      setFilteredTypes([]); // Kosongkan jika tidak ada unit dipilih
-    }
-  };
-
-  // handle onChange input type by category
-  const handleTypeChange = (typeId) => {
-    setSelectedType(typeId); // Simpan tipe yang dipilih
-    if (typeId && UnitId != '') {
-      // Memanggil API untuk mendapatkan tagnumber berdasarkan tipe
-      getTagnumberByTypeUnit(typeId, UnitId, (data) => {
-        if (data === null) {
-          setTagnumbers([]);
-        } else {
-          setTagnumbers(data.data);
-        }
-      });
-    } else {
-      setTagnumbers([]); // Kosongkan jika tidak ada unit dipilih
-    }
-  };
-
-  const handleAddSkhp = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(); // Buat instance FormData
-    formData.append('plo_id', e.target.plo_id.value);
-    formData.append('tag_number_id', e.target.tag_number_id.value);
-    formData.append('no_skhp', e.target.no_skhp.value);
-    formData.append('file_skhp', e.target.file_skhp.files[0]);
-    formData.append('issue_date', e.target.issue_date.value);
-    formData.append('overdue_date', e.target.overdue_date.value);
+    setTagnumbers([]);
     
+    if (categoryId) {
+      try {
+        const data = await getTypeByCategory(categoryId);
+        setFilteredTypes(data?.data || []);
+      } catch (error) {
+        console.error("Error fetching types:", error);
+        setFilteredTypes([]);
+      }
+    } else {
+      setFilteredTypes([]);
+    }
+  };
 
-    addSkhp(formData, (res) => {
+  const handleTypeChange = async (typeId) => {
+    setSelectedType(typeId);
+    
+    if (typeId && unitId) {
+      try {
+        const data = await getTagnumberByTypeUnit(typeId, unitId);
+        setTagnumbers(data?.data || []);
+      } catch (error) {
+        console.error("Error fetching tag numbers:", error);
+        setTagnumbers([]);
+      }
+    } else {
+      setTagnumbers([]);
+    }
+  };
+
+  const handleAddSkhp = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('plo_id', e.target.plo_id.value);
+      formData.append('tag_number_id', e.target.tag_number_id.value);
+      formData.append('no_skhp', e.target.no_skhp.value);
+      formData.append('file_skhp', e.target.file_skhp.files[0]);
+      formData.append('issue_date', e.target.issue_date.value);
+      formData.append('overdue_date', e.target.overdue_date.value);
+
+      const res = await addSkhp(formData);
       if (res.success) {
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'SKHP berhasil ditambahkan!',
-          icon: 'success',
-        });
-        // Redirect to SKHP page
+        Swal.fire("Berhasil!", "SKHP berhasil ditambahkan!", "success");
         navigate('/skhp');
       } else {
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'SKHP gagal ditambahkan!',
-          icon: 'error',
-        });
+        setValidation(res.response?.data.errors || []);
+        Swal.fire("Gagal!", "SKHP gagal ditambahkan!", "error");
       }
-    });
+    } catch (error) {
+      console.error("Error adding SKHP:", error);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire("Error!", "Terjadi kesalahan saat menambahkan SKHP!", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -148,12 +161,19 @@ const AddSkhp = () => {
                       required
                     >
                       <option value=''>Pilih Plo</option>
-                      {IsPlo.map((plo) => (
+                      {ploList.map((plo) => (
                         <option key={plo.id} value={plo.id} unit={plo.unit_id}>
                           {plo.unit.unit_name}
                         </option>
                       ))}
                     </select>
+                    {validation.plo_id && (
+                      validation.plo_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='category' className='text-emerald-950'>
@@ -167,8 +187,8 @@ const AddSkhp = () => {
                       onChange={(e) => handleCategoryChange(e.target.value)}
                     >
                       <option value=''>Pilih Kategori</option>
-                      {IsCategory.length > 0 ? (
-                        IsCategory.map((category) => (
+                      {categoryList.length > 0 ? (
+                        categoryList.map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.category_name}
                           </option>
@@ -237,6 +257,13 @@ const AddSkhp = () => {
                         </option>
                       )}
                     </select>
+                    {validation.tag_number_id && (
+                      validation.tag_number_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -252,6 +279,13 @@ const AddSkhp = () => {
                       className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       required
                     />
+                    {validation.no_skhp && (
+                      validation.no_skhp.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label
@@ -267,6 +301,13 @@ const AddSkhp = () => {
                       className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       required
                     />
+                    {validation.file_skhp && (
+                      validation.file_skhp.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -282,6 +323,13 @@ const AddSkhp = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         required
                       />
+                      {validation.issue_date && (
+                        validation.issue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
@@ -294,6 +342,13 @@ const AddSkhp = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         required
                       />
+                      {validation.overdue_date && (
+                        validation.overdue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -302,10 +357,15 @@ const AddSkhp = () => {
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   whileHover={{ scale: 0.99 }}
-                  className='w-full bg-emerald-950 text-white py-2 rounded-md uppercase'
                   type='submit'
+                  className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting} // Disable tombol jika sedang submit
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </motion.button>
                 <button
                   type='button'

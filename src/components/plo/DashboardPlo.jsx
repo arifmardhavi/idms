@@ -15,19 +15,36 @@ const DashboardPlo = () => {
 
   const [plo, setPlo] = useState([]);
   const [countplo, setCountPlo] = useState({});
+  const [loading, setLoading] = useState(false);
   const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getPlo((data) => {
-      localStorage.setItem("plo", JSON.stringify(data.data));
-      setPlo(data.data || []);
-    });
-
-    ploCountDueDays((data) => {
-      localStorage.setItem("countplo", JSON.stringify(data.data));
-      setCountPlo(data.data || {});
-    });
+    fetchPlo();
+    fetchPloCountDueDays();
   }, []);
+
+  const fetchPlo = async () => {
+    try {
+      setLoading(true);
+      const data = await getPlo();
+      setPlo(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchPloCountDueDays = async () => {
+    try {
+      setLoading(true);
+      const data = await ploCountDueDays();
+      setCountPlo(data.data);
+    } catch (error) {
+      console.error("Error fetching COI:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -96,9 +113,9 @@ const DashboardPlo = () => {
               className={`${
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
-                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
+                : diffDays < 272
+                ? 'bg-yellow-400 text-black' // Kurang dari 9 bulan
+                : 'bg-emerald-950 text-white' // Lebih dari 9 bulan
               } rounded-full w-fit p-2`}
             >
               {diffDays}
@@ -209,7 +226,7 @@ const DashboardPlo = () => {
                 ? 'text-emerald-950'
                 : diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
@@ -336,6 +353,7 @@ const DashboardPlo = () => {
         </Breadcrumbs>
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+        {loading ? <p>Loading...</p> : (
           <div className='flex flex-col md:flex-row justify-evenly'>
             <div className="flex flex-col items-center">
               <span>PLO</span>
@@ -382,11 +400,12 @@ const DashboardPlo = () => {
               />
             </div>
           </div>
+        )}
         </div>
         {/* TABLE PLO */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-            <DataGrid
+          {loading ? <p>Loading...</p> :<DataGrid
               rows={plo}
               columns={columns}
               // checkboxSelection
@@ -417,7 +436,7 @@ const DashboardPlo = () => {
               }}
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
-            />
+            /> }
           </div>
         </div>
       </div>

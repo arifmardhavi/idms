@@ -15,18 +15,42 @@ import { getSkhp, skhpCountDueDays } from "../../services/skhp.service";
 const DashboardSkhp = () => {
   const [skhp, setSkhp] = useState([]);
   const [countskhp, setCountSkhp] = useState({});
+  const [loading, setLoading] = useState(false);
+  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getSkhp((data) => {
-      localStorage.setItem("skhp", JSON.stringify(data.data));
-      setSkhp(data.data || []);
-    });
+    fetchSkhp();
+    fetchSkhpCountDueDays();
 
     skhpCountDueDays((data) => {
       localStorage.setItem("countskhp", JSON.stringify(data.data));
       setCountSkhp(data.data || {});
     });
   }, []);
+
+  const fetchSkhp = async () => {
+    try {
+      setLoading(true);
+      const data = await getSkhp();
+      setSkhp(data.data);
+    } catch (error) {
+      console.error("Error fetching SKHP:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSkhpCountDueDays = async () => {
+      try {
+        setLoading(true);
+        const data = await skhpCountDueDays();
+        setCountSkhp(data.data);
+      } catch (error) {
+        console.error("Error fetching COI:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const columns = [
     {
@@ -50,7 +74,7 @@ const DashboardSkhp = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.row.file_skhp}`}
+            to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -118,7 +142,7 @@ const DashboardSkhp = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.row.file_skhp}`}
+            to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -135,7 +159,7 @@ const DashboardSkhp = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${params.value}`}
+              to={`${base_public_url}skhp/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -208,7 +232,7 @@ const DashboardSkhp = () => {
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-col md:flex-row justify-evenly'>
-            <div className="flex flex-col items-center">
+          {loading ? <p>Loading...</p> : ( <div className="flex flex-col items-center">
               <span>SKHP</span>
               <PieChart
                 series={[
@@ -229,13 +253,13 @@ const DashboardSkhp = () => {
                 }}
                 {...sizingskhp}
               />
-            </div>
+            </div> )}
           </div>
         </div>
         {/* TABLE skhp */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-            <DataGrid
+          {loading ? <p>Loading...</p> : <DataGrid
               rows={skhp}
               columns={columns}
               // checkboxSelection
@@ -266,7 +290,7 @@ const DashboardSkhp = () => {
               }}
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
-            />
+            /> }
           </div>
         </div>
       </div>

@@ -15,18 +15,36 @@ import { getCoi, coiCountDueDays } from "../../services/coi.service";
 const DashboardCoi = () => {
   const [coi, setCoi] = useState([]);
   const [countcoi, setCountCoi] = useState({});
+  const [loading, setLoading] = useState(false);
+    const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
   useEffect(() => {
-    getCoi((data) => {
-      localStorage.setItem("coi", JSON.stringify(data.data));
-      setCoi(data.data || []);
-    });
-
-    coiCountDueDays((data) => {
-      localStorage.setItem("countcoi", JSON.stringify(data.data));
-      setCountCoi(data.data || {});
-    });
+    fetchCoi();
+    fetchCoiCountDueDays();
   }, []);
+
+  const fetchCoi = async () => {
+    try {
+      setLoading(true);
+      const data = await getCoi();
+      setCoi(data.data);
+    } catch (error) {
+      console.error("Error fetching COI:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchCoiCountDueDays = async () => {
+    try {
+      setLoading(true);
+      const data = await coiCountDueDays();
+      setCountCoi(data.data);
+    } catch (error) {
+      console.error("Error fetching COI:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns = [
     {
@@ -50,7 +68,7 @@ const DashboardCoi = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
+            to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
           >
@@ -100,7 +118,7 @@ const DashboardCoi = () => {
               className={`${
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
@@ -118,7 +136,7 @@ const DashboardCoi = () => {
       renderCell: (params) => (
         <div className='py-4'>
           <Link
-            to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.row.coi_certificate}`}
+            to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
           >
@@ -135,7 +153,7 @@ const DashboardCoi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/certificates/${params.value}`}
+              to={`${base_public_url}coi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -213,7 +231,7 @@ const DashboardCoi = () => {
                 ? 'text-emerald-950'
                 : diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
@@ -232,7 +250,7 @@ const DashboardCoi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
+              to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -252,7 +270,7 @@ const DashboardCoi = () => {
         <div className='py-4 pl-4'>
           {params.value ? (
             <Link
-              to={`http://ptmksmvmidmsru7.pertamina.com:4444/coi/rla/${params.value}`}
+              to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
             >
@@ -320,6 +338,7 @@ const DashboardCoi = () => {
   return (
     <div className='flex flex-col md:flex-row w-full'>
       <Header />
+      
       <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
         <Breadcrumbs
           aria-label='breadcrumb'
@@ -341,6 +360,7 @@ const DashboardCoi = () => {
         </Breadcrumbs>
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+        {loading ? <p>Loading...</p> : (
           <div className='flex flex-col md:flex-row justify-evenly'>
             <div className="flex flex-col items-center">
               <span>COI</span>
@@ -387,10 +407,11 @@ const DashboardCoi = () => {
               />
             </div>
           </div>
+        )}
         </div>
         {/* TABLE coi */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-          <div className='flex flex-row justify-between'>
+        {loading ? <p>Loading...</p> : (<div className='flex flex-row justify-between'>
             <DataGrid
               rows={coi}
               columns={columns}
@@ -423,9 +444,10 @@ const DashboardCoi = () => {
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
             />
-          </div>
+          </div> )}
         </div>
       </div>
+      
     </div>
   );
 };

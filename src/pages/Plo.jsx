@@ -146,7 +146,7 @@ const Plo = () => {
               className={`${
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
@@ -259,7 +259,7 @@ const Plo = () => {
                 ? 'text-emerald-950'
                 : diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
-                : diffDays < 180
+                : diffDays < 272
                 ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
                 : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}

@@ -19,163 +19,166 @@ import {
 } from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
 const EditSkhp = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [UnitId, setUnitId] = useState('');
-  const [IsPlo, setIsPlo] = useState([]);
-  const [IsCategory, setIsCategory] = useState([]);
-  const [selectedPlo, setSelectedPlo] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState([]);
-  const [selectedTagNumber, setSelectedTagNumber] = useState('');
-  const [Tagnumbers, setTagnumbers] = useState([]);
-  const [skhp, setSkhp] = useState({});
-  const { id } = useParams();
   const navigate = useNavigate();
+const { id } = useParams();
 
-  // Fetch PLO and Category on mount
-  useEffect(() => {
-    getPlo((data) => setIsPlo(data?.data || []));
-    getCategory((data) => setIsCategory(data?.data || []));
-  }, []);
+const [isLoading, setIsLoading] = useState(true);
+const [unitId, setUnitId] = useState('');
+const [ploList, setPloList] = useState([]);
+const [categoryList, setCategoryList] = useState([]);
+const [selectedPlo, setSelectedPlo] = useState('');
+const [selectedCategory, setSelectedCategory] = useState('');
+const [selectedType, setSelectedType] = useState('');
+const [filteredTypes, setFilteredTypes] = useState([]);
+const [selectedTagNumber, setSelectedTagNumber] = useState('');
+const [Tagnumbers, setTagnumbers] = useState([]);
+const [skhp, setSkhp] = useState({});
+const [validation, setValidation] = useState([]);
+const [isSubmitting, setIsSubmitting] = useState(false);
+const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
 
-  // Fetch Skhp by ID
-  useEffect(() => {
-    setIsLoading(true);
-    getSkhpById(id, (data) => {
-      const skhpData = data?.data || {};
-      setSkhp(skhpData);
-      setSelectedTagNumber(skhpData?.tag_number_id || '');
-      setUnitId(skhpData?.plo?.unit_id || '');
-      setSelectedPlo(skhpData?.plo?.id || '');
-      setIsLoading(false);
-    });
-  }, [id]);
+useEffect(() => {
+  fetchPlo();
+  fetchCategories();
+}, []);
 
-  // Fetch Tag Number by selectedTagNumber
-  useEffect(() => {
-    if (!selectedTagNumber) return;
+useEffect(() => {
+  fetchSkhpById();
+}, [id]);
 
-    setIsLoading(true);
-    getTagnumberById(selectedTagNumber, (data) => {
-      handleCategoryChange(data?.data?.type?.category_id, true);
-      handleTypeChange(data?.data?.type_id, true);
-      setIsLoading(false);
-    });
-  }, [selectedTagNumber]);
+useEffect(() => {
+  if (selectedTagNumber) fetchTagNumberById();
+}, [selectedTagNumber]);
 
-  // Handle Category Change
-  const handleCategoryChange = (categoryId, force = false) => {
-    setSelectedCategory(categoryId);
-    setTagnumbers([]);
-    if (!force) {
-      setSelectedType('');
-      setSelectedTagNumber('');
-    }
+const fetchPlo = async () => {
+  try {
+    const data = await getPlo();
+    setPloList(data?.data || []);
+  } catch (error) {
+    console.error("Error fetching PLO:", error);
+  }
+};
 
-    if (categoryId) {
-      getTypeByCategory(categoryId, (data) => {
-        setFilteredTypes(data?.data || []);
-      });
-    } else {
-      setFilteredTypes([]);
-    }
-  };
+const fetchCategories = async () => {
+  try {
+    const data = await getCategory();
+    setCategoryList(data?.data || []);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+  }
+};
 
-  // Handle Type Change
-  const handleTypeChange = (typeId, force = false) => {
-    setSelectedType(typeId);
-    if (typeId && UnitId) {
-      getTagnumberByTypeUnit(typeId, UnitId, (data) => {
-        if (!force) {
-          setSelectedTagNumber('');
-        }
-        setTagnumbers(data?.data || []);
-      });
-    } else {
+const fetchSkhpById = async () => {
+  setIsLoading(true);
+  try {
+    const data = await getSkhpById(id);
+    const skhpData = data?.data || {};
+    setSkhp(skhpData);
+    setSelectedTagNumber(skhpData?.tag_number_id || '');
+    setUnitId(skhpData?.plo?.unit_id || '');
+    setSelectedPlo(skhpData?.plo?.id || '');
+  } catch (error) {
+    console.error("Error fetching SKHP:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const fetchTagNumberById = async () => {
+  setIsLoading(true);
+  try {
+    const data = await getTagnumberById(selectedTagNumber);
+    handleCategoryChange(data?.data?.type?.category_id, true);
+    handleTypeChange(data?.data?.type_id, true);
+  } catch (error) {
+    console.error("Error fetching tag number:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+const handleCategoryChange = async (categoryId, force = false) => {
+  setSelectedCategory(categoryId);
+  setTagnumbers([]);
+  if (!force) {
+    setSelectedType('');
+    setSelectedTagNumber('');
+  }
+  try {
+    const data = await getTypeByCategory(categoryId);
+    setFilteredTypes(data?.data || []);
+  } catch (error) {
+    console.error("Error fetching types:", error);
+    setFilteredTypes([]);
+  }
+};
+
+const handleTypeChange = async (typeId, force = false) => {
+  setSelectedType(typeId);
+  if (typeId && unitId) {
+    try {
+      const data = await getTagnumberByTypeUnit(typeId, unitId);
+      if (!force) setSelectedTagNumber('');
+      setTagnumbers(data?.data || []);
+    } catch (error) {
+      console.error("Error fetching tag numbers:", error);
       setTagnumbers([]);
     }
-  };
-
-  // Loading and Error Handling
-  if (isLoading) {
-    return <div>Loading...</div>;
   }
+};
 
-  if (!skhp || Object.keys(skhp).length === 0) {
-    return <div>Data skhp tidak ditemukan.</div>;
-  }
-
-  const handleUpdateSkhp = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    if (e.target.file_skhp.files[0]) {
-      formData.append(
-        'file_skhp',
-        e.target.file_skhp.files[0] || null
-      );
+const handleUpdateSkhp = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  const formData = new FormData(e.target);
+  try {
+    const res = await updateSkhp(id, formData);
+    if (res.success) {
+      Swal.fire("Berhasil!", "SKHP berhasil diperbarui!", "success");
+      setValidation([]);
+      navigate('/skhp');
+    } else {
+      Swal.fire("Gagal!", "SKHP gagal diperbarui!", "error");
     }
-    formData.append('plo_id', e.target.plo_id.value);
-    formData.append('tag_number_id', e.target.tag_number.value);
-    formData.append('no_skhp', e.target.no_skhp.value);
-    formData.append('issue_date', e.target.issue_date.value);
-    formData.append('overdue_date', e.target.overdue_date.value);
+  } catch (error) {
+    console.error("Error updating SKHP:", error);
+    setValidation(error.response?.data.errors || []);
+    Swal.fire("Error!", "Terjadi kesalahan saat memperbarui SKHP!", "error");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-    updateSkhp(id, formData, (res) => {
+const handledeleteFile = async (file) => {
+  const result = await Swal.fire({
+    title: 'Konfirmasi Hapus',
+    text: 'Apakah Anda yakin ingin menghapus file SKHP ini?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Ya, Hapus',
+    cancelButtonText: 'Batal',
+  });
+  
+  if (result.isConfirmed) {
+    try {
+      const res = await deleteSkhpFile(id, file);
       if (res.success) {
-        Swal.fire({
-          title: 'Berhasil!',
-          text: 'Skhp berhasil diperbarui!',
-          icon: 'success',
-        });
-        navigate('/skhp');
+        Swal.fire("Berhasil!", "File berhasil dihapus!", "success");
+        setValidation([]);
+        fetchSkhpById();
       } else {
-        Swal.fire({
-          title: 'Gagal!',
-          text: 'skhp gagal diperbarui!',
-          icon: 'error',
-        });
+        Swal.fire("Gagal!", "File gagal dihapus!", "error");
       }
-    });
-  };
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      setValidation(error.response?.data.errors || []);
+      Swal.fire("Error!", "Terjadi kesalahan saat menghapus file!", "error");
+    }
+  }
+};
 
-  const handledeleteFile = (file) => {
-    Swal.fire({
-      title: 'Konfirmasi Hapus',
-      text: 'Apakah Anda yakin ingin menghapus file Skhp ini?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Ya, Hapus',
-      cancelButtonText: 'Batal',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Jika pengguna mengonfirmasi
-        console.log(file);
-        console.log(id);
-        deleteSkhpFile(id, file, (res) => {
-          if (res.success) {
-            Swal.fire({
-              title: 'Berhasil!',
-              text: 'File berhasil dihapus!',
-              icon: 'success',
-            });
-            getSkhpById(id, (data) => {
-              setSkhp(data.data);
-            });
-          } else {
-            Swal.fire({
-              title: 'Gagal!',
-              text: 'File gagal dihapus!',
-              icon: 'error',
-            });
-          }
-        });
-      }
-    });
-  };
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -197,6 +200,7 @@ const EditSkhp = () => {
             <Typography className='text-lime-500'>Edit SKHP</Typography>
           </Breadcrumbs>
           <div>
+          {isLoading ? <div>Loading...</div> : (
             <form
               encType='multipart/form-data'
               onSubmit={(e) => handleUpdateSkhp(e)}
@@ -223,12 +227,19 @@ const EditSkhp = () => {
                       required
                     >
                       <option value=''>Pilih Plo</option>
-                      {IsPlo.map((plo) => (
+                      {ploList.map((plo) => (
                         <option key={plo.id} value={plo.id} unit={plo.unit_id}>
                           {plo.unit.unit_name}
                         </option>
                       ))}
                     </select>
+                    {validation.plo_id && (
+                      validation.plo_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='category' className='text-emerald-950'>
@@ -242,8 +253,8 @@ const EditSkhp = () => {
                       onChange={(e) => handleCategoryChange(e.target.value)}
                     >
                       <option value=''>Pilih Kategori</option>
-                      {IsCategory.length > 0 ? (
-                        IsCategory.map((category) => (
+                      {categoryList.length > 0 ? (
+                        categoryList.map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.category_name}
                           </option>
@@ -254,6 +265,13 @@ const EditSkhp = () => {
                         </option>
                       )}
                     </select>
+                    {validation.category_id && (
+                      validation.category_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-row space-x-2'>
@@ -281,6 +299,13 @@ const EditSkhp = () => {
                         </option>
                       )}
                     </select>
+                    {validation.type_id && (
+                      validation.type_id.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className='w-full'>
                     <label htmlFor='tag_number' className='text-emerald-950'>
@@ -306,6 +331,13 @@ const EditSkhp = () => {
                         </option>
                       )}
                     </select>
+                    {validation.tag_number && (
+                      validation.tag_number.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -322,6 +354,13 @@ const EditSkhp = () => {
                       defaultValue={skhp.no_skhp}
                       required
                     />
+                    {validation.no_skhp && (
+                      validation.no_skhp.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
@@ -336,12 +375,19 @@ const EditSkhp = () => {
                         id='file_skhp'
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg'
                       />
+                      {validation.file_skhp && (
+                        validation.file_skhp.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
                       {skhp.file_skhp ? (
                         <>
                           <Link
-                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${skhp.file_skhp}`}
+                            to={`${base_public_url}skhp/${skhp.file_skhp}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -377,7 +423,7 @@ const EditSkhp = () => {
                       {skhp.file_old_skhp ? (
                         <>
                           <Link
-                            to={`http://ptmksmvmidmsru7.pertamina.com:4444/skhp/${skhp.file_old_skhp}`}
+                            to={`${base_public_url}skhp/${skhp.file_old_skhp}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
                           >
@@ -412,6 +458,13 @@ const EditSkhp = () => {
                         defaultValue={skhp.issue_date}
                         required
                       />
+                      {validation.issue_date && (
+                        validation.issue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
@@ -425,6 +478,13 @@ const EditSkhp = () => {
                         defaultValue={skhp.overdue_date}
                         required
                       />
+                      {validation.overdue_date && (
+                        validation.overdue_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -433,10 +493,15 @@ const EditSkhp = () => {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   whileHover={{ scale: 0.98 }}
-                  className='w-full bg-emerald-950 text-white py-2 rounded-md uppercase'
                   type='submit'
+                  className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-emerald-950 text-white'
+                  }`}
+                  disabled={isSubmitting} // Disable tombol jika sedang submit
                 >
-                  Submit
+                  {isSubmitting ? 'Processing...' : 'Save'}
                 </motion.button>
                 <button
                   type='button'
@@ -447,6 +512,7 @@ const EditSkhp = () => {
                 </button>
               </div>
             </form>
+          )}
           </div>
         </div>
       </div>

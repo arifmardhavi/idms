@@ -6,10 +6,10 @@ const API_BASE_URL = import.meta.env.VITE_BASE_BACKEND_LOCAL_URL;
 
 export const getAuthHeaders = () => {
     const token = localStorage.getItem("authToken");
-    if (!token) {
-        console.error("Auth token tidak ditemukan!");
-        return null;
-    }
+    // if (!token) {
+    //     console.error("Auth token tidak ditemukan!");
+    //     return null;
+    // }
     return {
         headers: {
             Authorization: `Bearer ${token}`,
