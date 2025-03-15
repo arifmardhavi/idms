@@ -12,6 +12,7 @@ import {
 import { getUnit } from '../../services/unit.service';
 import * as motion from 'motion/react-client';
 import { IconX } from '@tabler/icons-react';
+import { api_public } from "../../services/config";
 
 const EditPlo = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const EditPlo = () => {
   const [plo, setPlo] = useState({});
   const [validation, setValidation] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_SERVER_URL;
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchUnits();

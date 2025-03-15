@@ -22,6 +22,7 @@ import Skhp from './pages/Skhp.jsx';
 import DashboardSkhp from './components/skhp/DashboardSkhp.jsx';
 import AddSkhp from './components/skhp/AddSkhp.jsx';
 import EditSkhp from './components/skhp/EditSkhp.jsx';
+import ReportPlo from './components/plo/ReportPlo.jsx';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -168,6 +169,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <EditSkhp />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/plo/report/:id',
+    element: (
+      <ProtectedRoute>
+        <ReportPlo />
       </ProtectedRoute>
     ),
   },

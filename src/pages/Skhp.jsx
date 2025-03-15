@@ -20,12 +20,13 @@ import {
 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
+import { api_public } from '../services/config';
 
 const Skhp = () => {
   const [skhp, setSkhp] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [loading, setLoading] = useState(false);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchSkhp();

@@ -18,6 +18,8 @@ import {
   getTagnumberByTypeUnit,
 } from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
+import { api_public } from "../../services/config";
+
 const EditSkhp = () => {
   const navigate = useNavigate();
 const { id } = useParams();
@@ -35,7 +37,7 @@ const [Tagnumbers, setTagnumbers] = useState([]);
 const [skhp, setSkhp] = useState({});
 const [validation, setValidation] = useState([]);
 const [isSubmitting, setIsSubmitting] = useState(false);
-const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+const base_public_url = api_public;
 
 useEffect(() => {
   fetchPlo();

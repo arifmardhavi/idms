@@ -10,13 +10,14 @@ import { Link } from 'react-router-dom';
 import { IconCloudDownload, IconChevronRight } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { getSkhp, skhpCountDueDays } from "../../services/skhp.service";
+import { api_public } from "../../services/config";
 
 
 const DashboardSkhp = () => {
   const [skhp, setSkhp] = useState([]);
   const [countskhp, setCountSkhp] = useState({});
   const [loading, setLoading] = useState(false);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchSkhp();

@@ -10,13 +10,14 @@ import { Link } from 'react-router-dom';
 import { IconCloudDownload, IconChevronRight } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { getPlo, ploCountDueDays } from "../../services/plo.service";
+import { api_public } from "../../services/config";
 
 const DashboardPlo = () => {
 
   const [plo, setPlo] = useState([]);
   const [countplo, setCountPlo] = useState({});
   const [loading, setLoading] = useState(false);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchPlo();

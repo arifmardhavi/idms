@@ -18,6 +18,7 @@ import {
   getTagnumberByTypeUnit,
 } from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
+import { api_public } from '../../services/config';
 const EditCoi = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -36,7 +37,7 @@ const EditCoi = () => {
   const [Tagnumbers, setTagNumbers] = useState([]);
   const [coi, setCoi] = useState({});
   const [validation, setValidation] = useState([]);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = api_public;
   
   useEffect(() => {
     fetchPlo();

@@ -10,13 +10,14 @@ import { Link } from 'react-router-dom';
 import { IconCloudDownload, IconChevronRight } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { getCoi, coiCountDueDays } from "../../services/coi.service";
+import { api_public } from "../../services/config";
 
 
 const DashboardCoi = () => {
   const [coi, setCoi] = useState([]);
   const [countcoi, setCountCoi] = useState({});
   const [loading, setLoading] = useState(false);
-    const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchCoi();

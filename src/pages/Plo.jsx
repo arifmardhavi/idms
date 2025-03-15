@@ -18,12 +18,14 @@ import { IconRefresh } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { IconCloudDownload } from '@tabler/icons-react';
 import { IconPlus } from '@tabler/icons-react';
+import { api_public } from '../services/config';
+import { IconEye } from '@tabler/icons-react';
 
 const Plo = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [plo, setPlo] = useState([]);
   const [loading, setLoading] = useState(false);
-  const base_public_url = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchPlo();
@@ -190,6 +192,20 @@ const Plo = () => {
           ) : (
             <p>-</p>
           )}
+        </div>
+      ),
+    },
+    {
+      field: 'report_plo',
+      headerName: 'Report',
+      width: 100,
+      renderCell: (params) => (
+        <div className='py-4 pl-4'>
+          <Link to={`/plo/report/${params.row.id}`}
+            className=' text-lime-500'
+          >
+            <IconEye stroke={2} />
+          </Link>
         </div>
       ),
     },

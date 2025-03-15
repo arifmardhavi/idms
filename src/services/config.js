@@ -2,7 +2,13 @@
 import axios from "axios";
 
 // const API_BASE_URL = "http://ptmksmvmidmsru7.pertamina.com:4444/api/";
-const API_BASE_URL = import.meta.env.VITE_BASE_BACKEND_LOCAL_URL;
+// const base_server = import.meta.env.VITE_BASE_BACKEND_SERVER_URL;
+const base_local = import.meta.env.VITE_BASE_BACKEND_LOCAL_URL;
+const API_BASE_URL = base_local;
+// const public_server = import.meta.env.VITE_PUBLIC_BACKEND_SERVER_URL;
+const public_local = import.meta.env.VITE_PUBLIC_BACKEND_LOCAL_URL;
+
+export const api_public = public_local;
 
 export const getAuthHeaders = () => {
     const token = localStorage.getItem("authToken");
