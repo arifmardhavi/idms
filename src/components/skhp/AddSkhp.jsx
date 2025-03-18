@@ -1,5 +1,5 @@
 import Header from '../Header';
-import { Breadcrumbs, Typography } from '@mui/material';
+import { Autocomplete, Breadcrumbs, TextField, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
@@ -23,6 +23,7 @@ const AddSkhp = () => {
   const [Tagnumbers, setTagnumbers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
+  const [tagnumberId, setTagnumberId] = useState([]);
 
   useEffect(() => {
     fetchPlo();
@@ -88,7 +89,7 @@ const AddSkhp = () => {
     try {
       const formData = new FormData();
       formData.append('plo_id', e.target.plo_id.value);
-      formData.append('tag_number_id', e.target.tag_number_id.value);
+      formData.append('tag_number_id', tagnumberId);
       formData.append('no_skhp', e.target.no_skhp.value);
       formData.append('file_skhp', e.target.file_skhp.files[0]);
       formData.append('issue_date', e.target.issue_date.value);
@@ -206,64 +207,64 @@ const AddSkhp = () => {
                     <label htmlFor='type' className='text-emerald-950'>
                       Tipe <sup className='text-red-500'>*</sup>
                     </label>
-                    <select
-                      name='type_id'
-                      id='type'
-                      className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                      value={selectedType}
-                      onChange={(e) => handleTypeChange(e.target.value)}
-                    >
-                      {selectedPlo == '' ? (
-                        <option value='' disabled selected>
-                          Pilih Plo terlebih dahulu
-                        </option>
-                      ) : (
-                        <option value=''>Pilih Tipe</option>
+                    <Autocomplete
+                      id="type"
+                      value={filteredTypes.find((type) => type.id === selectedType) || null}
+                      onChange={(event, newValue) => handleTypeChange(newValue ? newValue.id : '')}
+                      options={selectedPlo === '' ? [] : filteredTypes}
+                      getOptionLabel={(option) => option.type_name || ''}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      noOptionsText={selectedPlo === '' ? 'Pilih Plo terlebih dahulu' : 'Tidak ada Tipe'}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="type_id" // Tambahkan name di sini
+                          placeholder={selectedPlo === '' ? 'Pilih Plo terlebih dahulu' : 'Pilih Tipe'}
+                          variant="outlined"
+                          error={!!validation.type_id}
+                          helperText={
+                            validation.type_id &&
+                            validation.type_id.map((item, index) => (
+                              <span key={index} className="text-red-600 text-sm">
+                                {item}
+                              </span>
+                            ))
+                          }
+                        />
                       )}
-                      {selectedPlo == '' ? (
-                        ''
-                      ) : filteredTypes.length > 0 ? (
-                        filteredTypes.map((type) => (
-                          <option key={type.id} value={type.id}>
-                            {type.type_name}
-                          </option>
-                        ))
-                      ) : (
-                        <option value='' disabled>
-                          Tidak ada Tipe
-                        </option>
-                      )}
-                    </select>
+                    />
                   </div>
                   <div className='w-full'>
                     <label htmlFor='tag_number' className='text-emerald-950'>
                       Tag Number <sup className='text-red-500'>*</sup>
                     </label>
-                    <select
-                      name='tag_number_id'
-                      id='tag_number'
-                      className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                    >
-                      <option value=''>Pilih Tag Number</option>
-                      {Tagnumbers.length > 0 ? (
-                        Tagnumbers.map((tagnumber) => (
-                          <option key={tagnumber.id} value={tagnumber.id}>
-                            {tagnumber.tag_number}
-                          </option>
-                        ))
-                      ) : (
-                        <option value='' disabled>
-                          Tidak ada Tag Number
-                        </option>
+                    <Autocomplete 
+                      id="tag_number"
+                      options={Tagnumbers}
+                      getOptionLabel={(option) => option.tag_number} // Tampilkan tag_number
+                      isOptionEqualToValue={(option, value) => option.id === value} // Bandingkan ID langsung
+                      onChange={(event, newValue) => {
+                        const selectedId = newValue ? newValue.id : '';
+                        setTagnumberId(selectedId);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="tag_number_id"
+                          placeholder="Pilih Tag Number"
+                          variant="outlined"
+                          error={!!validation.tag_number_id}
+                          helperText={
+                            validation.tag_number_id &&
+                            validation.tag_number_id.map((item, index) => (
+                              <span key={index} className="text-red-600 text-sm">
+                                {item}
+                              </span>
+                            ))
+                          }
+                        />
                       )}
-                    </select>
-                    {validation.tag_number_id && (
-                      validation.tag_number_id.map((item, index) => (
-                        <div key={index}>
-                          <small className="text-red-600 text-sm">{item}</small>
-                        </div>
-                      ))
-                    )}
+                    />
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>

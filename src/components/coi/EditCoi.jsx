@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from '../Header';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Breadcrumbs, Typography } from '@mui/material';
+import { Autocomplete, Breadcrumbs, TextField, Typography } from '@mui/material';
 import { IconChevronRight, IconX } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import {
@@ -37,6 +37,7 @@ const EditCoi = () => {
   const [Tagnumbers, setTagNumbers] = useState([]);
   const [coi, setCoi] = useState({});
   const [validation, setValidation] = useState([]);
+  const [tagnumberId, setTagnumberId] = useState([]);
   const base_public_url = api_public;
   
   useEffect(() => {
@@ -78,6 +79,7 @@ const EditCoi = () => {
       setCoi(coiData);
       setIsRLA(!!coiData.rla);
       setSelectedTagNumber(coiData?.tag_number_id || '');
+      setTagnumberId(coiData?.tag_number_id || '');
       setUnitId(coiData?.plo?.unit_id || '');
       setSelectedPlo(coiData?.plo?.id || '');
     } catch (error) {
@@ -136,6 +138,7 @@ const EditCoi = () => {
     
     try {
       const formData = new FormData(e.target);
+      formData.append('tag_number_id', tagnumberId ?? 0);
       const res = await updateCoi(id, formData);
       
       if (res.success) {
@@ -283,65 +286,71 @@ const EditCoi = () => {
                       <label htmlFor='type' className='text-emerald-950'>
                         Tipe
                       </label>
-                      <select
-                        name='type_id'
-                        id='type'
-                        className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                        value={selectedType}
-                        onChange={(e) => handleTypeChange(e.target.value)}
-                      >
-                        <option value=''>Pilih Tipe</option>
-                        {filteredTypes.length > 0 ? (
-                          filteredTypes.map((type) => (
-                            <option key={type.id} value={type.id}>
-                              {type.type_name}
-                            </option>
-                          ))
-                        ) : (
-                          <option value='' disabled>
-                            Tipe tidak ditemukan
-                          </option>
+                      <Autocomplete
+                        id="type"
+                        options={filteredTypes}
+                        getOptionLabel={(option) => option.type_name}  // Yang ditampilkan di dropdown
+                        onChange={(event, newValue) => {
+                          const selectedId = newValue ? newValue.id : '';
+                          handleTypeChange(selectedId);  // Kirim ID ke state
+                        }}
+                        value={filteredTypes.find((type) => type.id === selectedType) || null}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="type_id"
+                            placeholder="Pilih Tipe"
+                            variant="outlined"
+                            error={!!validation.type_id}
+                            helperText={
+                              validation.type_id &&
+                              validation.type_id.map((item, index) => (
+                                <span key={index} className="text-red-600 text-sm">
+                                  {item}
+                                </span>
+                              ))
+                            }
+                          />
                         )}
-                      </select>
-                      {validation.type_id && (
-                        validation.type_id.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
+                        noOptionsText="Tipe tidak ditemukan"
+                      />
+
                     </div>
                     <div className='w-full'>
                       <label htmlFor='tag_number' className='text-emerald-950'>
                         Tag Number
                       </label>
-                      <select
-                        name='tag_number_id'
-                        id='tag_number'
-                        className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                        value={selectedTagNumber}
-                        onChange={(e) => setSelectedTagNumber(e.target.value)}
-                      >
-                        <option value=''>Pilih Tag Number</option>
-                        {Tagnumbers.length > 0 ? (
-                          Tagnumbers.map((tagnumber) => (
-                            <option key={tagnumber.id} value={tagnumber.id}>
-                              {tagnumber.tag_number}
-                            </option>
-                          ))
-                        ) : (
-                          <option value='' disabled>
-                            Tag Number tidak ditemukan
-                          </option>
+                      <Autocomplete
+                        id="tag_number"
+                        options={Tagnumbers}
+                        getOptionLabel={(option) => option.tag_number}  // Menampilkan tag_number di dropdown
+                        onChange={(event, newValue) => {
+                          const selectedId = newValue ? newValue.id : '';
+                          setTagnumberId(selectedId);  // Simpan ID ke state
+                        }}
+                        value={Tagnumbers.find((tag) => tag.id === selectedTagNumber) || null}
+                        isOptionEqualToValue={(option, value) => option.id === value}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="tag_number_id"
+                            placeholder="Pilih Tag Number"
+                            variant="outlined"
+                            error={!!validation.tag_number_id}
+                            helperText={
+                              validation.tag_number_id &&
+                              validation.tag_number_id.map((item, index) => (
+                                <span key={index} className="text-red-600 text-sm">
+                                  {item}
+                                </span>
+                              ))
+                            }
+                          />
                         )}
-                      </select>
-                      {validation.tag_number_id && (
-                        validation.tag_number_id.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
+                        noOptionsText="Tag Number tidak ditemukan"
+                      />
+
                     </div>
                   </div>
                   <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>

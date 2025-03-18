@@ -2,350 +2,116 @@ import { AnimatePresence } from 'motion/react';
 import * as motion from 'motion/react-client';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-
-// icons
 import {
-  IconHome,
-  IconBookUpload,
-  IconBrandUnity,
-  IconCategory,
-  IconAlignBoxLeftMiddle,
-  IconTag,
-  IconStack2,
-  IconRectangularPrism,
-  IconArticle,
+  IconHome, IconBrandUnity, IconCategory, IconAlignBoxLeftMiddle, IconTag,
+  IconStack2, IconRectangularPrism, IconArticle, IconX, IconUser,
+  IconDatabaseCog, IconFiles, IconFileAnalytics
 } from '@tabler/icons-react';
-import { Icon } from '@mui/material';
-import { IconX } from '@tabler/icons-react';
-import { IconUser } from '@tabler/icons-react';
-import { IconDatabaseCog } from '@tabler/icons-react';
-import { IconFiles } from '@tabler/icons-react';
-import { IconFileAnalytics } from '@tabler/icons-react';
-const Header = () => {
-  const [open, setOpen] = useState(false);
-  const [openMobile, setOpenMobile] = useState(false);
-  const [activeTab, setActiveTab] = useState('');
+import { jwtDecode } from 'jwt-decode';
+import { IconLogout } from '@tabler/icons-react';
+import { apiLogout } from '../services/config';
+import Swal from 'sweetalert2';
 
-  const handleClick = (tabName) => {
-    if (activeTab === tabName) {
-      setOpen(!open);
-    } else {
-      setOpen(true);
-      setActiveTab(tabName);
+const SidesMenu = [
+  { name: 'Home', icon: <IconHome />, path: '/' },
+  { name: 'Unit', icon: <IconBrandUnity />, path: '/unit', tab: 'masterdata' },
+  { name: 'Kategori Peralatan', icon: <IconCategory />, path: '/category', tab: 'masterdata' },
+  { name: 'Tipe Peralatan', icon: <IconAlignBoxLeftMiddle />, path: '/type', tab: 'masterdata' },
+  { name: 'Tag Number', icon: <IconTag />, path: '/tagnumber', tab: 'masterdata' },
+  { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
+  { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
+  { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
+  { name: 'User', icon: <IconUser />, path: '/user', tab: 'regulatorycompliance' },
+];
+
+const Header = () => {
+  const [openTab, setOpenTab] = useState('');
+  const [openMobile, setOpenMobile] = useState(false);
+  const token = localStorage.getItem('token');
+  let userLevel = '';
+
+  const handleLogout = async (event) => {
+    event.preventDefault();
+    try {
+      await apiLogout('/logout');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      localStorage.clear();
+      Swal.fire('Berhasil!', 'Logout berhasil!', 'success').then(() => {
+        window.location.href = '/login';
+      });
     }
   };
 
-  const SidesMenu = [
-    {
-      name: 'Home',
-      icon: <IconHome stroke={2} />,
-      tab: 'home',
-      path: '/',
-    },
-    {
-      name: 'Unit',
-      icon: <IconBrandUnity stroke={2} />,
-      tab: 'masterdata',
-      path: '/unit',
-    },
-    {
-      name: 'Kategori Peralatan ',
-      icon: <IconCategory stroke={2} />,
-      tab: 'masterdata',
-      path: '/category',
-    },
-    {
-      name: 'Tipe Peralatan',
-      icon: <IconAlignBoxLeftMiddle stroke={2} />,
-      tab: 'masterdata',
-      path: '/type',
-    },
-    {
-      name: 'Tag Number',
-      icon: <IconTag stroke={2} />,
-      tab: 'masterdata',
-      path: '/tagnumber',
-    },
-    {
-      name: 'PLO',
-      icon: <IconStack2 stroke={2} />,
-      tab: 'regulatorycompliance',
-      path: '/plo',
-    },
-    {
-      name: 'COI',
-      icon: <IconRectangularPrism stroke={2} />,
-      tab: 'regulatorycompliance',
-      path: '/coi',
-    },
-    {
-      name: 'SKHP',
-      icon: <IconFileAnalytics stroke={2} />,
-      tab: 'regulatorycompliance',
-      path: '/skhp',
-    },
-    {
-      name: 'User',
-      icon: <IconUser stroke={2} />,
-      tab: 'regulatorycompliance',
-      path: '/user',
-    },
-  ];
+  try {
+    userLevel = String(jwtDecode(token).level_user);
+  } catch (error) {
+    console.error('Invalid token:', error);
+    localStorage.removeItem('token');
+  }
+
+  const handleTabClick = (tabName) => setOpenTab(openTab === tabName ? '' : tabName);
+  const activeMenu = (menu) => localStorage.getItem('active') === menu ? 'text-lime-300 border-lime-300 border-l-4' : '';
+
+  const renderMenu = (tab) => {
+    return SidesMenu.filter(menu => menu.tab === tab).map((menu, index) => (
+      <motion.div 
+        key={menu.path || menu.name || index} // Tambahkan key yang unik 
+        whileTap={{ scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
+        className={`hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md ${activeMenu(menu.name)}`}
+      >
+        <Link to={menu.path} className='flex items-center space-x-3 p-2 cursor-pointer' onClick={() => localStorage.setItem('active', menu.name)}>
+          {menu.icon}
+          <span className='text-white'>{menu.name}</span>
+        </Link>
+      </motion.div>
+    ));
+  }
+  
+  const renderTab = (tab, icon, label) => (
+    <motion.div whileTap={{ scale: 0.9 }} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
+      className={`flex items-center space-x-2 p-2 cursor-pointer hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md ${openTab === tab ? 'text-lime-300 border-lime-300 border-l-4' : ''}`}
+      onClick={() => handleTabClick(tab)}>
+      {icon}
+      <span className='text-sm'>{label}</span>
+    </motion.div>
+  );
+
   return (
     <>
-      {/* dekstop */}
-      <div
-        className={`${
-          openMobile ? 'block' : 'hidden md:flex flex-col'
-        } fixed w-60 min-h-screen h-full space-y-2 bg-emerald-950 text-white shadow-lg px-2 py-4 z-50`}
-      >
-        <div className='flex flex-row justify-center items-center space-x-2'>
-          <img
-            className='w-24 xl:w-32 border-r-2 border-slate-300'
-            src='/images/kpi-putih.png'
-            alt='Logo Pertamina'
-          />
+      {/* Desktop */}
+      <div className={`fixed w-60 min-h-screen space-y-2 bg-emerald-950 text-white shadow-lg px-2 py-4 z-50 ${openMobile ? 'block' : 'hidden md:flex flex-col'}`}>
+        <div className='flex justify-center items-center space-x-2'>
+          <img className='w-24 xl:w-32 border-r-2 border-slate-300' src='/images/kpi-putih.png' alt='Logo Pertamina' />
           <span className='text-md xl:text-xl font-bold'>IDMS</span>
         </div>
-        <div className='flex flex-col space-y-2'>
-          <AnimatePresence className='text-xs'>
-            <motion.div
-              key={1}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className='flex flex-col space-y-2'
-            >
-              <motion.div
-                key={2}
-                // whileHover={{ scale: 0.95 }}
-                whileTap={{ scale: 0.9 }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={` flex flex-row space-x-2 p-2 cursor-pointer ${
-                  activeTab === 'masterdata' && open
-                    ? 'text-lime-300 border-lime-300 border-l-4'
-                    : ''
-                } hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md`}
-                transition={{
-                  duration: 0.4,
-                  scale: {
-                    type: 'spring',
-                    bounce: 0.4,
-                  },
-                }}
-                onClick={() => {
-                  handleClick('masterdata');
-                }}
-              >
-                <IconDatabaseCog />
-                <span className='text-sm'>Master Data</span>
-              </motion.div>
-              {activeTab === 'masterdata' && open && (
-                <div className='pl-4'>
-                  {SidesMenu.map(
-                    (menu, index) =>
-                      menu.tab == 'masterdata' && (
-                        <AnimatePresence key={index}>
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className='flex flex-col space-y-2'
-                          >
-                            <motion.div
-                              // whileHover={{ scale: 0.95 }}
-                              whileTap={{ scale: 0.9 }}
-                              initial={{ opacity: 0, scale: 0 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              className={` ${
-                                localStorage.getItem('active') === menu.name
-                                  ? 'text-lime-300 border-lime-300 border-l-4'
-                                  : ''
-                              } hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md`}
-                              transition={{
-                                duration: 0.4,
-                                scale: {
-                                  type: 'spring',
-                                  visualDuration: index / 10,
-                                  bounce: 0.4,
-                                },
-                              }}
-                            >
-                              <Link
-                                to={menu.path}
-                                className='flex flex-row items-center space-x-3 cursor-pointer p-2'
-                                onClick={() =>
-                                  localStorage.setItem('active', menu.name)
-                                }
-                              >
-                                {menu.icon}
-                                <span className='text-white'>{menu.name}</span>
-                              </Link>
-                            </motion.div>
-                          </motion.div>
-                        </AnimatePresence>
-                      )
-                  )}
-                </div>
-              )}
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className='flex flex-col space-y-2'
-            >
-              <motion.div
-                // whileHover={{ scale: 0.95 }}
-                whileTap={{ scale: 0.9 }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={` flex flex-row space-x-2 p-2 cursor-pointer ${
-                  activeTab === 'regulatorycompliance' && open
-                    ? 'text-lime-300 border-lime-300 border-l-4'
-                    : ''
-                } hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md`}
-                transition={{
-                  duration: 0.4,
-                  scale: {
-                    type: 'spring',
-                    bounce: 0.4,
-                  },
-                }}
-                onClick={() => {
-                  handleClick('regulatorycompliance');
-                }}
-              >
-                <IconFiles />
-                <span className='text-sm'>Regulatory Compliance</span>
-              </motion.div>
-              {activeTab === 'regulatorycompliance' && open && (
-                <div className='pl-4'>
-                  {SidesMenu.map(
-                    (menu, index) =>
-                      menu.tab == 'regulatorycompliance' && (
-                        <AnimatePresence key={index}>
-                          <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className='flex flex-col space-y-2'
-                          >
-                            <motion.div
-                              // whileHover={{ scale: 0.95 }}
-                              whileTap={{ scale: 0.9 }}
-                              initial={{ opacity: 0, scale: 0 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              className={` ${
-                                localStorage.getItem('active') === menu.name
-                                  ? 'text-lime-300 border-lime-300 border-l-4'
-                                  : ''
-                              } hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md`}
-                              transition={{
-                                duration: 0.4,
-                                scale: {
-                                  type: 'spring',
-                                  visualDuration: index / 10,
-                                  bounce: 0.4,
-                                },
-                              }}
-                            >
-                              <Link
-                                to={menu.path}
-                                className='flex flex-row items-center space-x-3 cursor-pointer p-2'
-                                onClick={() =>
-                                  localStorage.setItem('active', menu.name)
-                                }
-                              >
-                                {menu.icon}
-                                <span className='text-white'>{menu.name}</span>
-                              </Link>
-                            </motion.div>
-                          </motion.div>
-                        </AnimatePresence>
-                      )
-                  )}
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-          {/* {SidesMenu.map(
-            (menu, index) =>
-              menu.tab == 'masterdata' && (
-                <AnimatePresence key={index}>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className='flex flex-col space-y-2'
-                  >
-                    <motion.div
-                      // whileHover={{ scale: 0.95 }}
-                      whileTap={{ scale: 0.9 }}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className={` ${
-                        localStorage.getItem('active') === menu.name
-                          ? 'text-lime-300 border-lime-300 border-l-4'
-                          : ''
-                      } hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md`}
-                      transition={{
-                        duration: 0.4,
-                        scale: {
-                          type: 'spring',
-                          visualDuration: index / 10,
-                          bounce: 0.4,
-                        },
-                      }}
-                    >
-                      <Link
-                        to={menu.path}
-                        className='flex flex-row items-center space-x-3 cursor-pointer p-2'
-                        onClick={() =>
-                          localStorage.setItem('active', menu.name)
-                        }
-                      >
-                        {menu.icon}
-                        <span className='text-white'>{menu.name}</span>
-                      </Link>
-                    </motion.div>
-                  </motion.div>
-                </AnimatePresence>
-              )
-          )} */}
-        </div>
+        <AnimatePresence mode="wait">
+          {userLevel !== '2' && (
+            <>
+              {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
+              {openTab === 'masterdata' && <div key="masterdata" className='pl-4'>{renderMenu('masterdata')}</div>}
+            </>
+          )}
+          {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
+          {openTab === 'regulatorycompliance' && <div key="regulatorycompliance" className='pl-4'>{renderMenu('regulatorycompliance')}</div>}
+          <div onClick={handleLogout} className='cursor-pointer'>{renderTab('logout', <IconLogout />, 'Logout')}</div>
+        </AnimatePresence>
       </div>
 
-      {/* mobile */}
-      <div className='md:hidden flex flex-row justify-between items-center px-2 text-white bg-emerald-950'>
-        <div className='flex flex-row justify-center items-center w-[calc(100%-3rem)] space-x-2'>
-          <img
-            className='w-28 border-slate-300'
-            src='/images/kpi-putih.png'
-            alt='Logo Pertamina'
-          />
+      {/* Mobile */}
+      <div className='md:hidden flex justify-between items-center px-2 text-white bg-emerald-950'>
+        <div className='flex justify-center items-center w-[calc(100%-3rem)] space-x-2'>
+          <img className='w-28 border-slate-300' src='/images/kpi-putih.png' alt='Logo Pertamina' />
           <span className='text-xl font-bold'>IDMS</span>
         </div>
         <motion.div whileTap={{ scale: 0.8 }}>
-          {openMobile ? (
-            <IconX
-              className={`cursor-pointer w-10 h-10 text-lime-300`}
-              stroke={1}
-              onClick={() => setOpenMobile(false)}
-            />
-          ) : (
-            <IconArticle
-              className={`cursor-pointer w-10 h-10 text-white`}
-              stroke={1}
-              onClick={() => setOpenMobile(true)}
-            />
-          )}
+          {openMobile ? <IconX className='cursor-pointer w-10 h-10 text-lime-300' onClick={() => setOpenMobile(false)} />
+            : <IconArticle className='cursor-pointer w-10 h-10' onClick={() => setOpenMobile(true)} />}
         </motion.div>
       </div>
     </>
