@@ -41,10 +41,10 @@ const Login = () => {
                     <div>
                         <form onSubmit={handleLogin} className="space-y-4 text-white flex flex-col justify-center items-center">
                             <div className="space-y-2">
-                                <p>Masukkan Email</p>
-                                <input name="email" type="email" placeholder="ex: youremail@gmail.com" className="border border-lime-300 rounded-md p-2 w-96 bg-transparent outline-none" required />
-                                {validation.email && (
-                                    validation.email.map((item, index) => (
+                                <p>Masukkan Username</p>
+                                <input name="username" type="text" placeholder="ex: arifmardhavi" className="border border-lime-300 rounded-md p-2 w-96 bg-transparent outline-none" required />
+                                {validation.username && (
+                                    validation.username.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>

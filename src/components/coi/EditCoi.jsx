@@ -26,6 +26,7 @@ const EditCoi = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [IsRLA, setIsRLA] = useState(false);
+  const [IsReEng, setIsReEng] = useState(false);
   const [unitId, setUnitId] = useState('');
   const [ploList, setPloList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
@@ -78,6 +79,7 @@ const EditCoi = () => {
       const coiData = data?.data || {};
       setCoi(coiData);
       setIsRLA(!!coiData.rla);
+      setIsReEng(!!coiData.re_engineer);
       setSelectedTagNumber(coiData?.tag_number_id || '');
       setTagnumberId(coiData?.tag_number_id || '');
       setUnitId(coiData?.plo?.unit_id || '');
@@ -457,8 +459,8 @@ const EditCoi = () => {
                       </div>
                     </div>
                   </div>
-                  <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                    <div className='w-full flex flex-row space-x-2'>
+                  <div className='flex flex-col space-y-2'>
+                    <div className='flex flex-row space-x-2 w-full'>
                       <div className='w-full'>
                         <label className='text-emerald-950'>
                           Issue Date <sup className='text-red-500'>*</sup>
@@ -467,8 +469,8 @@ const EditCoi = () => {
                           type='date'
                           name='issue_date'
                           id='issue_date'
-                          className='w-full px-3 py-2 border border-gray-300 rounded-lg'
                           defaultValue={coi.issue_date}
+                          className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                           required
                         />
                         {validation.issue_date && (
@@ -481,14 +483,14 @@ const EditCoi = () => {
                       </div>
                       <div className='w-full'>
                         <label className='text-emerald-950'>
-                          Overdue Date <sup className='text-red-500'>*</sup>
+                          Due Date <sup className='text-red-500'>*</sup>
                         </label>
                         <input
                           type='date'
                           name='overdue_date'
-                          id='overdue_date'
-                          className='w-full px-3 py-2 border border-gray-300 rounded-lg'
+                          id='due_date'
                           defaultValue={coi.overdue_date}
+                          className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                           required
                         />
                         {validation.overdue_date && (
@@ -500,28 +502,97 @@ const EditCoi = () => {
                         )}
                       </div>
                     </div>
-                    <div className='w-full md:w-1/3'>
-                      <label htmlFor='rla' className='text-emerald-950'>
-                        RLA
-                      </label>
-                      <select
-                        name='rla'
-                        id='rla'
-                        className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                        value={IsRLA ? 1 : 0}
-                        onChange={(e) => setIsRLA(e.target.value === '1')}
-                      >
-                        <option value=''>Pilih RLA</option>
-                        <option value='1'>Available</option>
-                        <option value='0'>N/A</option>
-                      </select>
-                      {validation.rla && (
+                    <div className='flex flex-row space-x-2 w-full'>
+                      <div className='w-full'>
+                        <label className='text-emerald-950' htmlFor='rla'>
+                          RLA
+                        </label>
+                        <select
+                          name='rla'
+                          id='rla'
+                          className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          value={IsRLA ? 1 : 0}
+                          onChange={(e) => setIsRLA(e.target.value === '1')}
+                        >
+                          <option value='0'>N/A</option>
+                          <option value='1'>Available</option>
+                        </select>
+                        {validation.rla && (
                           validation.rla.map((item, index) => (
                             <div key={index}>
                               <small className="text-red-600 text-sm">{item}</small>
                             </div>
                           ))
                         )}
+                      </div>
+                      <div className='w-full'>
+                        <label className='text-emerald-950' htmlFor='rla'>
+                          Re-Engineer
+                        </label>
+                        <select
+                          name='re_engineer'
+                          id='re_engineer'
+                          className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          value={IsReEng ? 1 : 0}
+                          onChange={(e) => setIsReEng(e.target.value === '1')}
+                        >
+                          <option value='0'>N/A</option>
+                          <option value='1'>Available</option>
+                        </select>
+                        {validation.re_engineer && (
+                          validation.re_engineer.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      {IsReEng && (
+                        <div className='w-full'>
+                          <label
+                            className='text-emerald-950'
+                            htmlFor='re_engineer_certificate'
+                          >
+                            Re-Engineer Certificate <sup className='text-red-500'>*</sup>
+                          </label>
+                          <input
+                            type='file'
+                            name='re_engineer_certificate'
+                            id='re_engineer_certificate'
+                            className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          />
+                          {validation.re_engineer_certificate && (
+                            validation.re_engineer_certificate.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
+                          <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                            {coi.re_engineer_certificate ? (
+                              <>
+                                <Link
+                                  to={`${base_public_url}coi/re_engineer/${coi.re_engineer_certificate}`}
+                                  target='_blank'
+                                  className='text-emerald-950 hover:underline cursor-pointer'
+                                >
+                                  {coi.re_engineer_certificate}
+                                </Link>
+                                <IconX
+                                  onClick={() =>
+                                    handledeleteFile({
+                                      re_engineer_certificate: coi.rla_certificate,
+                                    })
+                                  }
+                                  className='text-red-500 cursor-pointer hover:rotate-90 transition duration-500 '
+                                />
+                              </>
+                            ) : (
+                              <span>-</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   {IsRLA && (

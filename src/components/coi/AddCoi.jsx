@@ -14,6 +14,7 @@ import * as motion from 'motion/react-client';
 const AddCoi = () => {
   const navigate = useNavigate();
   const [IsRLA, setIsRLA] = useState(false);
+  const [IsReEng, setIsReEng] = useState(false);
   const [unitId, setUnitId] = useState('');
   const [ploList, setPloList] = useState([]);
   const [categoryList, setCategoryList] = useState([]);
@@ -96,11 +97,16 @@ const AddCoi = () => {
       formData.append('issue_date', e.target.issue_date.value);
       formData.append('overdue_date', e.target.overdue_date.value);
       formData.append('rla', e.target.rla.value);
+      formData.append('re_engineer', e.target.re_engineer.value);
 
       if (IsRLA) {
         formData.append('rla_issue', e.target.rla_issue.value);
         formData.append('rla_overdue', e.target.rla_overdue.value);
         formData.append('rla_certificate', e.target.rla_certificate.files[0]);
+      }
+
+      if (IsReEng){
+        formData.append('re_engineer_certificate', e.target.re_engineer_certificate.files[0]);
       }
 
       const res = await addCoi(formData);
@@ -352,8 +358,8 @@ const AddCoi = () => {
                     )}
                   </div>
                 </div>
-                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                  <div className='flex flex-row space-x-2 w-full md:w-2/3'>
+                <div className='flex flex-col space-y-2'>
+                  <div className='flex flex-row space-x-2 w-full'>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
                         Issue Date <sup className='text-red-500'>*</sup>
@@ -393,27 +399,76 @@ const AddCoi = () => {
                       )}
                     </div>
                   </div>
-                  <div className='w-full md:w-1/3'>
-                    <label className='text-emerald-950' htmlFor='rla'>
-                      RLA
-                    </label>
-                    <select
-                      name='rla'
-                      id='rla'
-                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                      onChange={(e) =>
-                        e.target.value == 1 ? setIsRLA(true) : setIsRLA(false)
-                      }
-                    >
-                      <option value='0'>N/A</option>
-                      <option value='1'>Available</option>
-                    </select>
-                    {validation.rla && (
-                      validation.rla.map((item, index) => (
-                        <div key={index}>
-                          <small className="text-red-600 text-sm">{item}</small>
-                        </div>
-                      ))
+                  <div className='flex flex-row space-x-2 w-full'>
+                    <div className='w-full'>
+                      <label className='text-emerald-950' htmlFor='rla'>
+                        RLA
+                      </label>
+                      <select
+                        name='rla'
+                        id='rla'
+                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                        onChange={(e) =>
+                          e.target.value == 1 ? setIsRLA(true) : setIsRLA(false)
+                        }
+                      >
+                        <option value='0'>N/A</option>
+                        <option value='1'>Available</option>
+                      </select>
+                      {validation.rla && (
+                        validation.rla.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <div className='w-full'>
+                      <label className='text-emerald-950' htmlFor='rla'>
+                        Re-Engineer
+                      </label>
+                      <select
+                        name='re_engineer'
+                        id='re_engineer'
+                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                        onChange={(e) =>
+                          e.target.value == 1 ? setIsReEng(true) : setIsReEng(false)
+                        }
+                      >
+                        <option value='0'>N/A</option>
+                        <option value='1'>Available</option>
+                      </select>
+                      {validation.re_engineer && (
+                        validation.re_engineer.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    {IsReEng && (
+                      <div className='w-full'>
+                        <label
+                          className='text-emerald-950'
+                          htmlFor='re_engineer_certificate'
+                        >
+                          Re-Engineer Certificate <sup className='text-red-500'>*</sup>
+                        </label>
+                        <input
+                          type='file'
+                          name='re_engineer_certificate'
+                          id='re_engineer_certificate'
+                          className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          required
+                        />
+                        {validation.re_engineer_certificate && (
+                          validation.re_engineer_certificate.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

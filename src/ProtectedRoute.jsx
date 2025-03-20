@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem("token");
+  const now = new Date();
+ 
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,8 +22,21 @@ const ProtectedRoute = () => {
   try {
     const decoded = jwtDecode(token);
     const levelUser = String(decoded.level_user); // Pastikan string
+    // const exp = Date(decoded.exp);
+    const nowsecond = Math.floor(now.getTime() / 1000);
 
-    // Blokir akses ke semua path di tab 'masterdata' jika level_user = 2
+    if (nowsecond > decoded.exp) {
+      localStorage.removeItem("token");
+      Swal.fire({
+        icon: 'error',
+        title: 'Akses Ditolak!',
+        text: 'Login Terlebih Dahulu.',
+        confirmButtonText: 'OK'
+      }).then(() => navigate('/login'));
+      return null;
+    }
+
+    
     const masterDataPaths = ["/unit", "/category", "/type", "/tagnumber"];
 
     if (levelUser === "2" && masterDataPaths.includes(location.pathname)) {
