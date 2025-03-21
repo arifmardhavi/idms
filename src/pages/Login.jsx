@@ -2,10 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/user.service";
 import Swal from "sweetalert2";
 import { useState } from "react";
+import { IconEye } from "@tabler/icons-react";
+import { IconEyeClosed } from "@tabler/icons-react";
 
 const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [validation, setValidation] = useState([]);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -21,16 +24,17 @@ const Login = () => {
             navigate('/');
         } catch (error) {
             console.error(error.response?.data?.errors);
+            const message = error.response?.data?.message || 'Terjadi kesalahan saat melakukan login!';
             setValidation(error.response?.data?.errors || []);
-            Swal.fire('Gagal!', 'Terjadi kesalahan saat melakukan login!', 'error');
+            Swal.fire('Gagal!', message, 'error');
         } finally {
             setIsSubmitting(false);
         }
     };
     return (
         <div className="bg-emerald-950 flex flex-col justify-center items-center min-w-screen min-h-screen">
-            <div className="bg-lime-400 flex flex-col justify-center items-center text-emerald-950 w-[600px] h-96 rounded-lg rotate-6 " >
-                <div className=" bg-emerald-950 flex flex-col p-2 text-lime-300 w-[600px] h-96 rounded-lg -rotate-6 border border-lime-300/20">
+            <div className="bg-lime-400 flex flex-col justify-center items-center text-emerald-950 w-[300px] md:w-[600px] h-96 rounded-lg rotate-6 " >
+                <div className=" bg-emerald-950 flex flex-col p-2 text-lime-300 w-[300px] md:w-[600px] h-96 rounded-lg -rotate-6 border border-lime-300/20">
                     <div className="flex flex-col justify-center items-center my-2" >
                         <div className="flex flex-row justify-center items-center">
                             <img src='/images/kpi-putih.png' alt="Logo" width={150} className="border-r border-lime-300 mr-2" />
@@ -38,11 +42,11 @@ const Login = () => {
                         </div>
                         <h1 className="text-2xl">Login</h1>
                     </div>
-                    <div>
-                        <form onSubmit={handleLogin} className="space-y-4 text-white flex flex-col justify-center items-center">
+                    <div className="flex flex-col justify-center items-center my-2">
+                        <form onSubmit={handleLogin} className="space-y-4 text-white flex flex-col w-full md:w-96">
                             <div className="space-y-2">
-                                <p>Masukkan Username</p>
-                                <input name="username" type="text" placeholder="ex: arifmardhavi" className="border border-lime-300 rounded-md p-2 w-96 bg-transparent outline-none" required />
+                                {/* <p>Masukkan Username</p> */}
+                                <input name="username" type="text" placeholder="Masukkan Username" className="border border-lime-300 rounded-md p-2 w-full bg-transparent outline-none" required />
                                 {validation.username && (
                                     validation.username.map((item, index) => (
                                         <div key={index}>
@@ -51,11 +55,12 @@ const Login = () => {
                                     ))
                                 )}
                             </div>
-                            <div className="flex flex-col justify-center items-center my-2">
-                                <input name="password" type="password" placeholder="********" className="border border-lime-300 rounded-md p-2 w-96 bg-transparent outline-none" required />
+                            <div className="flex flex-row justify-center items-center my-2 space-x-2 md:space-x-1">
+                                <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Masukkan Password" className="border border-lime-300 rounded-md p-2 w-full bg-transparent outline-none" required />
+                                <button onClick={() => setShowPassword(!showPassword)} type="button" className="border border-lime-400 text-lime-400 rounded-md p-2">{showPassword ? <IconEye /> : <IconEyeClosed />}</button>
                             </div>
                             <div className="flex flex-col justify-center items-center my-2">
-                                <button type="submit" className="bg-lime-400 text-emerald-950 rounded-md p-2 w-96" disabled={isSubmitting}>Login</button>
+                                <button type="submit" className="bg-lime-400 text-emerald-950 rounded-md p-2 w-full md:w-96" disabled={isSubmitting}>Login</button>
                             </div>
                         </form>
                     </div>

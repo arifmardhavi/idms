@@ -236,7 +236,7 @@ const Category = () => {
         {editMode === false && (
           <div className='w-full h-fit bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
             <h1 className='text-xl font-bold uppercase'>Tambah Kategori</h1>
-            <form method='POST' onSubmit={(event) => handleAddCategory(event)}>
+            <form method='POST' onSubmit={(event) => handleAddCategory(event)} >
               <div className='flex flex-col space-y-4'>
                 <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
@@ -319,6 +319,7 @@ const Category = () => {
             <form
               method='POST'
               onSubmit={(event) => handleUpdateCategory(event)}
+              key={editCategory.id}
             >
               <div className='flex flex-col space-y-4'>
                 <div className='flex flex-row space-x-2'>

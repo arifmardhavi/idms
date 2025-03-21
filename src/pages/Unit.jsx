@@ -318,7 +318,7 @@ const handleNonactive = async (unit) => {
         {editMode && (
           <div className="w-full h-fit bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
             <h1 className="text-xl font-bold uppercase">Edit Unit</h1>
-            <form method="POST" onSubmit={(event) => handleUpdateUnit(event)}>
+            <form method="POST" onSubmit={(event) => handleUpdateUnit(event)} key={editUnit.id}>
               <div className="flex flex-col space-y-4">
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>

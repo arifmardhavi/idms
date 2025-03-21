@@ -54,24 +54,36 @@ const Header = () => {
   const handleTabClick = (tabName) => setOpenTab(openTab === tabName ? '' : tabName);
   const activeMenu = (menu) => localStorage.getItem('active') === menu ? 'text-lime-300 border-lime-300 border-l-4' : '';
 
-  const renderMenu = (tab) => {
-    return SidesMenu.filter(menu => menu.tab === tab).map((menu, index) => (
-      <motion.div 
-        key={menu.path || menu.name || index} // Tambahkan key yang unik 
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
-        className={`hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md ${activeMenu(menu.name)}`}
-      >
-        <Link to={menu.path} className='flex items-center space-x-3 p-2 cursor-pointer' onClick={() => localStorage.setItem('active', menu.name)}>
-          {menu.icon}
-          <span className='text-white'>{menu.name}</span>
-        </Link>
-      </motion.div>
-    ));
-  }
-  
+  const renderMenu = (tab) => (
+    <AnimatePresence>
+      {openTab === tab && (
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className='pl-4'
+        >
+          {SidesMenu.filter(menu => menu.tab === tab).map((menu, index) => (
+            <motion.div
+              key={menu.path || menu.name || index}
+              whileTap={{ scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
+              className={`hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md ${activeMenu(menu.name)}`}
+            >
+              <Link to={menu.path} className='flex items-center space-x-3 p-2 cursor-pointer' onClick={() => localStorage.setItem('active', menu.name)}>
+                {menu.icon}
+                <span className='text-white'>{menu.name}</span>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
   const renderTab = (tab, icon, label) => (
     <motion.div whileTap={{ scale: 0.9 }} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
@@ -90,17 +102,15 @@ const Header = () => {
           <img className='w-24 xl:w-32 border-r-2 border-slate-300' src='/images/kpi-putih.png' alt='Logo Pertamina' />
           <span className='text-md xl:text-xl font-bold'>IDMS</span>
         </div>
-        <AnimatePresence mode="wait">
-          {userLevel !== '2' && (
-            <>
-              {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
-              {openTab === 'masterdata' && <div key="masterdata" className='pl-4'>{renderMenu('masterdata')}</div>}
-            </>
-          )}
-          {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
-          {openTab === 'regulatorycompliance' && <div key="regulatorycompliance" className='pl-4'>{renderMenu('regulatorycompliance')}</div>}
-          <div onClick={handleLogout} className='cursor-pointer'>{renderTab('logout', <IconLogout />, 'Logout')}</div>
-        </AnimatePresence>
+        {userLevel !== '2' && (
+          <>
+            {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
+            {renderMenu('masterdata')}
+          </>
+        )}
+        {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
+        {renderMenu('regulatorycompliance')}
+        <div onClick={handleLogout} className='cursor-pointer'>{renderTab('logout', <IconLogout />, 'Logout')}</div>
       </div>
 
       {/* Mobile */}

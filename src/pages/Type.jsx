@@ -377,7 +377,7 @@ const Type = () => {
         {editMode && (
           <div className='w-full h-fit bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
             <h1 className='text-xl font-bold uppercase'>Edit Tipe</h1>
-            <form method='POST' onSubmit={(event) => handleUpdateType(event)}>
+            <form method='POST' onSubmit={(event) => handleUpdateType(event)} key={editType.id}>
               <div className='flex flex-col space-y-4'>
                 <div className='w-full'>
                   <label className='text-sm uppercase' htmlFor='type_name'>
