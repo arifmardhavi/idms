@@ -21,7 +21,7 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'User', icon: <IconUser />, path: '/user', tab: 'regulatorycompliance' },
+  { name: 'User', icon: <IconUser />, path: '/user', tab: 'masterdata' },
 ];
 
 const Header = () => {
