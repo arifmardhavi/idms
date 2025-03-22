@@ -319,7 +319,7 @@ const Coi = () => {
     },
     {
       field: 're_engineer_certificate',
-      headerName: 'Re-Engineer file',
+      headerName: 'Re-Engineering file',
       width: 150,
       renderCell: (params) => (
         <div className='py-4 pl-4'>

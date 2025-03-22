@@ -283,6 +283,26 @@ const DashboardCoi = () => {
         </div>
       ),
     },
+    {
+      field: 're_engineer_certificate',
+      headerName: 'Re-Engineering file',
+      width: 150,
+      renderCell: (params) => (
+        <div className='py-4 pl-4'>
+          {params.value ? (
+            <Link
+              to={`${base_public_url}coi/re_engineer/${params.value}`}
+              target='_blank'
+              className=' text-lime-500'
+            >
+              <IconCloudDownload stroke={2} />
+            </Link>
+          ) : (
+            <p>-</p>
+          )}
+        </div>
+      ),
+    },
   ];
 
   const CustomQuickFilter = () => (

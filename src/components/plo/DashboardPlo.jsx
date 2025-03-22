@@ -379,7 +379,7 @@ const DashboardPlo = () => {
               />
             </div>
             <div className="flex flex-col items-center text-center">
-              <span>RLA Equipment</span>
+              <span>RLA Instalasi</span>
               <PieChart
                 series={[
                   {
