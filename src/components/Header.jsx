@@ -11,6 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 import { IconLogout } from '@tabler/icons-react';
 import { apiLogout } from '../services/config';
 import Swal from 'sweetalert2';
+import { IconContract } from '@tabler/icons-react';
 
 const SidesMenu = [
   { name: 'Home', icon: <IconHome />, path: '/' },
@@ -18,10 +19,11 @@ const SidesMenu = [
   { name: 'Kategori Peralatan', icon: <IconCategory />, path: '/category', tab: 'masterdata' },
   { name: 'Tipe Peralatan', icon: <IconAlignBoxLeftMiddle />, path: '/type', tab: 'masterdata' },
   { name: 'Tag Number', icon: <IconTag />, path: '/tagnumber', tab: 'masterdata' },
+  { name: 'User', icon: <IconUser />, path: '/user', tab: 'masterdata' },
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'User', icon: <IconUser />, path: '/user', tab: 'masterdata' },
+  { name: 'Contract', icon: <IconContract />, path: '/skhp', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {

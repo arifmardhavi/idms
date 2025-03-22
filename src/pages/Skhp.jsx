@@ -158,7 +158,7 @@ const Skhp = () => {
       },
     },
     {
-      field: 'file_skhp',
+      field: 'files_skhp',
       headerName: 'FILE SKHP',
       width: 100,
       renderCell: (params) => (
@@ -174,14 +174,14 @@ const Skhp = () => {
       ),
     },
     {
-      field: 'file_old_skhp',
+      field: 'files_old_skhp',
       headerName: 'SKHP LAMA',
       width: 100,
       renderCell: (params) => (
         <div className='py-4 pl-4'>
-          {params.value ? (
+          {params.row.file_old_skhp ? (
             <Link
-              to={`${base_public_url}skhp/${params.value}`}
+              to={`${base_public_url}skhp/${params.row.file_old_skhp}`}
               target='_blank'
               className=' text-lime-500'
             >
