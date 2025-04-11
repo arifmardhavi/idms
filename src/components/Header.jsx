@@ -23,7 +23,7 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'Contract', icon: <IconContract />, path: '/skhp', tab: 'regulatorycompliance' },
+  { name: 'Contract', icon: <IconContract />, path: '/contract', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {

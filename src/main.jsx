@@ -23,6 +23,9 @@ import DashboardSkhp from './components/skhp/DashboardSkhp.jsx';
 import AddSkhp from './components/skhp/AddSkhp.jsx';
 import EditSkhp from './components/skhp/EditSkhp.jsx';
 import ReportPlo from './components/plo/ReportPlo.jsx';
+import Contract from './pages/Contract.jsx';
+import AddContract from './components/contract/addContract.jsx';
+import EditContract from './components/contract/EditContract.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -41,16 +44,19 @@ const router = createBrowserRouter([
       { path: '/plo', element: <Plo /> },
       { path: '/coi', element: <Coi /> },
       { path: '/skhp', element: <Skhp /> },
+      { path: '/contract', element: <Contract /> },
       { path: '/plo/dashboard', element: <DashboardPlo /> },
-      { path: '/coi/dashboard', element: <DashboardCoi /> },
-      { path: '/skhp/dashboard', element: <DashboardSkhp /> },
       { path: '/plo/tambah', element: <AddPlo /> },
       { path: '/plo/edit/:id', element: <EditPlo /> },
+      { path: '/plo/report/:id', element: <ReportPlo /> },
+      { path: '/coi/dashboard', element: <DashboardCoi /> },
       { path: '/coi/tambah', element: <AddCoi /> },
       { path: '/coi/edit/:id', element: <EditCoi /> },
+      { path: '/skhp/dashboard', element: <DashboardSkhp /> },
       { path: '/skhp/tambah', element: <AddSkhp /> },
       { path: '/skhp/edit/:id', element: <EditSkhp /> },
-      { path: '/plo/report/:id', element: <ReportPlo /> },
+      { path: '/contract/tambah', element: <AddContract /> },
+      { path: '/contract/edit/:id', element: <EditContract /> },
     ],
   },
 ]);
