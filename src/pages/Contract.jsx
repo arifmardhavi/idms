@@ -148,7 +148,7 @@ const Contract = () => {
             width: 150,
             renderCell: (params) => (
                 <div className='flex flex-row justify-center py-2 items-center space-x-2'>
-                  <Link to={`/contract/edit/${params.row.id}`}>
+                  <Link to={`/contract/dashboard/${params.row.id}`}>
                       <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}

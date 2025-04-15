@@ -89,7 +89,7 @@ const DashboardPlo = () => {
     },
     {
       field: 'overdue_date',
-      headerName: 'Overdue Date',
+      headerName: 'Inspection Due Date',
       width: 150,
       renderCell: (params) => (
         <div className='py-4'>
@@ -182,7 +182,7 @@ const DashboardPlo = () => {
     },
     {
       field: 'rla_issue',
-      headerName: 'RLA Issue',
+      headerName: 'RLA Issue Date',
       width: 150,
       renderCell: (params) => (
         <div className='py-4'>
@@ -198,7 +198,7 @@ const DashboardPlo = () => {
     },
     {
       field: 'rla_overdue',
-      headerName: 'RLA Overdue',
+      headerName: 'RLA Due Date',
       width: 150,
       renderCell: (params) => (
         <div className='py-4'>

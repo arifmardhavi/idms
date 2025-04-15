@@ -26,6 +26,7 @@ import ReportPlo from './components/plo/ReportPlo.jsx';
 import Contract from './pages/Contract.jsx';
 import AddContract from './components/contract/addContract.jsx';
 import EditContract from './components/contract/EditContract.jsx';
+import DashboardContract from './components/contract/DashboardContract.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
       { path: '/skhp/edit/:id', element: <EditSkhp /> },
       { path: '/contract/tambah', element: <AddContract /> },
       { path: '/contract/edit/:id', element: <EditContract /> },
+      { path: '/contract/dashboard/:id', element: <DashboardContract /> },
     ],
   },
 ]);

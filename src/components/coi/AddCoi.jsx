@@ -381,7 +381,7 @@ const AddCoi = () => {
                     </div>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
-                        Due Date <sup className='text-red-500'>*</sup>
+                        RLA Due Date <sup className='text-red-500'>*</sup>
                       </label>
                       <input
                         type='date'
@@ -477,7 +477,7 @@ const AddCoi = () => {
                     <div className='flex flex-row space-x-2'>
                       <div className='w-full'>
                         <label htmlFor='rla_issue' className='text-emerald-950'>
-                          RLA Issue
+                          RLA Issue Date
                         </label>
                         <input
                           type='date'
@@ -495,7 +495,7 @@ const AddCoi = () => {
                       </div>
                       <div className='w-full'>
                         <label htmlFor='rla_due' className='text-emerald-950'>
-                          RLA Due
+                          RLA Due Date
                         </label>
                         <input
                           type='date'

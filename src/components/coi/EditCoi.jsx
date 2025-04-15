@@ -483,7 +483,7 @@ const EditCoi = () => {
                       </div>
                       <div className='w-full'>
                         <label className='text-emerald-950'>
-                          Due Date <sup className='text-red-500'>*</sup>
+                          Inspection Due Date <sup className='text-red-500'>*</sup>
                         </label>
                         <input
                           type='date'
@@ -619,7 +619,7 @@ const EditCoi = () => {
                         </div>
                         <div className='w-full'>
                           <label className='text-emerald-950'>
-                            RLA Overdue Date
+                            RLA Due Date
                           </label>
                           <input
                             type='date'

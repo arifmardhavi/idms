@@ -50,7 +50,7 @@ const AddContract = () => {
         Swal.fire("Error!", "failed add contract!", "error");
       }
     } catch (error) {
-      console.error("Error adding SKHP:", error);
+      console.error("Error adding Contract:", error);
       setValidation(error.response?.data.errors || []);
       Swal.fire("Error!", "something went wrong add contract!", "error");
     } finally {
