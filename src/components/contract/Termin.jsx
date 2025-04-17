@@ -10,7 +10,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { Box, Modal } from "@mui/material";
 import Swal from "sweetalert2";
 
-const Termin = () => {
+const Termin = ({ onAddedTermin }) => {
     
     const { id } = useParams();
     const [isLoading, setLoading] = useState(true);
@@ -69,6 +69,7 @@ const Termin = () => {
                 setOpen(false);
                 Swal.fire("Berhasil!", "success add termin!", "success");
                 fetchTermin();
+                onAddedTermin();
             } else {
                 Swal.fire("Error!", "failed add termin!", "error");
             }
@@ -93,6 +94,7 @@ const Termin = () => {
             if (res.success) {
                 Swal.fire("Berhasil!", "success Update termin!", "success");
                 fetchTermin();
+                onAddedTermin();
             } else {
                 Swal.fire("Error!", "failed Update termin!", "error");
             }
@@ -120,6 +122,7 @@ const Termin = () => {
                 if (res.success) {
                     Swal.fire("Berhasil!", "Termin berhasil dihapus!", "success");
                     fetchTermin();
+                    onAddedTermin();
                 } else {
                     Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Termin!", "error");
                 }

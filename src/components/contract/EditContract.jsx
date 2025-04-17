@@ -17,6 +17,7 @@ const EditContract = () => {
   const [contractPrice, setContractPrice] = useState('');
   const [isLoading, setLoading] = useState(true);
   const base_public_url = api_public;
+  const [IsKOM, setIsKOM] = useState(false);
 
   useEffect(() => {
     fetchContract();
@@ -27,6 +28,7 @@ const EditContract = () => {
       setLoading(true);
       const data = await getContractById(id);
       setContract(data.data);
+      setIsKOM(data.data.kom);
   
       const formattedPrice = formatNumber(data.data.contract_price);
       setContractPrice(formattedPrice);
@@ -296,25 +298,129 @@ const EditContract = () => {
                         )}
                     </div>
                   </div>
-                    <div className='w-full'>
-                        <label htmlFor="contract_status">Contract Status<sup className='text-red-500'>*</sup></label>
-                        <select
-                            className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                            name="contract_status"
-                            id="contract_status"
-                            defaultValue={contract.contract_status}
-                        >
-                            <option value="1">Aktif</option>
-                            <option value="0">Selesai</option>
-                        </select>
-                        {validation.contract_status && (
-                            validation.contract_status.map((item, index) => (
-                            <div key={index}>
+                  <div className='w-full'>
+                      <label htmlFor="contract_status">Contract Status<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="contract_status"
+                          id="contract_status"
+                          defaultValue={contract.contract_status}
+                      >
+                          <option value="1">Aktif</option>
+                          <option value="0">Selesai</option>
+                      </select>
+                      {validation.contract_status && (
+                          validation.contract_status.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                  <div className='w-full'>
+                      <label htmlFor="kom">KOM<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="kom"
+                          id="kom"
+                          defaultValue={contract.kom}
+                          onChange={(e) =>
+                            e.target.value == 1 ? setIsKOM(true) : setIsKOM(false)
+                          }
+                      >
+                          <option value="0">N/A</option>
+                          <option value="1">Available</option>
+                      </select>
+                      {validation.kom && (
+                          validation.kom.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                </div>
+                <div>
+                {IsKOM && (
+                    <div className='space-y-2'>
+                      <div className='flex flex-row space-x-2'>
+                        <div className='w-full'>
+                          <label htmlFor='contract_start_date' className='text-emerald-950'>
+                            Kontrak Mulai
+                          </label>
+                          <input
+                            type='date'
+                            name='contract_start_date'
+                            id='contract_start_date'
+                            defaultValue={contract.contract_start_date}
+                            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          />
+                          {validation.contract_start_date && (
+                            validation.contract_start_date.map((item, index) => (
+                              <div key={index}>
                                 <small className="text-red-600 text-sm">{item}</small>
-                            </div>
+                              </div>
                             ))
+                          )}
+                        </div>
+                        <div className='w-full'>
+                          <label htmlFor='contract_end_date' className='text-emerald-950'>
+                            Kontrak Berakhir
+                          </label>
+                          <input
+                            type='date'
+                            name='contract_end_date'
+                            id='contract_end_date'
+                            defaultValue={contract.contract_end_date}
+                            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          />
+                          {validation.contract_end_date && (
+                            validation.contract_end_date.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                      <div className='w-full'>
+                        <label
+                          className='text-emerald-950'
+                          htmlFor='meeting_notes'
+                        >
+                          Notulensi KOM
+                        </label>
+                        <input
+                          type='file'
+                          name='meeting_notes'
+                          id='meeting_notes'
+                          className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                        />
+                        {validation.meeting_notes && (
+                          validation.meeting_notes.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
                         )}
+                        <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                          {contract.meeting_notes ? (
+                          <>
+                              <Link
+                              to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
+                              target='_blank'
+                              className='text-emerald-950 hover:underline cursor-pointer'
+                              >
+                              {contract.meeting_notes}
+                              </Link>
+                          </>
+                          ) : (
+                          <span>-</span>
+                          )}
+                      </div>
+                      </div>
                     </div>
+                  )}
                 </div>
               </div>
               <div className='w-full flex flex-row space-x-2 py-2'>

@@ -7,24 +7,12 @@ import { Breadcrumbs, Typography } from "@mui/material";
 import { IconChevronRight } from "@tabler/icons-react";
 import Termin from "./Termin";
 import Billing from "./Billing";
+import Spk from "./Spk";
 const DashboardContract = () => {
     const {id} = useParams();
-    const [contractPrice, setContractPrice] = useState('');
     const [contract, setContract] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const base_public_url = api_public;
-
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 360,
-        bgcolor: 'background.paper',
-        boxShadow: 30,
-        p: 4,
-        borderRadius: 2
-    };
 
     useEffect(() => {
         fetchContract();
@@ -35,26 +23,11 @@ const DashboardContract = () => {
           setLoading(true);
           const data = await getContractById(id);
           setContract(data.data);
-    
-          const formattedPrice = formatNumber(data.data.contract_price.toString());
-          setContractPrice(formattedPrice);
         } catch (error) {
           console.error("Error fetching contract:", error);
         } finally {
           setLoading(false);
         }
-    };
-    
-    const formatNumber = (value) => {
-        const numeric = value.replace(/[^\d]/g, ''); // Hapus semua non-digit
-        if (!numeric) return '';
-        return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // Tambah koma sebagai pemisah ribuan
-    };
-    
-    const handleInputChange = (e) => {
-        const value = e.target.value;
-        const formatted = formatNumber(value);
-        setContractPrice(formatted);
     };
   return (
     <div className='flex flex-col md:flex-row w-full'>
@@ -75,164 +48,156 @@ const DashboardContract = () => {
                 </Link>
                 <Typography className='text-lime-500'>Dashboard Contract</Typography>
             </Breadcrumbs>
-            {isLoading ? <div>Loading...</div> : <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                <div className="flex flex-col uppercase font-bold">
-                    <span>{contract.contract_name}</span> 
-                </div>
-                <div>
-                    <div className='flex flex-col space-y-2'>
-                        <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                            <div className='w-full'>
-                                <label className='text-emerald-950'>
-                                    No Vendor <sup className='text-red-500'>*</sup>{' '}
-                                </label>
-                                <input
-                                    type='text'
-                                    name='no_vendor'
-                                    id='no_vendor'
-                                    placeholder='No Vendor'
-                                    value={contract.no_vendor}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                                    disabled
-                                />
-                            </div>
-                            <div className='w-full'>
-                                <label className='text-emerald-950'>
-                                    Vendor Name <sup className='text-red-500'>*</sup>{' '}
-                                </label>
-                                <input
-                                    type='text'
-                                    name='vendor_name'
-                                    id='vendor_name'
-                                    placeholder='Vendor Name'
-                                    value={contract.vendor_name}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                            <div className='w-full'>
-                                <label className='text-emerald-950'>
-                                    No Contract <sup className='text-red-500'>*</sup>{' '}
-                                </label>
-                                <input
-                                    type='text'
-                                    name='no_contract'
-                                    id='no_contract'
-                                    placeholder='No Contract'
-                                    value={contract.no_contract}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                                    disabled
-                                />
-                            </div>
-                            <div className='w-full'>
-                                <label className='text-emerald-950'>
-                                    Contract Name <sup className='text-red-500'>*</sup>{' '}
-                                </label>
-                                <input
-                                    type='text'
-                                    name='contract_name'
-                                    id='contract_name'
-                                    placeholder='Contract Name'
-                                    value={contract.contract_name}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                            <div className='flex flex-row space-x-2 w-full'>
-                                <div className='w-full'>
-                                    <label htmlFor="contract_type">Contract Type<sup className='text-red-500'>*</sup></label>
-                                    <select
-                                        className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                        name="contract_type"
-                                        id="contract_type"
-                                        value={contract.contract_type}
-                                        disabled
-                                    >
-                                        <option value="1">Lumpsum</option>
-                                        <option value="2">Unit Price</option>
-                                    </select>
-                                </div>
-                                <div className='w-full'>
-                                    <label className='text-emerald-950'>
-                                    Contract Date <sup className='text-red-500'>*</sup>
-                                    </label>
-                                    <input
-                                    type='date'
-                                    name='contract_date'
-                                    id='contract_date'
-                                    value={contract.contract_date}
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                                    disabled
-                                    />
-                                </div>
-                            </div>
-                            <div className='w-full md:w-2/3'>
-                                <label className='text-emerald-950'>
-                                    Contract Price <sup className='text-red-500'>*</sup>{' '}
-                                </label>
-                                <input
-                                    type='text'
-                                    name='contract_price'
-                                    id='contract_price'
-                                    placeholder='Contract Price'
-                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                                    value={contractPrice}
-                                    onChange={handleInputChange}
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                            <div className='w-full'>
-                                <label className='text-emerald-950'>
-                                    Contract File <sup className='text-red-500'>*</sup>{' '}
-                                </label>
-                                <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-2'>
-                                    {contract.contract_file ? (
-                                    <>
-                                        <Link
+            { isLoading ? <div>Loading...</div> : <div className='w-full space-y-2 bg-white shadow-sm px-2 py-4 rounded-lg'>
+                <h1 className="text-xl uppercase font-bold" >Detail Contract</h1>
+                <div className="flex flex-col md:flex-row space-y-2 md:space-x-2 md:space-y-0" >
+                    <div className="w-full md:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
+                        <table className="w-full" >
+                            <tr>
+                                <td>Judul Kontrak</td>
+                                <td>:</td>
+                                <td>{contract.contract_name}</td>
+                            </tr>
+                            <tr>
+                                <td>No Kontrak</td>
+                                <td>:</td>
+                                <td>{contract.no_contract}</td>
+                            </tr>
+                            <tr>
+                                <td>Nama Vendor</td>
+                                <td>:</td>
+                                <td>{contract.vendor_name}</td>
+                            </tr>
+                            <tr>
+                                <td>Nomor Vendor</td>
+                                <td>:</td>
+                                <td>{contract.no_vendor}</td>
+                            </tr>
+                            <tr>
+                                <td>Tipe Kontrak</td>
+                                <td>:</td>
+                                <td>{contract.contract_type == '1' ? 'Lumpsum' : 'Unit Price'}</td>
+                            </tr>
+                            <tr>
+                                <td>Nilai Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                {new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                                }).format(contract.contract_price)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                {new Intl.DateTimeFormat('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                }).format(new Date(contract.contract_date))}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dokumen Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                    <Link
                                         to={`${base_public_url}contract/${contract.contract_file}`}
                                         target='_blank'
-                                        className='text-emerald-950 hover:underline cursor-pointer'
-                                        >
+                                        className='bg-emerald-950 text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                                    >
                                         {contract.contract_file}
-                                        </Link>
-                                    </>
-                                    ) : (
-                                    <span>-</span>
-                                    )}
-                                </div>
-                            </div>
-                            <div className='w-full'>
-                                <label htmlFor="contract_status">Contract Status<sup className='text-red-500'>*</sup></label>
-                                <select
-                                    className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                    name="contract_status"
-                                    id="contract_status"
-                                    disabled
-                                >
-                                    <option value="1">Aktif</option>
-                                    <option value="0">Selesai</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex flex-row justify-end space-x-2">
-                            <Link to={`/contract/edit/${id}`} className="text-lime-400 bg-emerald-950 w-full text-center py-2 px-4 rounded">
-                                    Edit
-                            </Link>
-                        </div>
+                                    </Link>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div className="w-full md:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
+                        <table className="w-full" >
+                            <tr>
+                                <td>Jumlah Termin</td>
+                                <td>:</td>
+                                <td>{contract.termin_count}</td>
+                            </tr>
+                            <tr>
+                                <td>Jumlah Penagihan</td>
+                                <td>:</td>
+                                <td>{contract.billing_count}</td>
+                            </tr>
+                            <tr>
+                                <td>Progress Pekerjaan</td>
+                                <td>:</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td>Adendum</td>
+                                <td>:</td>
+                                <td>Yes</td>
+                            </tr>
+                            <tr>
+                                <td>Mulai Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                    {new Intl.DateTimeFormat('id-ID', {
+                                        day: '2-digit',
+                                        month: 'long',
+                                        year: 'numeric',
+                                    }).format(new Date(contract.contract_start_date))}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Akhir Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                    {new Intl.DateTimeFormat('id-ID', {
+                                        day: '2-digit',
+                                        month: 'long',
+                                        year: 'numeric',
+                                    }).format(new Date(contract.contract_end_date))}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dokumen Notulensi KOM</td>
+                                <td>:</td>
+                                <td>
+                                    <Link
+                                        to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
+                                        target='_blank'
+                                        className='bg-emerald-950 text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                                    >
+                                        {contract.meeting_notes}
+                                    </Link>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Status Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                    <span className="bg-emerald-950 text-lime-400 px-2 rounded-md">
+                                        {contract.contract_status == '1' ? 'Berjalan' : 'Selesai'}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
-            </div> }
+                <div className="w-full p-2 flex flex-row justify-center">
+                    <Link to={`/contract/edit/${id}`} className="text-lime-400 bg-emerald-950 w-full md:w-64 text-center py-2 px-4 rounded">
+                            Update
+                    </Link>
+                </div>
+            </div>}
             <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                <Termin />
+                <Spk />
             </div>
             <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                <Billing />
+                <Termin onAddedTermin={fetchContract} />
+            </div>
+            <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                <Billing onAddedBilling={fetchContract} />
             </div>
         </div>
     </div>

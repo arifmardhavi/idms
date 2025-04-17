@@ -12,6 +12,7 @@ const AddContract = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
   const [contractPrice, setContractPrice] = useState('');
+  const [IsKOM, setIsKOM] = useState(false);
 
   const formatNumber = (value) => {
     const numeric = value.replace(/[^\d]/g, ''); // hapus non-digit
@@ -39,6 +40,10 @@ const AddContract = () => {
       formData.append('contract_date', e.target.contract_date.value);
       formData.append('contract_price', rawContractPrice);
       formData.append('contract_file', e.target.contract_file.files[0]);
+      formData.append('kom', e.target.kom.value);
+      formData.append('contract_start_date', e.target.contract_start_date.value);
+      formData.append('contract_end_date', e.target.contract_end_date.value);
+      formData.append('meeting_notes', e.target.meeting_notes.files[0]);
       formData.append('contract_status', e.target.contract_status.value);
 
       const res = await addContract(formData);
@@ -253,24 +258,110 @@ const AddContract = () => {
                       ))
                     )}
                   </div>
-                    <div className='w-full'>
-                        <label htmlFor="contract_status">Contract Status<sup className='text-red-500'>*</sup></label>
-                        <select
-                            className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                            name="contract_status"
-                            id="contract_status"
-                        >
-                            <option value="1">Aktif</option>
-                            <option value="0">Selesai</option>
-                        </select>
-                        {validation.contract_status && (
-                            validation.contract_status.map((item, index) => (
-                            <div key={index}>
+                  <div className='w-full'>
+                      <label htmlFor="contract_status">Contract Status<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="contract_status"
+                          id="contract_status"
+                      >
+                          <option value="1">Aktif</option>
+                          <option value="0">Selesai</option>
+                      </select>
+                      {validation.contract_status && (
+                          validation.contract_status.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                  <div className='w-full'>
+                      <label htmlFor="kom">KOM<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="kom"
+                          id="kom"
+                          onChange={(e) =>
+                            e.target.value == 1 ? setIsKOM(true) : setIsKOM(false)
+                          }
+                      >
+                          <option value="0">N/A</option>
+                          <option value="1">Available</option>
+                      </select>
+                      {validation.kom && (
+                          validation.kom.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                </div>
+                <div>
+                {IsKOM && (
+                    <div className='space-y-2'>
+                      <div className='flex flex-row space-x-2'>
+                        <div className='w-full'>
+                          <label htmlFor='contract_start_date' className='text-emerald-950'>
+                            Kontrak Mulai
+                          </label>
+                          <input
+                            type='date'
+                            name='contract_start_date'
+                            id='contract_start_date'
+                            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          />
+                          {validation.contract_start_date && (
+                            validation.contract_start_date.map((item, index) => (
+                              <div key={index}>
                                 <small className="text-red-600 text-sm">{item}</small>
-                            </div>
+                              </div>
                             ))
+                          )}
+                        </div>
+                        <div className='w-full'>
+                          <label htmlFor='contract_end_date' className='text-emerald-950'>
+                            Kontrak Berakhir
+                          </label>
+                          <input
+                            type='date'
+                            name='contract_end_date'
+                            id='contract_end_date'
+                            className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                          />
+                          {validation.contract_end_date && (
+                            validation.contract_end_date.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                      <div className='w-full'>
+                        <label
+                          className='text-emerald-950'
+                          htmlFor='meeting_notes'
+                        >
+                          Notulensi KOM
+                        </label>
+                        <input
+                          type='file'
+                          name='meeting_notes'
+                          id='meeting_notes'
+                          className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                        />
+                        {validation.meeting_notes && (
+                          validation.meeting_notes.map((item, index) => (
+                            <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                            </div>
+                          ))
                         )}
+                      </div>
                     </div>
+                  )}
                 </div>
               </div>
               <div className='w-full flex flex-row space-x-2 py-2'>

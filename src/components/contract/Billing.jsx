@@ -13,7 +13,7 @@ import Swal from "sweetalert2";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { api_public } from '../../services/config';
 
-const Billing = () => {
+const Billing = ({onAddedBilling}) => {
     
     const { id } = useParams();
     const [isLoading, setLoading] = useState(true);
@@ -87,6 +87,7 @@ const Billing = () => {
                 setOpen(false);
                 Swal.fire("Berhasil!", "success add Term Billing Status!", "success");
                 fetchTermBilling();
+                onAddedBilling();
             } else {
                 Swal.fire("Error!", "failed add Term Billing Status!", "error");
             }
@@ -106,6 +107,7 @@ const Billing = () => {
             if (res.success) {
                 Swal.fire("Berhasil!", "success Update Term Billing Status!", "success");
                 fetchTermBilling();
+                onAddedBilling();
             } else {
                 Swal.fire("Error!", "failed Update Term Billing Status!", "error");
             }
@@ -133,6 +135,7 @@ const Billing = () => {
                 if (res.success) {
                     Swal.fire("Berhasil!", "Term Billing Status berhasil dihapus!", "success");
                     fetchTermBilling();
+                    onAddedBilling();
                 } else {
                     Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Term Billing Status!", "error");
                 }
