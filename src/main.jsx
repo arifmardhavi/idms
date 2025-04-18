@@ -27,6 +27,8 @@ import Contract from './pages/Contract.jsx';
 import AddContract from './components/contract/addContract.jsx';
 import EditContract from './components/contract/EditContract.jsx';
 import DashboardContract from './components/contract/DashboardContract.jsx';
+import AddSpk from './components/contract/AddSpk.jsx';
+import EditSpk from './components/contract/EditSpk.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -59,6 +61,8 @@ const router = createBrowserRouter([
       { path: '/contract/tambah', element: <AddContract /> },
       { path: '/contract/edit/:id', element: <EditContract /> },
       { path: '/contract/dashboard/:id', element: <DashboardContract /> },
+      { path: '/contract/addspk/:id', element: <AddSpk /> },
+      { path: '/contract/editspk/:id/:spk_id', element: <EditSpk /> },
     ],
   },
 ]);
