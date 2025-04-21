@@ -8,6 +8,7 @@ import { IconChevronRight } from "@tabler/icons-react";
 import Termin from "./Termin";
 import Billing from "./Billing";
 import Spk from "./Spk";
+import SpkProgress from "./SpkProgress";
 const DashboardContract = () => {
     const {id} = useParams();
     const [contract, setContract] = useState([]);
@@ -117,16 +118,30 @@ const DashboardContract = () => {
                     </div>
                     <div className="w-full md:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
                         <table className="w-full" >
-                            <tr>
-                                <td>Jumlah Termin</td>
-                                <td>:</td>
-                                <td>{contract.termin_count}</td>
-                            </tr>
-                            <tr>
-                                <td>Jumlah Penagihan</td>
-                                <td>:</td>
-                                <td>{contract.billing_count}</td>
-                            </tr>
+                            {
+                                contract.contract_type == '1' ? (
+                                    <>
+                                        <tr>
+                                            <td>Jumlah Termin</td>
+                                            <td>:</td>
+                                            <td>{contract.termin_count}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jumlah Penagihan</td>
+                                            <td>:</td>
+                                            <td>{contract.billing_count}</td>
+                                        </tr>
+                                    </>
+                                ) : (
+                                    <>
+                                        <tr>
+                                            <td>Jumlah SPK</td>
+                                            <td>:</td>
+                                            <td>{contract.spk_count}</td>
+                                        </tr>
+                                    </>
+                                )
+                            }
                             <tr>
                                 <td>Progress Pekerjaan</td>
                                 <td>:</td>
@@ -190,15 +205,27 @@ const DashboardContract = () => {
                     </Link>
                 </div>
             </div>}
-            <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                <Spk />
-            </div>
-            <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                <Termin onAddedTermin={fetchContract} />
-            </div>
-            <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                <Billing onAddedBilling={fetchContract} />
-            </div>
+
+            { contract.contract_type == '2' && 
+            <>
+                <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                    <Spk />
+                </div>
+                <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                    <SpkProgress  />
+                </div>
+            </>
+            }
+            { contract.contract_type == '1' &&
+                <>
+                    <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                        <Termin onAddedTermin={fetchContract} />
+                    </div>
+                    <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                        <Billing onAddedBilling={fetchContract} />
+                    </div>
+                </>
+            }
         </div>
     </div>
   )

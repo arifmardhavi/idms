@@ -27,6 +27,10 @@ export const deleteUnit = async (id) => {
     return await apiDelete(`${endpoint}/${id}`);
 };
 
+export const ActiveUnit = async () => {
+    return await apiGet(`activeunits`);
+};
+
 export const nonactiveUnit = async (id) => {
     return await apiPut(`${endpoint}/nonactive/${id}`, {});
 };

@@ -5,7 +5,7 @@ import { Breadcrumbs, Typography } from '@mui/material';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { addPlo } from '../../services/plo.service';
-import { getUnit } from '../../services/unit.service';
+import { ActiveUnit } from '../../services/unit.service';
 import Swal from 'sweetalert2';
 
 const AddPlo = () => {
@@ -22,7 +22,7 @@ const AddPlo = () => {
 
   const fetchUnits = async () => {
     try {
-      const data = await getUnit();
+      const data = await ActiveUnit();
       setIsUnit(data.data);
     } catch (error) {
       console.error("Error fetching units:", error);

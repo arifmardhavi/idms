@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { getUnit, addUnit, updateUnit, nonactiveUnit } from '../services/unit.service';
+import { getUnit, addUnit, updateUnit, nonactiveUnit, deleteUnit } from '../services/unit.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
+import { jwtDecode } from 'jwt-decode';
+import { IconTrash } from '@tabler/icons-react';
 
 const Unit = () => {
   const [unit, setUnit] = useState([]);
@@ -15,6 +17,8 @@ const Unit = () => {
   const [loading, setLoading] = useState(false); // Loading state
   const [validation, setValidation] =useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const token = localStorage.getItem('token');
+  const userLevel = String(jwtDecode(token).level_user);
 
   useEffect(() => {
     fetchUnits();
@@ -70,7 +74,7 @@ const Unit = () => {
           >
             <IconPencil stroke={2} />
           </motion.button>
-          {params.row.status == 1 ? 
+          {params.row.status == 1 && 
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -79,7 +83,16 @@ const Unit = () => {
             >
               <IconCircleMinus stroke={2} />
             </motion.button>
-            : ''
+          }
+          {userLevel == 99 && 
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+              onClick={() => handleDelete(params.row.id)}
+            >
+              <IconTrash stroke={2} />
+            </motion.button>
           }
         </div>
       ),
@@ -160,6 +173,28 @@ const handleNonactive = async (unit) => {
     } catch (error) {
       console.error(error);
       Swal.fire('Gagal!', 'Terjadi kesalahan saat menonaktifkan unit!', 'error');
+    }
+  }
+};
+// Delete unit
+const handleDelete = async (id) => {
+  const confirm = await Swal.fire({
+    title: 'Apakah Anda yakin?',
+    text: 'Data unit akan dihapus secara permanen!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Hapus!',
+    cancelButtonText: 'Batal',
+  });
+
+  if (confirm.isConfirmed) {
+    try {
+      await deleteUnit(id);
+      Swal.fire('Berhasil!', 'Unit berhasil dihapus!', 'success');
+      fetchUnits();
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus unit!', 'error');
     }
   }
 };
