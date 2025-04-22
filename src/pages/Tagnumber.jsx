@@ -3,8 +3,8 @@ import Header from '../components/Header';
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
 import { getTagnumber, addTagnumber, updateTagnumber, nonactiveTagnumber } from '../services/tagnumber.service';
-import { getUnit } from '../services/unit.service';
-import { getCategory } from '../services/category.service';
+import { ActiveUnit } from '../services/unit.service';
+import { ActiveCategory } from '../services/category.service';
 import { getTypeByCategory } from '../services/type.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
@@ -46,7 +46,7 @@ const fetchTagnumber = async () => {
 const fetchUnits = async () => {
   try {
     setLoading(true);
-    const data = await getUnit();
+    const data = await ActiveUnit();
     setIsUnit(data.data);
   } catch (error) {
     console.log(error);
@@ -58,7 +58,7 @@ const fetchUnits = async () => {
 const fetchCategories = async () => {
   try {
     setLoading(true);
-    const data = await getCategory();
+    const data = await ActiveCategory();
     setIsCategory(data.data);
   } catch (error) {
     console.log(error);

@@ -11,11 +11,14 @@ import {
   addCategory,
   updateCategory,
   nonactiveCategory,
+  deleteCategory,
 } from '../services/category.service';
 import { IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
+import { jwtDecode } from 'jwt-decode';
 
 const Category = () => {
   const [category, setCategory] = useState([]);
@@ -24,6 +27,8 @@ const Category = () => {
   const [loading, setLoading] = useState(false); // Loading state
   const [validation, setValidation] =useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const token = localStorage.getItem('token');
+  const userLevel = String(jwtDecode(token).level_user);
 
   useEffect(() => {
     fetchCategories();
@@ -108,6 +113,29 @@ const Category = () => {
     }
   };
 
+  
+  const handleDelete = async (id) => {
+    const confirm = await Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: 'Data Kategori akan dihapus secara permanen!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal',
+    });
+  
+    if (confirm.isConfirmed) {
+      try {
+        await deleteCategory(id);
+        Swal.fire('Berhasil!', 'Kategori berhasil dihapus!', 'success');
+        fetchCategories();
+      } catch (error) {
+        console.error(error);
+        Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus Kategori!', 'error');
+      }
+    }
+  };
+
   const columns = [
     {
       field: 'category_name',
@@ -160,6 +188,16 @@ const Category = () => {
           >
             <IconCircleMinus stroke={2} />
           </motion.button>
+          }
+          {userLevel == 99 && 
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+              onClick={() => handleDelete(params.row.id)}
+            >
+              <IconTrash stroke={2} />
+            </motion.button>
           }
         </div>
       ),

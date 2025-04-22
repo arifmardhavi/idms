@@ -29,6 +29,10 @@ export const deleteCategory = async (id) => {
     return await apiDelete(`categories/${id}`);
 };
 
+export const ActiveCategory = async () => {
+    return await apiGet(`activecategories`);
+};
+
 export const nonactiveCategory = async (id) => {
     return await apiPut(`categories/nonactive/${id}`, {});
 };

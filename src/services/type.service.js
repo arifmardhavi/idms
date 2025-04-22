@@ -8,4 +8,5 @@ export const getTypeByCategory = async (id) => await apiGet(`${endpoint}/categor
 export const addType = async (data) => await apiPost(endpoint, data);
 export const updateType = async (id, data) => await apiPut(`${endpoint}/${id}`, data);
 export const deleteType = async (id) => await apiDelete(`${endpoint}/${id}`);
+export const ActiveType = async () => await apiGet(`activetypes`);
 export const nonactiveType = async (id) => await apiPut(`${endpoint}/nonactive/${id}`, {});
