@@ -9,7 +9,7 @@ import {
   updatePlo,
   deletePloFile,
 } from '../../services/plo.service';
-import { getUnit } from '../../services/unit.service';
+import { ActiveUnit } from '../../services/unit.service';
 import * as motion from 'motion/react-client';
 import { IconX } from '@tabler/icons-react';
 import { api_public } from "../../services/config";
@@ -33,7 +33,7 @@ const EditPlo = () => {
 
   const fetchUnits = async () => {
     try {
-      const data = await getUnit();
+      const data = await ActiveUnit();
       setIsUnit(data.data);
     } catch (error) {
       console.error("Error fetching units:", error);
