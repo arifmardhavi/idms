@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { getSpkProgressByContract, deleteSpkProgress } from "../../services/spk_progress.service";
+import { getSpkProgressByContract, deleteSpkProgress, addSpkProgress } from "../../services/spk_progress.service";
 import { useState } from "react";
 import { useEffect } from "react";
 import { DataGrid, GridLogicOperator, GridToolbarQuickFilter } from "@mui/x-data-grid";
@@ -10,39 +10,38 @@ import { IconPlus } from "@tabler/icons-react";
 import Swal from "sweetalert2";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { api_public } from '../../services/config';
-// import { getSpkByContract, getSpkById } from "../../services/spk.service";
-// import { Box, Modal } from "@mui/material";
+import { Box, Modal } from "@mui/material";
+import { getSpkByContract, getSpkById } from "../../services/spk.service";
 
 const SpkProgress = () => {
     
     const { id } = useParams();
     const [isLoading, setLoading] = useState(true);
     const [spkProgress, setSpkProgress] = useState([]);
-    // const [spkData, setSpkData] = useState([]);
-    // const [spk, setSpk] = useState([]);
-    // const [open, setOpen] = useState(false);
-    // const [filteredSpk, setFilteredSpk] = useState([]);
-    // const [selectedSpk, setSelectedSpk] = useState("");
-
-    // const [openEdit, setOpenEdit] = useState(false);
-    // const [editSpkProgress, setEditSpkProgress] = useState({});
+    const [isWeeks, setIsWeeks] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [spk, setSpk] = useState([]);
+    const [selectedSpk, setSelectedSpk] = useState(null);
+    const [filteredWeek, setFilteredWeek] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [validation, setValidation] = useState([]);
     const base_public_url = api_public;
 
-    // const style = {
-    //     position: 'absolute',
-    //     top: '50%',
-    //     left: '50%',
-    //     transform: 'translate(-50%, -50%)',
-    //     width: 360,
-    //     bgcolor: 'background.paper',
-    //     boxShadow: 30,
-    //     p: 4,
-    //     borderRadius: 2
-    // };
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 360,
+        bgcolor: 'background.paper',
+        boxShadow: 30,
+        p: 4,
+        borderRadius: 2
+    };
 
     useEffect(() => {
         fetchSpkProgress();
-        // fetchSpk();
+        fetchSpk();
     }, [id]);
 
     const fetchSpkProgress = async () => {
@@ -50,60 +49,75 @@ const SpkProgress = () => {
             setLoading(true);
             const data = await getSpkProgressByContract(id);
             setSpkProgress(data.data);
-    
-            // Fetch all related SPK data
-            // const spkMap = {};
-            // for (const item of data.data) {
-            //     if (!spkMap[item.spk_id]) {
-            //         const spk = await getSpkById(item.spk_id);
-            //         spkMap[item.spk_id] = spk;
-            //     }
-            // }
-            // setSpkData(spkMap);
-            console.log(data.data);
+            // setSpk(data.data.spk);
+            // console.log(data.data);
+            // let tes
+            // const allSpk = [];
+
+            
+
+            // setSpk(allSpk);
+            // console.log(spk);
         } catch (error) {
             console.error("Error fetching spk progress:", error);
         } finally {
             setLoading(false);
         }
     };
+
+    const fetchSpk = async () => {
+        try {
+            setLoading(true);
+            const data = await getSpkByContract(id);
+            setSpk(data.data);
+        } catch (error) {
+            console.error("Error fetching spk:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleWeeks = (week) => {
+        for (const item of spkProgress) {
+            const foundWeek = item.spk?.weeks?.find((w) => w.week === week);
+            if (foundWeek) {
+                return foundWeek.label;
+            }
+        }
+        return '-'; // fallback kalau tidak ditemukan
+    };    
+
+    const handleChangeSpk = async (id) => {
+        setSelectedSpk(id);
+        const data = await getSpkById(id);
+        const weeks = data.data.weeks;
+        setFilteredWeek(weeks);
+        console.log(weeks);
+
+    };
+
+    const handleAddSpkProgress = async (e) => {
+        e.preventDefault();
+        setOpen(true);
+        const formData = new FormData(e.target);
+        setIsSubmitting(true);
+        try {
+            const res = await addSpkProgress(formData);
+            if (res.success) {
+                Swal.fire("Berhasil!", "success add spk!", "success");
+                setOpen(false);
+                fetchSpkProgress();
+            } else {
+                setValidation(res.response?.data.errors || []);
+                Swal.fire("Error!", "failed add spk!", "error");
+            }
+        } catch (error) {
+            console.error("Error adding spk progress:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
     
-    // const fetchSpk = async () => {
-    //     try {
-    //         setLoading(true);
-    //         const data = await getSpkByContract(id);
-    //         setSpk(data.data);
-    //         console.log('SPK : ', data.data);
-    //     } catch (error) {
-    //         console.error("Error fetching spk:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
-    // const handleSpkChange = async (id) => {
-    //     try {
-    //         setLoading(true);
-    //         const data = await getSpkById(id);
-    //         setFilteredSpk(data.data);
-    //         console.log(data.data);
-    //     } catch (error) {
-    //         console.error("Error fetching spk:", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
-    // const editspkProgress = async (id) => {
-    //     try {
-    //         const data = await getSpkProgressById(id);
-    //         setEditSpkProgress(data.data);
-    //         setOpenEdit(true);
-    //     } catch (error) {
-    //         console.error("Error fetching spk progress Status:", error);
-    //     }
-    // };
-
     const handleDelete = async (row) => {
         const result = await Swal.fire({
             title: "Apakah Anda yakin?",
@@ -142,12 +156,9 @@ const SpkProgress = () => {
             ) 
           }
         ,          
-        // { field: "week", headerName: "Week", width: 250, renderCell: (params) => {
-        //     const spk = spkData[params.row.spk_id];
-        //     const weeks = spk.data.weeks[(params.row.week - 1)].week;
-        //     const label = spk.data.weeks[(params.row.week - 1)].label;
-        //     return <div className="py-4">{weeks == params.value && label }</div>;
-        // }},        
+        { field: "week", headerName: "Week", width: 250, renderCell: (params) => {
+            return <div className="py-4">{handleWeeks(params.row.week) }</div>;
+        }},        
         { field: "plan_progress", headerName: "Progress Plan", width: 110, renderCell: (params) => <div className="py-4">
             {params.value} %
         </div> },
@@ -210,7 +221,7 @@ const SpkProgress = () => {
                 <h1 className='text-xl font-bold uppercase'>Progress Pekerjaan</h1>
                 <div className='flex flex-row justify-end items-center space-x-2'>
                     <button
-                        // onClick={() => setOpen(true)}
+                        onClick={() => setOpen(true)}
                         className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                     >
                         <IconPlus className='hover:rotate-180 transition duration-500' />
@@ -219,7 +230,7 @@ const SpkProgress = () => {
                 </div>
             </div>
             {/* modals add */}
-            {/* <Modal 
+            <Modal 
                 open={open} 
                 onClose={() => setOpen(false)} 
                 center
@@ -227,12 +238,12 @@ const SpkProgress = () => {
                 aria-describedby="modal-modal-billing_value"
             >
                 <Box sx={style}>
-                    <h2 id="modal-modal-title" className="text-xl font-bold">Tambah Status Penagihan</h2>
+                    <h2 id="modal-modal-title" className="text-xl font-bold">Tambah Progress Pekerjaan</h2>
                     <form 
                         className="flex flex-col space-y-2" 
                         method='post'
                         encType="multipart/form-data"
-                        // onSubmit={(e) => handleAddTermBilling(e)}
+                        onSubmit={(e) => handleAddSpkProgress(e)}
                     >
                             <div className='w-full'>
                                 <label className='text-emerald-950'>
@@ -242,44 +253,137 @@ const SpkProgress = () => {
                                     className="w-full px-1 py-2 border border-gray-300 rounded-md"
                                     name="spk_id"
                                     id="spk_id"
-                                    value={selectedSpk}
-                                    onChange={(e) => setSelectedSpk(e.target.value)}
                                     required
+                                    value={selectedSpk}
+                                    onChange={(e) => handleChangeSpk(e.target.value)}
                                 >
-                                    <option value="">Pilih Kategori</option>
+                                    <option value="">Pilih SPK</option>
+                                    {
+                                        spk.length > 0 ?
+                                            spk.map((item) => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.spk_name}
+                                                </option>
+                                            ))
+                                        : 
+                                        <option value="" disabled>Tidak Ada SPK</option>
+                                }
                                 </select>
+                                {validation.spk_id && (
+                                    validation.spk_id.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                             <div className='w-full'>
                                 <label className='text-emerald-950'>
-                                    Nilai Penagihan <sup className='text-red-500'>*</sup>{' '}
+                                    Week <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <select
+                                    className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                                    name="week"
+                                    id="week"
+                                    required
+                                >
+                                    <option value="">Pilih Week</option>
+                                    {
+                                        filteredWeek.length > 0 ?
+                                        filteredWeek.map((item) => (
+                                                <option key={item.week} value={item.week}>
+                                                    {item.label}
+                                                </option>
+                                            ))
+                                        : 
+                                        <option value="" disabled>Tidak Ada Week</option>
+                                }
+                                </select>
+                                {validation.week && (
+                                    validation.week.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    Plan Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                                 </label>
                                 <input
-                                    type='text'
-                                    name='billing_value'
-                                    id='billing_value'
-                                    placeholder='ex: 2000000'
+                                    type='number'
+                                    name='plan_progress'
+                                    id='plan_progress'
+                                    placeholder='ex: 10'
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                                 />
+                                {validation.plan_progress && (
+                                    validation.plan_progress.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                             <div className='w-full'>
                                 <label className='text-emerald-950'>
-                                    Bukti Pembayaran <sup className='text-red-500'>*</sup>{' '}
+                                    Aktual Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <input
+                                    type='number'
+                                    name='actual_progress'
+                                    id='actual_progress'
+                                    placeholder='ex: 10'
+                                    required
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                                />
+                                {validation.actual_progress && (
+                                    validation.actual_progress.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    File Progress <sup className='text-red-500'>*</sup>{' '}
                                 </label>
                                 <input
                                     type='file'
-                                    name='payment_document'
-                                    id='payment_document'
+                                    name='progress_file'
+                                    id='progress_file'
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                                 />
+                                {validation.progress_file && (
+                                    validation.progress_file.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                             <div className='w-full'>
-                                <button type='submit' className='text-lime-400 bg-emerald-950 w-full text-center py-2 px-4 rounded'>Simpan</button>
+                                <motion.button
+                                    whileTap={{ scale: 0.97 }}
+                                    whileHover={{ scale: 0.99 }}
+                                    type='submit'
+                                    className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                                    isSubmitting
+                                        ? 'bg-gray-500 cursor-not-allowed'
+                                        : 'bg-emerald-950 text-white'
+                                    }`}
+                                    disabled={isSubmitting} // Disable tombol jika sedang submit
+                                >
+                                    {isSubmitting ? 'Processing...' : 'Save'}
+                                </motion.button>
                             </div>
                     </form>
                 </Box>
-            </Modal> */}
+            </Modal>
             {/* modals add  */}
             { isLoading ? <div>Loading...</div> : 
                 <DataGrid
