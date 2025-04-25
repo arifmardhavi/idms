@@ -82,8 +82,6 @@ const SpkProgress = () => {
         const data = await getSpkById(id);
         const weeks = data.data.weeks;
         setFilteredWeek(weeks);
-        console.log(weeks);
-
     };
 
     const fetchSpkProgressById = async (id) => {
@@ -115,6 +113,7 @@ const SpkProgress = () => {
             }
         } catch (error) {
             console.error("Error adding spk progress:", error);
+            setValidation(error.response?.data.errors || []);
         } finally {
             setIsSubmitting(false);
         }
@@ -136,7 +135,7 @@ const SpkProgress = () => {
             }
         } catch (error) {
             console.error("Error update progress:", error);
-            Swal.fire("Error!", "something went wrong Update Term Billing Status!", "error");
+            Swal.fire("Error!", "something went wrong Update!", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -367,7 +366,7 @@ const SpkProgress = () => {
                                     type='number'
                                     name='actual_progress'
                                     id='actual_progress'
-                                    placeholder='ex: 10'
+                                    placeholder="ex: 10"
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                                 />
@@ -605,7 +604,7 @@ const SpkProgress = () => {
                     }}
                     initialState={{
                         pagination: {
-                            paginationModel: { pageSize: 5, page: 0 },
+                            paginationModel: { pageSize: 10, page: 0 },
                         },
                         filter: {
                             filterModel: {

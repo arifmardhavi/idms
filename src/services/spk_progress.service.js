@@ -4,6 +4,7 @@ const endpoint = "spk_progress";
 
 export const getSpkProgress = async () => await apiGet(endpoint);
 export const getSpkProgressById = async (id) => await apiGet(`${endpoint}/${id}`);
+export const getSpkProgressBySpk = async (id) => await apiGet(`${endpoint}/spk/${id}`);
 export const getSpkProgressByContract = async (id) => await apiGet(`${endpoint}/contract/${id}`);
 export const addSpkProgress = async (data) => await apiPost(endpoint, data);
 export const updateSpkProgress = async (id, data) => await apiPost(`${endpoint}/${id}?_method=PUT`, data);

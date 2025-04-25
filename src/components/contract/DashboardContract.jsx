@@ -9,6 +9,7 @@ import Termin from "./Termin";
 import Billing from "./Billing";
 import Spk from "./Spk";
 import SpkProgress from "./SpkProgress";
+import LumpsumProgress from "./LumpsumProgress";
 const DashboardContract = () => {
     const {id} = useParams();
     const [contract, setContract] = useState([]);
@@ -143,11 +144,6 @@ const DashboardContract = () => {
                                 )
                             }
                             <tr>
-                                <td>Progress Pekerjaan</td>
-                                <td>:</td>
-                                <td>20%</td>
-                            </tr>
-                            <tr>
                                 <td>Adendum</td>
                                 <td>:</td>
                                 <td>Yes</td>
@@ -223,6 +219,9 @@ const DashboardContract = () => {
                     </div>
                     <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                         <Billing onAddedBilling={fetchContract} />
+                    </div>
+                    <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                        <LumpsumProgress />
                     </div>
                 </>
             }
