@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { getSpkProgressByContract, deleteSpkProgress, addSpkProgress } from "../../services/spk_progress.service";
+import { getSpkProgressByContract, deleteSpkProgress, addSpkProgress, getSpkProgressById, updateSpkProgress } from "../../services/spk_progress.service";
 import { useState } from "react";
 import { useEffect } from "react";
 import { DataGrid, GridLogicOperator, GridToolbarQuickFilter } from "@mui/x-data-grid";
@@ -18,13 +18,15 @@ const SpkProgress = () => {
     const { id } = useParams();
     const [isLoading, setLoading] = useState(true);
     const [spkProgress, setSpkProgress] = useState([]);
-    const [isWeeks, setIsWeeks] = useState([]);
     const [open, setOpen] = useState(false);
     const [spk, setSpk] = useState([]);
-    const [selectedSpk, setSelectedSpk] = useState(null);
+    const [selectedSpk, setSelectedSpk] = useState('');
     const [filteredWeek, setFilteredWeek] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [validation, setValidation] = useState([]);
+    const [editspkProgress, setEditSpkProgress] = useState('');
+    const [selectedWeek, setSelectedWeek] = useState('');
+    const [openEdit, setOpenEdit] = useState(false);
     const base_public_url = api_public;
 
     const style = {
@@ -48,16 +50,14 @@ const SpkProgress = () => {
         try {
             setLoading(true);
             const data = await getSpkProgressByContract(id);
+            data.data.forEach((item) => {
+                item.spk.weeks.forEach((weak) => {
+                    if (weak.week == item.week) {
+                        return weak.label;
+                    }
+                });
+            });
             setSpkProgress(data.data);
-            // setSpk(data.data.spk);
-            // console.log(data.data);
-            // let tes
-            // const allSpk = [];
-
-            
-
-            // setSpk(allSpk);
-            // console.log(spk);
         } catch (error) {
             console.error("Error fetching spk progress:", error);
         } finally {
@@ -75,17 +75,7 @@ const SpkProgress = () => {
         } finally {
             setLoading(false);
         }
-    }
-
-    const handleWeeks = (week) => {
-        for (const item of spkProgress) {
-            const foundWeek = item.spk?.weeks?.find((w) => w.week === week);
-            if (foundWeek) {
-                return foundWeek.label;
-            }
-        }
-        return '-'; // fallback kalau tidak ditemukan
-    };    
+    }  
 
     const handleChangeSpk = async (id) => {
         setSelectedSpk(id);
@@ -96,6 +86,18 @@ const SpkProgress = () => {
 
     };
 
+    const fetchSpkProgressById = async (id) => {
+        try {
+            const data = await getSpkProgressById(id);
+            setEditSpkProgress(data.data)
+            handleChangeSpk(data.data.spk_id);
+            setSelectedWeek(data.data.week);
+            setOpenEdit(true);
+        }  catch (error) {
+            console.error("Error fetching spk progress:", error);
+        }
+    }
+
     const handleAddSpkProgress = async (e) => {
         e.preventDefault();
         setOpen(true);
@@ -104,7 +106,7 @@ const SpkProgress = () => {
         try {
             const res = await addSpkProgress(formData);
             if (res.success) {
-                Swal.fire("Berhasil!", "success add spk!", "success");
+                Swal.fire("Berhasil!", "sukses menambahkan progress pekerjaan!", "success");
                 setOpen(false);
                 fetchSpkProgress();
             } else {
@@ -113,6 +115,28 @@ const SpkProgress = () => {
             }
         } catch (error) {
             console.error("Error adding spk progress:", error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+    const handleUpdateSpkProgress = async (e) => {
+        setIsSubmitting(true);
+        e.preventDefault();
+        const SpkProgressId = editspkProgress.id;
+        const formData = new FormData(e.target);
+        try {
+            const res = await updateSpkProgress(SpkProgressId, formData);
+            if (res.success) {
+                setOpenEdit(false);
+                Swal.fire("Berhasil!", "sukses update progress pekerjaan!", "success");
+                fetchSpkProgress();
+            } else {
+                setValidation(res.response?.data.errors || []);
+                Swal.fire("Error!", "failed update spk!", "error");
+            }
+        } catch (error) {
+            console.error("Error update progress:", error);
+            Swal.fire("Error!", "something went wrong Update Term Billing Status!", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -149,6 +173,7 @@ const SpkProgress = () => {
             field: 'spk', 
             headerName: 'SPK', 
             width: 250, 
+            valueGetter: (params) => params.spk_name,
             renderCell: (params) => (
               <div className="py-4">
                 {params.row.spk?.spk_name ?? '-'}
@@ -156,18 +181,25 @@ const SpkProgress = () => {
             ) 
           }
         ,          
-        { field: "week", headerName: "Week", width: 250, renderCell: (params) => {
-            return <div className="py-4">{handleWeeks(params.row.week) }</div>;
-        }},        
+        { field: "week", 
+            headerName: "Week", 
+            valueGetter: (params) => params,
+            width: 250, 
+            renderCell: (params) => {
+                // console.log(params.row);
+                const label = params.row.spk?.weeks?.find((w) => w.week === Number(params.row.week))?.label;
+                return <div className="py-4">{label}</div>;
+            },
+        },                
         { field: "plan_progress", headerName: "Progress Plan", width: 110, renderCell: (params) => <div className="py-4">
-            {params.value} %
+            {params.value}%
         </div> },
         { field: "actual_progress", headerName: "Progress Aktual", width: 120, renderCell: (params) => <div className="py-4">
-            {params.value} %
+            {params.value}%
         </div> },
         { field: "progress_file", headerName: "File Progress", width: 110, renderCell: (params) => <div className="">
             <Link
-                to={`${base_public_url}contract/spk/${params.value}`}
+                to={`${base_public_url}contract/spk/progress/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
             >
@@ -185,7 +217,7 @@ const SpkProgress = () => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         className='px-2 py-1 bg-emerald-950 text-lime-400 text-sm rounded'
-                        // onClick={() => editspkProgress(params.row.id)}
+                        onClick={() => fetchSpkProgressById(params.row.id)}
                     >
                         <IconPencil stroke={2} />
                     </motion.button>
@@ -385,6 +417,175 @@ const SpkProgress = () => {
                 </Box>
             </Modal>
             {/* modals add  */}
+            {/* modals edit */}
+            <Modal 
+                open={openEdit} 
+                onClose={() => setOpenEdit(false)} 
+                center
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-billing_value"
+            >
+                <Box sx={style}>
+                    <h2 id="modal-modal-title" className="text-xl font-bold">Edit Progress Pekerjaan</h2>
+                    <form 
+                        className="flex flex-col space-y-2" 
+                        method='post'
+                        encType="multipart/form-data"
+                        onSubmit={(e) => handleUpdateSpkProgress(e)}
+                    >
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    SPK <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <select
+                                    className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                                    name="spk_id"
+                                    id="spk_id"
+                                    required
+                                    value={selectedSpk}
+                                    onChange={(e) => handleChangeSpk(e.target.value)}
+                                >
+                                    <option value="">Pilih SPK</option>
+                                    {
+                                        spk.length > 0 ?
+                                            spk.map((item) => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.spk_name}
+                                                </option>
+                                            ))
+                                        : 
+                                        <option value="" disabled>Tidak Ada SPK</option>
+                                }
+                                </select>
+                                {validation.spk_id && (
+                                    validation.spk_id.map((item, index) => (
+                                        <div key={index}>
+                                            <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    Week <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <select
+                                    className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                                    name="week"
+                                    id="week"
+                                    value={selectedWeek}
+                                    onChange={(e) => setSelectedWeek(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Pilih Week</option>
+                                    {
+                                        filteredWeek.length > 0 ?
+                                        filteredWeek.map((item) => (
+                                                <option key={item.week} value={item.week}>
+                                                    {item.label}
+                                                </option>
+                                            ))
+                                        : 
+                                        <option value="" disabled>Tidak Ada Week</option>
+                                }
+                                </select>
+                                {validation.week && (
+                                    validation.week.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    Plan Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <input
+                                    type='number'
+                                    name='plan_progress'
+                                    id='plan_progress'
+                                    placeholder='ex: 10'
+                                    defaultValue={editspkProgress.plan_progress}
+                                    required
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                                />
+                                {validation.plan_progress && (
+                                    validation.plan_progress.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    Aktual Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <input
+                                    type='number'
+                                    name='actual_progress'
+                                    id='actual_progress'
+                                    placeholder='ex: 10'
+                                    defaultValue={editspkProgress.actual_progress}
+                                    required
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                                />
+                                {validation.actual_progress && (
+                                    validation.actual_progress.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                <label className='text-emerald-950'>
+                                    File Progress <sup className='text-red-500'>*</sup>{' '}
+                                </label>
+                                <input
+                                    type='file'
+                                    name='progress_file'
+                                    id='progress_file'
+                                    className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                                />
+                                {validation.progress_file && (
+                                    validation.progress_file.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                                <div className="w-full p-2 bg-lime-400 text-emerald-950" >
+                                    <Link
+                                        to={`${base_public_url}contract/spk/progress/${editspkProgress.progress_file}`}
+                                        target='_blank'
+                                        className='hover:underline'
+                                    >
+                                            {editspkProgress.progress_file}
+                                        </Link>
+                                </div>
+                            </div>
+                            <div className='w-full space-y-1'>
+                                <motion.button
+                                    whileTap={{ scale: 0.97 }}
+                                    whileHover={{ scale: 0.99 }}
+                                    type='submit'
+                                    className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                                    isSubmitting
+                                        ? 'bg-gray-500 cursor-not-allowed'
+                                        : 'bg-emerald-950 text-white'
+                                    }`}
+                                    disabled={isSubmitting} // Disable tombol jika sedang submit
+                                >
+                                    {isSubmitting ? 'Processing...' : 'Save'}
+                                </motion.button>
+                                <button className="w-full bg-slate-500 text-white py-2 rounded-md uppercase" onClick={() => setOpenEdit(false)} >Cancel</button>
+                            </div>
+                    </form>
+                </Box>
+            </Modal>
+            {/* modals edit  */}
             { isLoading ? <div>Loading...</div> : 
                 <DataGrid
                     rows={spkProgress}
