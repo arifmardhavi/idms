@@ -50,13 +50,6 @@ const SpkProgress = () => {
         try {
             setLoading(true);
             const data = await getSpkProgressByContract(id);
-            data.data.forEach((item) => {
-                item.spk.weeks.forEach((weak) => {
-                    if (weak.week == item.week) {
-                        return weak.label;
-                    }
-                });
-            });
             setSpkProgress(data.data);
         } catch (error) {
             console.error("Error fetching spk progress:", error);
@@ -106,6 +99,7 @@ const SpkProgress = () => {
             if (res.success) {
                 Swal.fire("Berhasil!", "sukses menambahkan progress pekerjaan!", "success");
                 setOpen(false);
+                setSelectedSpk('');
                 fetchSpkProgress();
             } else {
                 setValidation(res.response?.data.errors || []);
@@ -128,6 +122,7 @@ const SpkProgress = () => {
             if (res.success) {
                 setOpenEdit(false);
                 Swal.fire("Berhasil!", "sukses update progress pekerjaan!", "success");
+                setSelectedSpk('');
                 fetchSpkProgress();
             } else {
                 setValidation(res.response?.data.errors || []);
@@ -144,7 +139,7 @@ const SpkProgress = () => {
     const handleDelete = async (row) => {
         const result = await Swal.fire({
             title: "Apakah Anda yakin?",
-            text: "Data SPK akan dihapus secara permanen!",
+            text: "Data Progress SPK akan dihapus secara permanen!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Ya, hapus!",
@@ -155,14 +150,14 @@ const SpkProgress = () => {
             try {
                 const res = await deleteSpkProgress(row.id);
                 if (res.success) {
-                    Swal.fire("Berhasil!", "spk berhasil dihapus!", "success");
+                    Swal.fire("Berhasil!", "progress spk berhasil dihapus!", "success");
                     fetchSpkProgress();
                 } else {
-                    Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus spk!", "error");
+                    Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus spk progress!", "error");
                 }
             } catch (error) {
-                console.error("Error deleting spk:", error);
-                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus spk!", "error");
+                console.error("Error deleting spk progress:", error);
+                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus spk progress!", "error");
             }
         }
     };
@@ -180,14 +175,11 @@ const SpkProgress = () => {
             ) 
           }
         ,          
-        { field: "week", 
+        { field: "week_label", 
             headerName: "Week", 
-            valueGetter: (params) => params,
             width: 250, 
             renderCell: (params) => {
-                // console.log(params.row);
-                const label = params.row.spk?.weeks?.find((w) => w.week === Number(params.row.week))?.label;
-                return <div className="py-4">{label}</div>;
+                return <div className="py-4">{params.value}</div>;
             },
         },                
         { field: "plan_progress", headerName: "Progress Plan", width: 110, renderCell: (params) => <div className="py-4">
