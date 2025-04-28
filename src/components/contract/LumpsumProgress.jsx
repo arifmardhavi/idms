@@ -11,6 +11,7 @@ import { useState } from "react";
 import { addLumpsumProgress, deleteLumpsumProgress, getLumpsumProgressByContract, getLumpsumProgressById, updateLumpsumProgress } from "../../services/lumpsum_progress.service";
 import Swal from "sweetalert2";
 import { Box, Modal } from "@mui/material";
+import { getContractById } from "../../services/contract.service";
 
 const LumpsumProgress = () => {
     
@@ -40,6 +41,7 @@ const LumpsumProgress = () => {
 
     useEffect(() => {
         fetchProgress();
+        fetchContract();
     }, [id]);
 
     const fetchProgress = async () => {
@@ -51,6 +53,18 @@ const LumpsumProgress = () => {
             // console.log(data.data);
         } catch (error) {
             console.error("Error fetching progress:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchContract = async () => {
+        try {
+            setLoading(true);
+            const data = await getContractById(id);
+            setIsWeeks(data.data?.weeks ?? []);
+        } catch (error) {
+            console.error("Error fetching contract:", error);
         } finally {
             setLoading(false);
         }

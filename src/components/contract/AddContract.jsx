@@ -41,9 +41,11 @@ const AddContract = () => {
       formData.append('contract_price', rawContractPrice);
       formData.append('contract_file', e.target.contract_file.files[0]);
       formData.append('kom', e.target.kom.value);
-      formData.append('contract_start_date', e.target.contract_start_date.value);
-      formData.append('contract_end_date', e.target.contract_end_date.value);
-      formData.append('meeting_notes', e.target.meeting_notes.files[0]);
+      if (IsKOM) {
+        formData.append('contract_start_date', e.target.contract_start_date.value);
+        formData.append('contract_end_date', e.target.contract_end_date.value);
+        formData.append('meeting_notes', e.target.meeting_notes.files[0]);
+      }
       formData.append('contract_status', e.target.contract_status.value);
 
       const res = await addContract(formData);

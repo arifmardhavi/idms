@@ -10,6 +10,7 @@ import Billing from "./Billing";
 import Spk from "./Spk";
 import SpkProgress from "./SpkProgress";
 import LumpsumProgress from "./LumpsumProgress";
+import Amandemen from "./amandemen/Amandemen";
 const DashboardContract = () => {
     const {id} = useParams();
     const [contract, setContract] = useState([]);
@@ -52,8 +53,8 @@ const DashboardContract = () => {
             </Breadcrumbs>
             { isLoading ? <div>Loading...</div> : <div className='w-full space-y-2 bg-white shadow-sm px-2 py-4 rounded-lg'>
                 <h1 className="text-xl uppercase font-bold" >Detail Contract</h1>
-                <div className="flex flex-col md:flex-row space-y-2 md:space-x-2 md:space-y-0" >
-                    <div className="w-full md:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
+                <div className="flex flex-col lg:flex-row space-y-2 lg:space-x-2 lg:space-y-0" >
+                    <div className="w-full lg:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
                         <table className="w-full" >
                             <tr>
                                 <td>Judul Kontrak</td>
@@ -117,7 +118,7 @@ const DashboardContract = () => {
                             </tr>
                         </table>
                     </div>
-                    <div className="w-full md:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
+                    <div className="w-full lg:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
                         <table className="w-full" >
                             {
                                 contract.contract_type == '1' ? (
@@ -144,43 +145,53 @@ const DashboardContract = () => {
                                 )
                             }
                             <tr>
-                                <td>Adendum</td>
+                                <td>Amandemen</td>
                                 <td>:</td>
-                                <td>Yes</td>
+                                <td>No</td>
                             </tr>
                             <tr>
                                 <td>Mulai Kontrak</td>
                                 <td>:</td>
                                 <td>
-                                    {new Intl.DateTimeFormat('id-ID', {
-                                        day: '2-digit',
-                                        month: 'long',
-                                        year: 'numeric',
-                                    }).format(new Date(contract.contract_start_date))}
+                                    {
+                                        contract.contract_start_date ? new Intl.DateTimeFormat('id-ID', {
+                                            day: '2-digit',
+                                            month: 'long',
+                                            year: 'numeric',
+                                        }).format(new Date(contract.contract_start_date))
+                                        : '-'
+                                    }
                                 </td>
                             </tr>
                             <tr>
                                 <td>Akhir Kontrak</td>
                                 <td>:</td>
                                 <td>
-                                    {new Intl.DateTimeFormat('id-ID', {
-                                        day: '2-digit',
-                                        month: 'long',
-                                        year: 'numeric',
-                                    }).format(new Date(contract.contract_end_date))}
+                                    {
+                                        contract.contract_end_date ? new Intl.DateTimeFormat('id-ID', {
+                                            day: '2-digit',
+                                            month: 'long',
+                                            year: 'numeric',
+                                        }).format(new Date(contract.contract_end_date))
+                                        : '-'
+                                    }
                                 </td>
                             </tr>
                             <tr>
                                 <td>Dokumen Notulensi KOM</td>
                                 <td>:</td>
                                 <td>
-                                    <Link
-                                        to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
-                                        target='_blank'
-                                        className='bg-emerald-950 text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
-                                    >
-                                        {contract.meeting_notes}
-                                    </Link>
+                                    {
+                                        contract.meeting_notes ? 
+                                            <Link
+                                                to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
+                                                target='_blank'
+                                                className='bg-emerald-950 text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                                            >
+                                                {contract.meeting_notes}
+                                            </Link>
+                                        : '-'
+                                    }
                                 </td>
                             </tr>
                             <tr>
@@ -218,13 +229,16 @@ const DashboardContract = () => {
                         <Termin onAddedTermin={fetchContract} />
                     </div>
                     <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-                        <Billing onAddedBilling={fetchContract} />
+                        {isLoading ? <div>Loading...</div> : <Billing onAddedBilling={fetchContract} /> }
                     </div>
                     <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                         <LumpsumProgress />
                     </div>
                 </>
             }
+            <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                <Amandemen />
+            </div>
         </div>
     </div>
   )

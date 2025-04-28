@@ -28,7 +28,7 @@ const EditContract = () => {
       setLoading(true);
       const data = await getContractById(id);
       setContract(data.data);
-      setIsKOM(data.data.kom);
+      setIsKOM(data.data.kom == 1 ? true : false);
   
       const formattedPrice = formatNumber(data.data.contract_price);
       setContractPrice(formattedPrice);

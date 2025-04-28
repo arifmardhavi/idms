@@ -173,7 +173,7 @@ const Billing = ({onAddedBilling}) => {
             renderCell: (params) => (
               <div className='py-4'>
                 <Link
-                  to={`${base_public_url}contract/${params.row.payment_document}`}
+                  to={`${base_public_url}contract/payment/${params.row.payment_document}`}
                   target='_blank'
                   className='item-center text-lime-500'
                 >
