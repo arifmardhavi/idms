@@ -30,7 +30,7 @@ const EditSpk = () => {
             setLoading(true);
             const data = await getSpkById(spk_id);
             setSpk(data.data);
-            setIsInvoice(data.data.invoice);
+            setIsInvoice(data.data.invoice == 1 ? true : false);
             const formattedPrice = formatNumber(data.data.spk_price);
             setSpkPrice(formattedPrice);
             if (data.data.invoice_value) {
