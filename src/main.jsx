@@ -29,6 +29,8 @@ import EditContract from './components/contract/EditContract.jsx';
 import DashboardContract from './components/contract/DashboardContract.jsx';
 import AddSpk from './components/contract/AddSpk.jsx';
 import EditSpk from './components/contract/EditSpk.jsx';
+import AddAmandemen from './components/contract/amandemen/AddAmandemen.jsx';
+import EditAmandemen from './components/contract/amandemen/EditAmandemen.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -63,6 +65,8 @@ const router = createBrowserRouter([
       { path: '/contract/dashboard/:id', element: <DashboardContract /> },
       { path: '/contract/addspk/:id', element: <AddSpk /> },
       { path: '/contract/editspk/:id/:spk_id', element: <EditSpk /> },
+      { path: '/contract/addamandemen/:id', element: <AddAmandemen /> },
+      { path: '/contract/editamandemen/:id/:amandemen_id', element: <EditAmandemen /> },
     ],
   },
 ]);

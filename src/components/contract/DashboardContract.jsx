@@ -53,6 +53,9 @@ const DashboardContract = () => {
             </Breadcrumbs>
             { isLoading ? <div>Loading...</div> : <div className='w-full space-y-2 bg-white shadow-sm px-2 py-4 rounded-lg'>
                 <h1 className="text-xl uppercase font-bold" >Detail Contract</h1>
+                <div className="w-full flex flex-row justify-center">
+                    <button className="text-lime-400 bg-emerald-950 w-fit text-center py-2 px-4 rounded cursor-pointer transform hover:scale-95 duration-75">Dashboard {contract.contract_name}</button>
+                </div>
                 <div className="flex flex-col lg:flex-row space-y-2 lg:space-x-2 lg:space-y-0" >
                     <div className="w-full lg:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
                         <table className="w-full" >
