@@ -64,7 +64,7 @@ const Contract = () => {
     };
 
     const columns = [
-        { field: 'no_vendor', headerName: 'No Vendor',  renderCell: (params) => <div className="py-4">{params.value}</div> },
+        { field: 'no_vendor', headerName: 'No Vendor', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
         { field: 'vendor_name', headerName: 'Nama Vendor', width: 200,  renderCell: (params) => <div className="py-4">{params.value}</div> },
         {
           field: 'no_contract',
@@ -105,7 +105,7 @@ const Contract = () => {
         {
           field: 'contract_date',
           headerName: 'Contract Date',
-          width: 150,
+          width: 130,
           renderCell: (params) => (
             <div className='py-4'>
               {new Intl.DateTimeFormat('id-ID', {
@@ -117,11 +117,49 @@ const Contract = () => {
           ),
         },
         {
+          field: 'durasi_mpp',
+          headerName: 'Sisa MPP',
+          width: 100,
+          renderCell: (params) => 
+          <div className='py-4 flex flex-row justify-center items-center'>
+            <p className={`${params.value.color == 'red' ? 'bg-red-500' : params.value.color == 'green' ? 'bg-green-500' : params.value.color == 'yellow' ? 'bg-yellow-500' : params.value.color == 'blue' ? 'bg-blue-500' : 'bg-emerald-950'} text-white rounded-full w-fit p-2 font-bold`}>
+              {params.value.sisa}
+            </p>
+          </div>,
+        },
+        {
+          field: 'monitoring_progress',
+          headerName: 'Deviasi Progress',
+          valueGetter: (params) => params.deviation,
+          width: 150,
+          renderCell: (params) => 
+          <div className='py-4 flex flex-row justify-center items-center'>
+            <p className={`${params.row.monitoring_progress.color == 'red' ? 'bg-red-500' : params.row.monitoring_progress.color == 'green' ? 'bg-green-500' : params.row.monitoring_progress.color == 'yellow' ? 'bg-yellow-500' : params.row.monitoring_progress.color == 'blue' ? 'bg-blue-500' : 'bg-emerald-950'} text-white rounded-full w-fit p-2 font-bold`}>
+              {params.row.monitoring_progress.deviation}
+            </p>
+          </div>,
+        },
+        { 
+            field: 'sisa_nilai', 
+            headerName: 'Sisa Nilai Kontrak',
+            width: 180,
+            valueGetter: (params) => params.sisa,
+            renderCell: (params) => (
+              <div className={`${params.row.sisa_nilai.color == 'green' ? 'text-white bg-green-500' : params.row.sisa_nilai.color == 'yellow' ? 'bg-yellow-300 text-emerald-950' : params.row.sisa_nilai.color == 'red' ? 'text-white bg-red-600' : 'text-white bg-blue-600'} p-2 rounded flex flex-row justify-center items-center my-2`}>
+                {new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+              }).format(new Date(params.row.sisa_nilai.sisa))}
+              </div>
+            )
+        },
+        {
           field: 'contract_file',
           headerName: 'Contract File',
           width: 100,
           renderCell: (params) => (
-            <div className='py-4'>
+            <div className='py-4 flex flex-row justify-center items-center'>
               <Link
                 to={`${base_public_url}contract/${params.row.contract_file}`}
                 target='_blank'
@@ -141,7 +179,7 @@ const Contract = () => {
                 {params.row.contract_status == '1' ? 'Aktif' : 'Selesai'}
               </div>
             )
-          },
+        },
         {
             field: 'actions',
             headerName: 'Aksi',
@@ -246,7 +284,7 @@ const Contract = () => {
                             filterModel: {
                                 items: [],
                                 quickFilterExcludeHiddenColumns: false,
-                                quickFilterLogicOperator: GridLogicOperator.Or,
+                                quickFilterLogicOperator: GridLogicOperator.And,
                             },
                         },
                     }}

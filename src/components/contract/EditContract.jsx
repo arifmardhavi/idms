@@ -30,7 +30,7 @@ const EditContract = () => {
       setContract(data.data);
       setIsKOM(data.data.kom == 1 ? true : false);
   
-      const formattedPrice = formatNumber(data.data.contract_price);
+      const formattedPrice = formatNumber(data.data.initial_contract_price);
       setContractPrice(formattedPrice);
   
     //   console.log(formattedPrice);
@@ -60,7 +60,7 @@ const EditContract = () => {
     try {
     const rawContractPrice = contractPrice.replace(/,/g, '');
     const formData = new FormData(e.target);
-    formData.append('contract_price', rawContractPrice);
+    formData.append('initial_contract_price', rawContractPrice);
 
     console.log(formData);
 
@@ -244,8 +244,8 @@ const EditContract = () => {
                     </label>
                     <input
                         type='text'
-                        name='contract_price'
-                        id='contract_price'
+                        name='initial_contract_price'
+                        id='initial_contract_price'
                         placeholder='Contract Price'
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         value={contractPrice}

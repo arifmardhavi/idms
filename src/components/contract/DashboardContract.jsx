@@ -150,7 +150,7 @@ const DashboardContract = () => {
                             <tr>
                                 <td>Amandemen</td>
                                 <td>:</td>
-                                <td>No</td>
+                                <td>{contract.amandemen_count}</td>
                             </tr>
                             <tr>
                                 <td>Mulai Kontrak</td>
