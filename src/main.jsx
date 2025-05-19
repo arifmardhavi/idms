@@ -31,6 +31,7 @@ import AddSpk from './components/contract/AddSpk.jsx';
 import EditSpk from './components/contract/EditSpk.jsx';
 import AddAmandemen from './components/contract/amandemen/AddAmandemen.jsx';
 import EditAmandemen from './components/contract/amandemen/EditAmandemen.jsx';
+import MonitoringContract from './components/contract/MonitoringContract.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
       { path: '/contract/editspk/:id/:spk_id', element: <EditSpk /> },
       { path: '/contract/addamandemen/:id', element: <AddAmandemen /> },
       { path: '/contract/editamandemen/:id/:amandemen_id', element: <EditAmandemen /> },
+      { path: '/contract/monitoring', element: <MonitoringContract /> },
     ],
   },
 ]);

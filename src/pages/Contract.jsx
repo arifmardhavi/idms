@@ -14,6 +14,8 @@ import { IconPencil } from "@tabler/icons-react";
 import { IconCircleMinus } from "@tabler/icons-react";
 import Swal from "sweetalert2";
 import { IconSettings } from "@tabler/icons-react";
+import { IconChartPie } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 const Contract = () => {
     const [contract, setContract] = useState([]);
     // const [selectedRows, setSelectedRows] = useState([]);
@@ -240,15 +242,22 @@ const Contract = () => {
                 <div className='flex flex-row justify-between'>
                     <h1 className='text-xl font-bold uppercase'>Contract</h1>
                     <div className='flex flex-row justify-end items-center space-x-2'>
-                        <motion.a
-                            href='/contract'
-                            whileTap={{ scale: 0.9 }}
+                        {/* <Link
+                            to='/contract/monitoring'
+                            className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
+                        >
+                            <IconChartPie className='hover:rotate-180 transition duration-500' />
+                            <span>Dashboard</span>
+                        </Link> */}
+                        <motion.button
                             whileHover={{ scale: 1.1 }}
-                            className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                            whileTap={{ scale: 0.95 }}
+                            className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
+                            onClick={fetchContract}
                         >
                             <IconRefresh className='hover:rotate-180 transition duration-500' />
                             <span>Refresh</span>
-                        </motion.a>
+                        </motion.button>
                         <Link
                             to='/contract/tambah'
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
@@ -259,7 +268,11 @@ const Contract = () => {
                     </div>
                 </div>
                 <div>
-                {loading ? <p>Loading...</p> : <DataGrid
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center h-20">
+                        <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+                    </div>
+                ) : <DataGrid
                     rows={contract}
                     columns={columns}
                     checkboxSelection
