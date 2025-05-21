@@ -9,13 +9,16 @@ import { useEffect } from "react";
 import Swal from "sweetalert2";
 import { IconLoader2 } from "@tabler/icons-react";
 import { getAmandemenById, updateAmandemen } from "../../../services/amandemen.service";
+import { api_public } from '../../../services/config';
 
 const EditAmandemen = () => {
     const { id, amandemen_id } = useParams();
+    const base_public_url = api_public;
     const [openNilai, setOpenNilai] = useState(false);
     const [openWaktu, setOpenWaktu] = useState(false);
     const [openDenda, setOpenDenda] = useState(false);
     const [openDokumen, setOpenDokumen] = useState(false);
+    const [requiredDokumen, setRequiredDokumen] = useState(false);
     const [validation, setValidation] = useState({})
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -36,6 +39,7 @@ const EditAmandemen = () => {
             setOpenNilai(data.data.amandemen_price ? true : false);
             setOpenWaktu(data.data.amandemen_end_date ? true : false);
             setOpenDenda(data.data.amandemen_penalty ? true : false);
+            setOpenDokumen(data.data.principle_permit_file ? true : false);
         } catch (error) {
             console.error("Error fetching amandemen:", error);
         } finally {
@@ -63,14 +67,14 @@ const EditAmandemen = () => {
       try {
         const res = await updateAmandemen(amandemen_id, formData);
         if (res.success) {
-          Swal.fire("Berhasil!", "sukses menambahkan amandemen!", "success");
+          Swal.fire("Berhasil!", "sukses update amandemen!", "success");
           navigate(`/contract/dashboard/${id}`);
         } else {
           setValidation(res.response?.data.errors || []);
-          Swal.fire("Error!", "failed add amandemen!", "error");
+          Swal.fire("Error!", "failed update amandemen!", "error");
         }
       } catch (error) {
-        console.error("Error adding amandemen:", error);
+        console.error("Error update amandemen:", error);
         setValidation(error.response?.data.errors || []);
       } finally {
         setIsSubmitting(false);
@@ -83,16 +87,16 @@ const EditAmandemen = () => {
 
       // Kalau input belum valid, sembunyikan input file
       if (isNaN(inputValue)) {
-        setOpenDokumen(false);
+        setRequiredDokumen(false);
         return;
       }
 
       const kelebihan = inputValue - price;
 
       if (kelebihan >= price * 0.1) {
-        setOpenDokumen(true);
+        setRequiredDokumen(true);
       } else {
-        setOpenDokumen(false);
+        setRequiredDokumen(false);
       }
     }
 
@@ -138,7 +142,7 @@ const EditAmandemen = () => {
                 <div className='flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2'>
                     <div className='w-full space-y-1'>
                         <label className='text-emerald-950'>
-                            Berita Acara Kesepakatan <sup className='text-red-500'>*</sup>{' '}
+                            Berita Acara Kesepakatan 
                         </label>
                         <input
                         type='file'
@@ -147,6 +151,15 @@ const EditAmandemen = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         
                         />
+                        {amandemen.ba_agreement_file && <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                          <Link
+                            to={`${base_public_url}contract/amandemen/ba_agreement/${amandemen.ba_agreement_file}`}
+                            target='_blank'
+                            className='text-emerald-950 hover:underline cursor-pointer'
+                          >
+                            {amandemen.ba_agreement_file}
+                          </Link>
+                        </div>}
                             {validation.ba_agreement_file && (
                                 validation.ba_agreement_file.map((item, index) => (
                                     <div key={index}>
@@ -157,7 +170,7 @@ const EditAmandemen = () => {
                     </div>
                     <div className='w-full space-y-1'>
                         <label className='text-emerald-950'>
-                            Dokumen Hasil Amandemen <sup className='text-red-500'>*</sup>{' '}
+                            Dokumen Hasil Amandemen 
                         </label>
                         <input
                         type='file'
@@ -166,6 +179,15 @@ const EditAmandemen = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         
                         />
+                        {amandemen.result_amandemen_file && <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                          <Link
+                            to={`${base_public_url}contract/amandemen/result_amandemen/${amandemen.result_amandemen_file}`}
+                            target='_blank'
+                            className='text-emerald-950 hover:underline cursor-pointer'
+                          >
+                            {amandemen.result_amandemen_file}
+                          </Link>
+                        </div>}
                             {validation.result_amandemen_file && (
                                 validation.result_amandemen_file.map((item, index) => (
                                     <div key={index}>
@@ -218,15 +240,15 @@ const EditAmandemen = () => {
                             className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                             required
                           />
-                          <p>
+                          {!loading && <p>
                             <small className="text-red-600 text-sm">
-                              min: {new Intl.NumberFormat('id-ID', {
+                              min: { new Intl.NumberFormat('id-ID', {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0,
-                              }).format(contract.contract_price + 1)}
+                              }).format(contract.initial_contract_price + 1)}
                             </small>
-                          </p>
+                          </p>}
 
                           {/* Validasi Error untuk Nilai */}
                           {validation.amandemen_price &&
@@ -241,15 +263,24 @@ const EditAmandemen = () => {
                         {openDokumen && (
                           <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                              Dokumen Ijin Prinsip <sup className='text-red-500'>*</sup>{' '}
+                              Dokumen Ijin Prinsip {requiredDokumen ? <sup className='text-red-500'>*</sup>: ''}{' '}
                             </label>
                             <input
                               type='file'
                               name='principle_permit_file'
                               id='principle_permit_file'
                               className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                              required
+                              required={requiredDokumen}
                             />
+                            {amandemen.principle_permit_file && <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                              <Link
+                                to={`${base_public_url}contract/amandemen/principle_permit/${amandemen.principle_permit_file}`}
+                                target='_blank'
+                                className='text-emerald-950 hover:underline cursor-pointer'
+                              >
+                                {amandemen.principle_permit_file}
+                              </Link>
+                            </div>}
                             {/* Validasi Error untuk File */}
                             {validation.principle_permit_file &&
                               validation.principle_permit_file.map((item, index) => (
@@ -261,6 +292,7 @@ const EditAmandemen = () => {
                         )}
                       </div>
                     )}
+                    
                   </div>
 
                 </div>
@@ -301,24 +333,28 @@ const EditAmandemen = () => {
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                           required
                           />
-                          <p>
-                            <small className="text-red-600 text-sm">
-                              min: {
-                                      new Intl.DateTimeFormat('id-ID', {
-                                        day: '2-digit',
-                                        month: 'long',
-                                        year: 'numeric',
-                                      }).format(
-                                        new Date(
-                                          new Date(contract.contract_end_date).setDate(
-                                            new Date(contract.contract_end_date).getDate() + 1
-                                          )
-                                        )
-                                      )
-                                    }
+                          {!loading && contract.contract_date && !isNaN(new Date(contract.contract_date).getTime()) && (
+                            <p>
+                              <small className="text-red-600 text-sm">
+                                min:{' '}
+                                {
+                                  new Intl.DateTimeFormat('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                  }).format(
+                                    (() => {
+                                      const d = new Date(contract.contract_date);
+                                      d.setDate(d.getDate() + 1);
+                                      return d;
+                                    })()
+                                  )
+                                }
+                              </small>
+                            </p>
+                          )}
 
-                            </small>
-                          </p>
+
                               {validation.amandemen_end_date && (
                                   validation.amandemen_end_date.map((item, index) => (
                                       <div key={index}>
@@ -366,7 +402,6 @@ const EditAmandemen = () => {
                           className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                           required
                           />
-                          <p><small className="text-red-600 text-sm">min: {contract.contract_penalty + 1}%</small></p>
                               {validation.amandemen_penalty && (
                                   validation.amandemen_penalty.map((item, index) => (
                                       <div key={index}>
@@ -376,27 +411,8 @@ const EditAmandemen = () => {
                               )}
                       </div>}
                     </div>
-                    {/* <div className='w-full space-y-1'>
-                        <label className='text-emerald-950'>
-                            Dokumen Hasil Amandemen <sup className='text-red-500'>*</sup>{' '}
-                        </label>
-                        <input
-                        type='file'
-                        name='result_amandemen_file'
-                        id='result_amandemen_file'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                        required
-                        />
-                            {validation.result_amandemen_file && (
-                                validation.result_amandemen_file.map((item, index) => (
-                                    <div key={index}>
-                                    <small className="text-red-600 text-sm">{item}</small>
-                                    </div>
-                                ))
-                            )}
-                    </div> */}
                 </div>
-                <div>
+                <div className='flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2'>
                     <motion.button
                         whileTap={{ scale: 0.97 }}
                         whileHover={{ scale: 0.99 }}
@@ -409,6 +425,15 @@ const EditAmandemen = () => {
                         disabled={isSubmitting} // Disable tombol jika sedang submit
                     >
                         {isSubmitting ? 'Processing...' : 'Save'}
+                    </motion.button>
+                    <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 0.99 }}
+                        type='button'
+                        className='w-full lg:w-1/3 bg-gray-500 text-white py-2 rounded-md uppercase'
+                        onClick={() => navigate(-1)}
+                    >
+                        Back
                     </motion.button>
                 </div>
               </form>}

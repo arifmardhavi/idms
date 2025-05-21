@@ -193,7 +193,7 @@ const AddAmandemen = () => {
                           <input
                             type='number'
                             name='amandemen_price'
-                            id='spk_name'
+                            id='amandemen_price'
                             placeholder={`ex: ${contract.contract_price + 1}`} 
                             onChange={(e) => handleDokumen(e.target.value)}
                             className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
@@ -210,8 +210,8 @@ const AddAmandemen = () => {
                           </p>
 
                           {/* Validasi Error untuk Nilai */}
-                          {validation.spk_name &&
-                            validation.spk_name.map((item, index) => (
+                          {validation.amandemen_price &&
+                            validation.amandemen_price.map((item, index) => (
                               <div key={index}>
                                 <small className="text-red-600 text-sm">{item}</small>
                               </div>

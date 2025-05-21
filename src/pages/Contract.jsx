@@ -14,7 +14,6 @@ import { IconPencil } from "@tabler/icons-react";
 import { IconCircleMinus } from "@tabler/icons-react";
 import Swal from "sweetalert2";
 import { IconSettings } from "@tabler/icons-react";
-import { IconChartPie } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
 const Contract = () => {
     const [contract, setContract] = useState([]);
