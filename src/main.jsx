@@ -32,6 +32,9 @@ import EditSpk from './components/contract/EditSpk.jsx';
 import AddAmandemen from './components/contract/amandemen/AddAmandemen.jsx';
 import EditAmandemen from './components/contract/amandemen/EditAmandemen.jsx';
 import MonitoringContract from './components/contract/MonitoringContract.jsx';
+import HistoricalMemorandum from './pages/HistoricalMemorandum.jsx';
+import AddHistoricalMemorandum from './components/historical/AddHistoricalMemorandum.jsx';
+import EditHistoricalMemorandum from './components/historical/EditHistoricalMemorandum.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -51,6 +54,7 @@ const router = createBrowserRouter([
       { path: '/coi', element: <Coi /> },
       { path: '/skhp', element: <Skhp /> },
       { path: '/contract', element: <Contract /> },
+      { path: '/historical_memorandum', element: <HistoricalMemorandum /> },
       { path: '/plo/dashboard', element: <DashboardPlo /> },
       { path: '/plo/tambah', element: <AddPlo /> },
       { path: '/plo/edit/:id', element: <EditPlo /> },
@@ -69,6 +73,8 @@ const router = createBrowserRouter([
       { path: '/contract/addamandemen/:id', element: <AddAmandemen /> },
       { path: '/contract/editamandemen/:id/:amandemen_id', element: <EditAmandemen /> },
       { path: '/contract/monitoring', element: <MonitoringContract /> },
+      { path: '/historical_memorandum/tambah', element: <AddHistoricalMemorandum /> },
+      { path: '/historical_memorandum/edit/:id', element: <EditHistoricalMemorandum /> },
     ],
   },
 ]);

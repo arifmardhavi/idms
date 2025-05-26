@@ -12,6 +12,7 @@ import { IconLogout } from '@tabler/icons-react';
 import { apiLogout } from '../services/config';
 import Swal from 'sweetalert2';
 import { IconContract } from '@tabler/icons-react';
+import { IconClipboardText } from '@tabler/icons-react';
 
 const SidesMenu = [
   { name: 'Home', icon: <IconHome />, path: '/' },
@@ -24,6 +25,7 @@ const SidesMenu = [
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
   { name: 'Contract', icon: <IconContract />, path: '/contract', tab: 'regulatorycompliance' },
+  { name: 'Historical Memorandum', icon: <IconClipboardText />, path: '/historical_memorandum', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {
@@ -75,7 +77,7 @@ const Header = () => {
               transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
               className={`hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md ${activeMenu(menu.name)}`}
             >
-              <Link to={menu.path} className='flex items-center space-x-3 p-2 cursor-pointer' onClick={() => localStorage.setItem('active', menu.name)}>
+              <Link to={menu.path} className='flex items-center space-x-3 p-2 cursor-pointer text-sm' onClick={() => localStorage.setItem('active', menu.name)}>
                 {menu.icon}
                 <span className='text-white'>{menu.name}</span>
               </Link>
