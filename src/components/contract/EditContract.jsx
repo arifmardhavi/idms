@@ -197,48 +197,67 @@ const EditContract = () => {
                   </div>
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                  <div className='flex flex-row space-x-2 w-full'>
-                    <div className='w-full'>
-                        <label htmlFor="contract_type">Contract Type<sup className='text-red-500'>*</sup></label>
-                        <select
-                            className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                            name="contract_type"
-                            id="contract_type"
-                            defaultValue={contract.contract_type}
-                        >
-                            <option value="1">Lumpsum</option>
-                            <option value="2">Unit Price</option>
-                        </select>
-                        {validation.contract_type && (
-                            validation.contract_type.map((item, index) => (
-                            <div key={index}>
-                                <small className="text-red-600 text-sm">{item}</small>
-                            </div>
-                            ))
-                        )}
-                    </div>
-                    <div className='w-full'>
-                      <label className='text-emerald-950'>
-                        Contract Date <sup className='text-red-500'>*</sup>
-                      </label>
-                      <input
-                        type='date'
-                        name='contract_date'
-                        id='contract_date'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                        defaultValue={contract.contract_date}
-                        required
-                      />
-                      {validation.contract_date && (
-                        validation.contract_date.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                  <div className='w-full'>
+                    <label className='text-emerald-950'>
+                      Contract Date <sup className='text-red-500'>*</sup>
+                    </label>
+                    <input
+                      type='date'
+                      name='contract_date'
+                      id='contract_date'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                      defaultValue={contract.contract_date}
+                      required
+                    />
+                    {validation.contract_date && (
+                      validation.contract_date.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                   </div>
-                  <div className='w-full md:w-2/3'>
+                  <div className='w-full'>
+                      <label htmlFor="contract_type">Contract Type<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="contract_type"
+                          id="contract_type"
+                          defaultValue={contract.contract_type}
+                      >
+                          <option value="1">Lumpsum</option>
+                          <option value="2">Unit Price</option>
+                      </select>
+                      {validation.contract_type && (
+                          validation.contract_type.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                </div>
+                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                  <div className='w-full'>
+                      <label htmlFor="pengawas">Inspector<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="pengawas"
+                          id="pengawas"
+                          defaultValue={contract.pengawas}
+                      >
+                          <option value="0">Inspection</option>
+                          <option value="1">Maintenance Execution</option>
+                      </select>
+                      {validation.pengawas && (
+                          validation.pengawas.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                  <div className='w-full'>
                     <label className='text-emerald-950'>
                       Contract Price <sup className='text-red-500'>*</sup>{' '}
                     </label>

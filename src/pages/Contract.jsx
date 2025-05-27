@@ -89,6 +89,16 @@ const Contract = () => {
               </div>
             )
         },
+        { 
+            field: 'pengawas', 
+            headerName: 'Inspector',
+            valueGetter: (params) => params == 1 ? 'Maintenance Execution' : params == 0 ? 'Inspection' : '-',
+            renderCell: (params) => (
+              <div className={`${params.row.pengawas == '1' ? 'bg-lime-300 text-emerald-950' : params.row.pengawas == '0' ? 'text-lime-300 bg-emerald-950' : 'text-white bg-red-500'} my-2 p-2 text-xs text-center rounded flex flex-col justify-center items-center`}>
+                {params.row.pengawas == '1' ? 'Maintenance Execution' : params.row.pengawas == '0' ? 'Inspection' : '-'}
+              </div>
+            )
+        },
         {
           field: 'contract_price',
           headerName: 'Price',
@@ -224,7 +234,7 @@ const Contract = () => {
         <GridToolbarQuickFilter
         placeholder='Cari data disini...'
         className='text-lime-300 px-4 py-4 border outline-none'
-        quickFilterParser={(searchInput) =>
+        quickFilterParser={(searchInput) => 
             searchInput
             .split(',')
             .map((value) => value.trim())
