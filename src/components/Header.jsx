@@ -24,7 +24,6 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'Contract', icon: <IconContract />, path: '/contract', tab: 'regulatorycompliance' },
   { name: 'Historical Memorandum', icon: <IconClipboardText />, path: '/historical_memorandum', tab: 'regulatorycompliance' },
 ];
 
@@ -114,6 +113,7 @@ const Header = () => {
         )}
         {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
         {renderMenu('regulatorycompliance')}
+        <Link to={'/contract'} className='cursor-pointer'>{renderTab('contract', <IconContract />, 'Contract')}</Link>
         <div onClick={handleLogout} className='cursor-pointer'>{renderTab('logout', <IconLogout />, 'Logout')}</div>
       </div>
 

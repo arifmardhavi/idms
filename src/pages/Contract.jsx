@@ -15,6 +15,7 @@ import { IconCircleMinus } from "@tabler/icons-react";
 import Swal from "sweetalert2";
 import { IconSettings } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
+import { Tooltip } from "@mui/material";
 const Contract = () => {
     const [contract, setContract] = useState([]);
     // const [selectedRows, setSelectedRows] = useState([]);
@@ -91,7 +92,7 @@ const Contract = () => {
         },
         { 
             field: 'pengawas', 
-            headerName: 'Inspector',
+            headerName: 'Pengawas',
             valueGetter: (params) => params == 1 ? 'Maintenance Execution' : params == 0 ? 'Inspection' : '-',
             renderCell: (params) => (
               <div className={`${params.row.pengawas == '1' ? 'bg-lime-300 text-emerald-950' : params.row.pengawas == '0' ? 'text-lime-300 bg-emerald-950' : 'text-white bg-red-500'} my-2 p-2 text-xs text-center rounded flex flex-col justify-center items-center`}>
@@ -197,34 +198,39 @@ const Contract = () => {
             width: 150,
             renderCell: (params) => (
                 <div className='flex flex-row justify-center py-2 items-center space-x-2'>
-                  <Link to={`/contract/dashboard/${params.row.id}`}>
-                      <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
-                      // onClick={() => handleEdit(params.row)}
-                      >
-                      <IconSettings stroke={2} />
-                      </motion.button>
-                  </Link>
-                  <Link to={`/contract/edit/${params.row.id}`}>
-                      <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
-                      // onClick={() => handleEdit(params.row)}
-                      >
-                      <IconPencil stroke={2} />
-                      </motion.button>
-                  </Link>
-                  <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
-                      onClick={() => handleDelete(params.row)}
-                  >
-                      <IconCircleMinus stroke={2} />
-                  </motion.button>
+                  <Tooltip title="Details" placement="left">
+                    <Link to={`/contract/dashboard/${params.row.id}`}>
+                        <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                        >
+                        <IconSettings stroke={2} />
+                        </motion.button>
+                    </Link>
+                  </Tooltip>
+                  <Tooltip title="Edit" placement="top">
+                    <Link to={`/contract/edit/${params.row.id}`}>
+                        <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                        // onClick={() => handleEdit(params.row)}
+                        >
+                        <IconPencil stroke={2} />
+                        </motion.button>
+                    </Link>
+                  </Tooltip>
+                  <Tooltip title="Delete" placement="top">
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+                        onClick={() => handleDelete(params.row)}
+                    >
+                        <IconCircleMinus stroke={2} />
+                    </motion.button>
+                  </Tooltip>
                 </div>
             ),
         },

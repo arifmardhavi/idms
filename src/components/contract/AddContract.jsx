@@ -218,7 +218,7 @@ const AddContract = () => {
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
-                      <label htmlFor="pengawas">Inspector<sup className='text-red-500'>*</sup></label>
+                      <label htmlFor="pengawas">Pengawas<sup className='text-red-500'>*</sup></label>
                       <select
                           className="w-full px-1 py-2 border border-gray-300 rounded-md"
                           name="pengawas"
