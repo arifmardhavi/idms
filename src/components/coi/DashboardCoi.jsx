@@ -17,12 +17,55 @@ const DashboardCoi = () => {
   const [coi, setCoi] = useState([]);
   const [countcoi, setCountCoi] = useState({});
   const [loading, setLoading] = useState(false);
+  const [clickCoi, setclickCoi] = useState(null);
+  const [clickRla, setclickRla] = useState(null);
+  const [filteredCoi, setFilteredCoi] = useState([]);
   const base_public_url = api_public;
 
   useEffect(() => {
     fetchCoi();
     fetchCoiCountDueDays();
   }, []);
+
+  useEffect(() => {
+    if (clickCoi) {
+      setclickRla(null); // Reset clickRla when clickCoi changes
+      const filtered = coi.filter((row) => {
+        if (clickCoi === 'Expired') {
+          return row.due_days <= 0;
+        } else if (clickCoi === '< 9 Bulan') {
+          return row.due_days < 272 && row.due_days > 0;
+        } else if (clickCoi === '> 9 Bulan') {
+          return row.due_days >= 272;
+        } else {
+          return true;
+        }
+      });
+      setFilteredCoi(filtered);
+      // console.log("click:-", clickCoi);
+      // console.log("Filtered COI Data:", filtered);
+    }
+  }, [clickCoi]);
+
+  useEffect(() => {
+    if (clickRla) {
+      setclickCoi(null); // Reset clickCoi when clickRla changes
+      const filtered = coi.filter((row) => {
+        if (clickRla === 'Expired') {
+          return row.rla_due_days <= 0 && row.rla_due_days !== null;
+        } else if (clickRla === '< 9 Bulan') {
+          return row.rla_due_days < 272 && row.rla_due_days > 0;
+        } else if (clickRla === '> 9 Bulan') {
+          return row.rla_due_days >= 272;
+        } else {
+          return true;
+        }
+      });
+      setFilteredCoi(filtered);
+      // console.log("click:-", clickRla);
+      // console.log("Filtered RLA Data:", filtered);
+    }
+  }, [clickRla]);
 
   const fetchCoi = async () => {
     try {
@@ -396,6 +439,11 @@ const DashboardCoi = () => {
                 ]}
                 width={350}
                 height={200}
+                onItemClick={(event, d) => {
+                  const clickedData = dataPieCoi[d.dataIndex];
+                  setclickCoi(clickedData.label);
+                }}
+
                 sx={{
                   [`& .${pieArcLabelClasses.root}`]: {
                     fill: 'white',
@@ -424,6 +472,11 @@ const DashboardCoi = () => {
                 }}
                 width={350}
                 height={200}
+                onItemClick={(event, d) => {
+                  const clickedData = dataPieRla[d.dataIndex];
+                  setclickRla(clickedData.label);
+                }}
+
                 {...sizingrla}
               />
             </div>
@@ -431,10 +484,17 @@ const DashboardCoi = () => {
         )}
         </div>
         {/* TABLE coi */}
+        {/* <div> 
+          <h1 className='text-2xl font-semibold text-emerald-950'>Data COI</h1>
+          <div>{clickCoi ? clickCoi : 'coi'} | {clickRla ? clickRla : 'rla'}</div>
+        </div> */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-        {loading ? <p>Loading...</p> : (<div className='flex flex-row justify-between'>
+        {loading ? <p>Loading...</p> : (<div className='flex flex-col'>
+            <div className='flex justify-end items-center mb-4'>
+              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredCoi(coi); setclickCoi(null); setclickRla(null);}} >Reset Filter</button>
+            </div>
             <DataGrid
-              rows={coi}
+              rows={filteredCoi.length > 0 ? filteredCoi : coi}
               columns={columns}
               // checkboxSelection
               disableColumnFilter

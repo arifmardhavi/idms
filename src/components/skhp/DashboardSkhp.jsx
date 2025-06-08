@@ -17,6 +17,8 @@ const DashboardSkhp = () => {
   const [skhp, setSkhp] = useState([]);
   const [countskhp, setCountSkhp] = useState({});
   const [loading, setLoading] = useState(false);
+  const [clickSkhp, setclickSkhp] = useState(null);
+  const [filteredSkhp, setFilteredSkhp] = useState([]);
   const base_public_url = api_public;
 
   useEffect(() => {
@@ -28,6 +30,25 @@ const DashboardSkhp = () => {
       setCountSkhp(data.data || {});
     });
   }, []);
+
+  useEffect(() => {
+    if (clickSkhp) {
+      const filtered = skhp.filter((row) => {
+        if (clickSkhp === 'Expired') {
+          return row.due_days <= 0;
+        } else if (clickSkhp === '< 6 Bulan') {
+          return row.due_days < 180 && row.due_days > 0;
+        } else if (clickSkhp === '> 6 Bulan') {
+          return row.due_days >= 180;
+        } else {
+          return true;
+        }
+      });
+      setFilteredSkhp(filtered);
+      // console.log("click:-", clickSkhp);
+      // console.log("Filtered Skhp Data:", filtered);
+    }
+  }, [clickSkhp]);
 
   const fetchSkhp = async () => {
     try {
@@ -64,7 +85,7 @@ const DashboardSkhp = () => {
     {
       field: 'plo',
       valueGetter: (params) => params.unit.unit_name,
-      headerName: 'PLO',
+      headerName: 'plo',
       width: 150,
       renderCell: (params) => <div className='py-4'>{params.value}</div>,
     },
@@ -246,6 +267,10 @@ const DashboardSkhp = () => {
                 ]}
                 width={350}
                 height={200}
+                onItemClick={(event, d) => {
+                  const clickedData = dataPieSkhp[d.dataIndex];
+                  setclickSkhp(clickedData.label);
+                }}
                 sx={{
                   [`& .${pieArcLabelClasses.root}`]: {
                     fill: 'white',
@@ -260,8 +285,12 @@ const DashboardSkhp = () => {
         {/* TABLE skhp */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-          {loading ? <p>Loading...</p> : <DataGrid
-              rows={skhp}
+          {loading ? <p>Loading...</p> : <div className="flex flex-col w-full">
+          <div className='flex justify-end items-center mb-4'>
+              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredSkhp(skhp); setclickSkhp(null);}} >Reset Filter</button>
+            </div> 
+          <DataGrid
+              rows={filteredSkhp.length > 0 ? filteredSkhp : skhp}
               columns={columns}
               // checkboxSelection
               disableColumnFilter
@@ -291,7 +320,7 @@ const DashboardSkhp = () => {
               }}
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
-            /> }
+            /> </div>}
           </div>
         </div>
       </div>

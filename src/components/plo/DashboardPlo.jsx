@@ -17,12 +17,56 @@ const DashboardPlo = () => {
   const [plo, setPlo] = useState([]);
   const [countplo, setCountPlo] = useState({});
   const [loading, setLoading] = useState(false);
+  const [clickPlo, setclickPlo] = useState(null);
+  const [clickRla, setclickRla] = useState(null);
+  const [filteredPlo, setFilteredPlo] = useState([]);
+  
   const base_public_url = api_public;
 
   useEffect(() => {
     fetchPlo();
     fetchPloCountDueDays();
   }, []);
+
+  useEffect(() => {
+      if (clickPlo) {
+        setclickRla(null); // Reset clickRla when clickPlo changes
+        const filtered = plo.filter((row) => {
+          if (clickPlo === 'Expired') {
+            return row.due_days <= 0;
+          } else if (clickPlo === '< 9 Bulan') {
+            return row.due_days < 272 && row.due_days > 0;
+          } else if (clickPlo === '> 9 Bulan') {
+            return row.due_days >= 272;
+          } else {
+            return true;
+          }
+        });
+        setFilteredPlo(filtered);
+        // console.log("click:-", clickPlo);
+        // console.log("Filtered Plo Data:", filtered);
+      }
+    }, [clickPlo]);
+  
+    useEffect(() => {
+      if (clickRla) {
+        setclickPlo(null); // Reset clickPlo when clickRla changes
+        const filtered = plo.filter((row) => {
+          if (clickRla === 'Expired') {
+            return row.rla_due_days <= 0 && row.rla_due_days !== null;
+          } else if (clickRla === '< 9 Bulan') {
+            return row.rla_due_days < 272 && row.rla_due_days > 0;
+          } else if (clickRla === '> 9 Bulan') {
+            return row.rla_due_days >= 272;
+          } else {
+            return true;
+          }
+        });
+        setFilteredPlo(filtered);
+        // console.log("click:-", clickRla);
+        // console.log("Filtered RLA Data:", filtered);
+      }
+    }, [clickRla]);
 
   const fetchPlo = async () => {
     try {
@@ -41,7 +85,7 @@ const DashboardPlo = () => {
       const data = await ploCountDueDays();
       setCountPlo(data.data);
     } catch (error) {
-      console.error("Error fetching COI:", error);
+      console.error("Error fetching Plo:", error);
     } finally {
       setLoading(false);
     }
@@ -369,6 +413,10 @@ const DashboardPlo = () => {
                 ]}
                 width={350}
                 height={200}
+                onItemClick={(event, d) => {
+                  const clickedData = dataPiePlo[d.dataIndex];
+                  setclickPlo(clickedData.label);
+                }}
                 sx={{
                   [`& .${pieArcLabelClasses.root}`]: {
                     fill: 'white',
@@ -397,6 +445,10 @@ const DashboardPlo = () => {
                 }}
                 width={350}
                 height={200}
+                onItemClick={(event, d) => {
+                  const clickedData = dataPieRla[d.dataIndex];
+                  setclickRla(clickedData.label);
+                }}
                 {...sizingrla}
               />
             </div>
@@ -406,8 +458,12 @@ const DashboardPlo = () => {
         {/* TABLE PLO */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-          {loading ? <p>Loading...</p> :<DataGrid
-              rows={plo}
+          {loading ? <p>Loading...</p> : <div className="flex flex-col w-full">
+            <div className='flex justify-end items-center mb-4'>
+              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredPlo(plo); setclickPlo(null); setclickRla(null);}} >Reset Filter</button>
+            </div>
+          <DataGrid
+              rows={filteredPlo.length > 0 ? filteredPlo : plo}
               columns={columns}
               // checkboxSelection
               disableColumnFilter
@@ -437,7 +493,7 @@ const DashboardPlo = () => {
               }}
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
-            /> }
+            /> </div> }
           </div>
         </div>
       </div>
