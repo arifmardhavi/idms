@@ -313,7 +313,7 @@ const Termin = ({ onAddedTermin }) => {
                             filterModel: {
                                 items: [],
                                 quickFilterExcludeHiddenColumns: false,
-                                quickFilterLogicOperator: GridLogicOperator.Or,
+                                quickFilterLogicOperator: GridLogicOperator.And,
                             },
                         },
                     }}
