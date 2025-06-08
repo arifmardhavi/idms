@@ -518,7 +518,7 @@ const DashboardCoi = () => {
                   filterModel: {
                     items: [],
                     quickFilterExcludeHiddenColumns: false,
-                    quickFilterLogicOperator: GridLogicOperator.Or,
+                    quickFilterLogicOperator: GridLogicOperator.And,
                   },
                 },
               }}

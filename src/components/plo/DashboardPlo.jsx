@@ -487,7 +487,7 @@ const DashboardPlo = () => {
                   filterModel: {
                     items: [],
                     quickFilterExcludeHiddenColumns: false,
-                    quickFilterLogicOperator: GridLogicOperator.Or,
+                    quickFilterLogicOperator: GridLogicOperator.And,
                   },
                 },
               }}
