@@ -58,34 +58,59 @@ const HistoricalMemorandum = () => {
         }
     };
     const columns = [
+        { field: 'unit', 
+            headerName: 'Area',
+            valueGetter: (params) => params ? params.unit_name : '-', 
+            width: 150,  
+            renderCell: (params) => <div className="py-4">{params.row.unit.unit_name ? params.row.unit.unit_name : '-'}</div> },
+        { field: 'category', 
+            headerName: 'Kategori Peralatan',
+            valueGetter: (params) => params ? params.category_name : '-', 
+            width: 200,  
+            renderCell: (params) => <div className="py-4">{params.row.category.category_name ? params.row.category.category_name : '-'}</div> },
         { field: 'tag_number', 
             headerName: 'Tag Number',
             valueGetter: (params) => params ? params.tag_number : '-', 
             width: 200,  
             renderCell: (params) => <div className="py-4">{params.row.tag_number_id ? params.row.tag_number.tag_number : '-'}</div> },
-        { field: 'judul_memorandum', headerName: 'Judul Memorandum', width: 200,  renderCell: (params) => <div className="py-4">{params.value}</div> },
+        { field: 'no_dokumen', headerName: 'No Dokumen', width: 200,  renderCell: (params) => <div className="py-4"><Link className="underline text-lime-500" to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`} target="_blank">{params.value}</Link></div> },
+        { field: 'perihal', headerName: 'Perihal', width: 200,  renderCell: (params) => <div className="py-4">{params.value}</div> },
         { 
-            field: 'jenis_memorandum', 
-            headerName: 'Jenis Memorandum',
-            width: 160,
-            valueGetter: (params) => params == 1 ? 'Laporan Pekerjaan' : 'Rekomendasi',
+            field: 'tipe_memorandum', 
+            headerName: 'Tipe Memo',
+            width: 200,
+            valueGetter: (params) => params == 0 ? 'Rekomendasi Rutin' : params == 1 ? 'Rekomendasi TA' : params == 2 ? 'Rekomendasi Overhaul' : params == 3 ? 'Dokumen Kajian/Evaluasi' : params == 4 ? 'Permintaan Tools' : 'Dokumen Kantor Pusat',
             renderCell: (params) => (
-              <div className={`${params.row.jenis_memorandum == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-                {params.row.jenis_memorandum == '1' ? 'Laporan Pekerjaan' : 'Rekomendasi'}
+              <div className={`bg-lime-300 text-emerald-950 my-2 p-2 rounded flex flex-col justify-center items-center`}>
+                {params.row.tipe_memorandum == '0' ? 'Rekomendasi Rutin' : params.row.tipe_memorandum == '1' ? 'Rekomendasi TA' : params.row.tipe_memorandum == '2' ? 'Rekomendasi Overhaul' : params.row.tipe_memorandum == '3' ? 'Dokumen Kajian/Evaluasi' : params.row.tipe_memorandum == '4' ? 'Permintaan Tools' : 'Dokumen Kantor Pusat'}
               </div>
             )
         },
-        { 
-            field: 'jenis_pekerjaan',
-            headerName: 'Jenis Pekerjaan', 
-            width: 160,
-            valueGetter: (params) => params == 0 ? 'ta' : params == 1 ? 'rutin' : params == 2 ? 'non rutin' : 'overhaul',
-            renderCell: (params) => (
-              <div className={`${params.row.jenis_pekerjaan == '0' ? 'bg-indigo-500 text-white' : params.row.jenis_pekerjaan == '1' ? 'text-white bg-blue-500' : params.row.jenis_pekerjaan == '2' ? 'bg-green-500 text-white' : 'text-emerald-950 bg-yellow-500'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-                {params.row.jenis_pekerjaan == '0' ? 'TA' : params.row.jenis_pekerjaan == '1' ? 'Rutin' : params.row.jenis_pekerjaan == '2' ? 'Non Rutin' : 'Overhaul'}
-              </div>
-            )
+        {
+          field: 'tanggal_terbit',
+          headerName: 'Tanggal Terbit',
+          width: 150,
+          renderCell: (params) => (
+            <div className='py-4'>
+              {new Intl.DateTimeFormat('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              }).format(new Date(params.value))}
+            </div>
+          ),
         },
+        // { 
+        //     field: 'jenis_pekerjaan',
+        //     headerName: 'Jenis Pekerjaan', 
+        //     width: 160,
+        //     valueGetter: (params) => params == 0 ? 'ta' : params == 1 ? 'rutin' : params == 2 ? 'non rutin' : 'overhaul',
+        //     renderCell: (params) => (
+        //       <div className={`${params.row.jenis_pekerjaan == '0' ? 'bg-indigo-500 text-white' : params.row.jenis_pekerjaan == '1' ? 'text-white bg-blue-500' : params.row.jenis_pekerjaan == '2' ? 'bg-green-500 text-white' : 'text-emerald-950 bg-yellow-500'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+        //         {params.row.jenis_pekerjaan == '0' ? 'TA' : params.row.jenis_pekerjaan == '1' ? 'Rutin' : params.row.jenis_pekerjaan == '2' ? 'Non Rutin' : 'Overhaul'}
+        //       </div>
+        //     )
+        // },
         {
           field: 'memorandum_file',
           headerName: 'Memo File',

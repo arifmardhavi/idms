@@ -3,29 +3,34 @@ import Header from "../Header"
 import { IconChevronRight } from "@tabler/icons-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { getTagnumber } from "../../services/tagnumber.service"
+import { getTagnumberByUnit } from "../../services/tagnumber.service"
 import { useEffect } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { addHistoricalMemorandum } from "../../services/historical_memorandum.service"
 import Swal from "sweetalert2"
+import { getUnit } from "../../services/unit.service"
+import { getCategory } from "../../services/category.service"
 
 const AddHistoricalMemorandum = () => {
     const [validation, setValidation] = useState([])
     const [loading, setLoading] = useState(true)
     const [tag_number, setTagNumber] = useState([])
+    const [unit, setUnit] = useState([])
+    const [category, setCategory] = useState([])
     const [selectedTagNumber, setSelectedTagNumber] = useState(null)
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        fetchTagNumber()
+        fetchUnit()
+        fetchCategory()
     }, [])
 
-    const fetchTagNumber = async () => {
+    const fetchUnit = async () => {
         try {
             setLoading(true);
-            const data = await getTagnumber();
-            setTagNumber(data.data);
+            const data = await getUnit();
+            setUnit(data.data);
             console.log(data.data);
         } catch (error) {
             console.error("Error fetching tag number:", error);
@@ -33,6 +38,34 @@ const AddHistoricalMemorandum = () => {
             setLoading(false);
         }
     }
+    const fetchCategory = async () => {
+        try {
+            setLoading(true);
+            const data = await getCategory();
+            setCategory(data.data);
+            console.log(data.data);
+        } catch (error) {
+            console.error("Error fetching tag number:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleTagNumberByUnit = async (unit_id) => {
+        if(unit_id) {
+            try {
+                const data = await getTagnumberByUnit(unit_id);
+                setTagNumber(data.data);
+            } catch (error) {
+                setTagNumber([]);
+                console.error("Error fetching tag number:", error);
+            }
+        }else{
+            setTagNumber([]);
+        }
+    }
+
+    
 
     const handleAddHistoricalMemorandum = async (e) => {
         e.preventDefault();
@@ -86,6 +119,66 @@ const AddHistoricalMemorandum = () => {
                 >
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                         <div className='w-full space-y-1'>
+                            <label className='text-emerald-950' htmlFor='unit_id'>
+                                Area <sup className='text-red-500'>*</sup>
+                            </label>
+                            <select 
+                                name="unit_id" 
+                                id="unit_id" 
+                                className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                                onChange={(e) => handleTagNumberByUnit(e.target.value)}
+                            >
+                                <option value="">Pilih Unit</option>
+                                {/* <option value="0">All Area</option> */}
+                                {
+                                    unit.length > 0 ?
+                                    unit.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.unit_name}
+                                        </option>
+                                    ))
+                                    : <option value="">Tidak ada unit tersedia</option>
+                                }
+                            </select>
+                                {validation.unit_id && (
+                                    validation.unit_id.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                        </div>
+                        <div className='w-full space-y-1'>
+                            <label className='text-emerald-950' htmlFor='category_id'>
+                                Kategori Peralatan <sup className='text-red-500'>*</sup>
+                            </label>
+                            <select 
+                                name="category_id" 
+                                id="category_id" 
+                                className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="">Pilih Kategori Peralatan</option>
+                                {
+                                    category.length > 0 ?
+                                    category.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.category_name}
+                                        </option>
+                                    ))
+                                    : <option value="">Tidak ada Kategori Peralatan</option>
+                                }
+                            </select>
+                                {validation.category_id && (
+                                    validation.category_id.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                        </div>
+                    </div>
+                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                        <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
                                 Tag Number
                             </label>
@@ -119,18 +212,18 @@ const AddHistoricalMemorandum = () => {
                         </div>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Judul Memorandum <sup className='text-red-500'>*</sup>{' '}
+                                No Dokumen <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <input
                             type='text'
-                            name='judul_memorandum'
-                            id='judul_memorandum'
-                            placeholder='Judul Memorandum'
+                            name='no_dokumen'
+                            id='no_dokumen'
+                            placeholder='Nomor Dokumen'
                             className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                             required
                             />
-                                {validation.judul_memorandum && (
-                                    validation.judul_memorandum.map((item, index) => (
+                                {validation.no_dokumen && (
+                                    validation.no_dokumen.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>
@@ -141,18 +234,18 @@ const AddHistoricalMemorandum = () => {
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Jenis Memorandum <sup className='text-red-500'>*</sup>{' '}
+                                Perihal <sup className='text-red-500'>*</sup>{' '}
                             </label>
-                            <select
-                                className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                name="jenis_memorandum"
-                                id="jenis_memorandum"
-                            >
-                                <option value="1">Rekomendasi</option>
-                                <option value="0">Laporan Pekerjaan</option>
-                            </select>
-                                {validation.jenis_memorandum && (
-                                    validation.jenis_memorandum.map((item, index) => (
+                            <input
+                            type='text'
+                            name='perihal'
+                            id='perihal'
+                            placeholder='perihal'
+                            className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                            required
+                            />
+                                {validation.perihal && (
+                                    validation.perihal.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>
@@ -161,20 +254,43 @@ const AddHistoricalMemorandum = () => {
                         </div>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Jenis Pekerjaan <sup className='text-red-500'>*</sup>{' '}
+                                Tipe Memo <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <select
                                 className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                name="jenis_pekerjaan"
-                                id="jenis_pekerjaan"
+                                name="tipe_memorandum"
+                                id="tipe_memorandum"
                             >
-                                <option value="0">TA</option>
-                                <option value="1">Rutin</option>
-                                <option value="2">Non Rutin</option>
-                                <option value="3">Overhaul</option>
+                                <option value="0">Rekomendasi Rutin</option>
+                                <option value="1">Rekomendasi TA</option>
+                                <option value="2">Rekomendasi Overhaul</option>
+                                <option value="3">Dokumen Kajian/Evaluasi</option>
+                                <option value="4">Permintaan Tools</option>
+                                <option value="5">Dokumen Kantor Pusat</option>
                             </select>
-                                {validation.jenis_pekerjaan && (
-                                    validation.jenis_pekerjaan.map((item, index) => (
+                                {validation.tipe_memorandum && (
+                                    validation.tipe_memorandum.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                        </div>
+                    </div>
+                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                        <div className='w-full space-y-1'>
+                            <label className='text-emerald-950'>
+                                Tanggal Terbit <sup className='text-red-500'>*</sup>{' '}
+                            </label>
+                            <input
+                            type='date'
+                            name='tanggal_terbit'
+                            id='tanggal_terbit'
+                            className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                            required
+                            />
+                                {validation.tanggal_terbit && (
+                                    validation.tanggal_terbit.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>

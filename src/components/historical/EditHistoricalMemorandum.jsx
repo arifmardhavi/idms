@@ -3,12 +3,14 @@ import Header from "../Header"
 import { IconChevronRight } from "@tabler/icons-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
-import { getTagnumber } from "../../services/tagnumber.service"
+import { getTagnumberByUnit } from "../../services/tagnumber.service"
 import { useEffect } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { updateHistoricalMemorandum, getHistoricalMemorandumById } from "../../services/historical_memorandum.service"
 import Swal from "sweetalert2"
 import { api_public } from "../../services/config";
+import { getUnit } from "../../services/unit.service"
+import { getCategory } from "../../services/category.service"
 
 const EditHistoricalMemorandum = () => {
     const {id} = useParams();
@@ -16,21 +18,36 @@ const EditHistoricalMemorandum = () => {
     const [loading, setLoading] = useState(true)
     const [tag_number, setTagNumber] = useState([])
     const [historicalMemorandum, setHistoricalMemorandum] = useState([])
+    const [unit, setUnit] = useState([])
+    const [category, setCategory] = useState([])
     const [selectedTagNumber, setSelectedTagNumber] = useState(null)
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const base_public_url = api_public;
 
     useEffect(() => {
-        fetchHistoricalMemorandum();
-        fetchTagNumber();
+        fetchAll();
     }, [id])
+
+    const fetchAll = async () => {
+        try {
+            setLoading(true);
+            await fetchUnit();
+            await fetchCategory();
+            await fetchHistoricalMemorandum();
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const fetchHistoricalMemorandum = async () => {
         try {
             setLoading(true);
             const data = await getHistoricalMemorandumById(id);
             setHistoricalMemorandum(data.data);
+            handleTagNumberByUnit(data.data.unit_id);
             setSelectedTagNumber(data.data.tag_number_id);
             console.log(data.data);
         } catch (error) {
@@ -40,38 +57,69 @@ const EditHistoricalMemorandum = () => {
         }
     }
 
-    const fetchTagNumber = async () => {
-        try {
-            setLoading(true);
-            const data = await getTagnumber();
-            setTagNumber(data.data);
-            console.log(data.data);
-        } catch (error) {
-            console.error("Error fetching tag number:", error);
-        } finally {
-            setLoading(false);
+    const fetchUnit = async () => {
+            try {
+                setLoading(true);
+                const data = await getUnit();
+                setUnit(data.data);
+                console.log(data.data);
+            } catch (error) {
+                console.error("Error fetching tag number:", error);
+            } finally {
+                setLoading(false);
+            }
         }
-    }
+        const fetchCategory = async () => {
+            try {
+                setLoading(true);
+                const data = await getCategory();
+                setCategory(data.data);
+                console.log(data.data);
+            } catch (error) {
+                console.error("Error fetching tag number:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    
+        const handleTagNumberByUnit = async (unit_id) => {
+            if(unit_id) {
+                try {
+                    const data = await getTagnumberByUnit(unit_id);
+                    setTagNumber(data.data);
+                } catch (error) {
+                    setTagNumber([]);
+                    console.error("Error fetching tag number:", error);
+                }
+            }else{
+                setTagNumber([]);
+            }
+        }
 
     const handleEditHistoricalMemorandum = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        selectedTagNumber ? formData.append('tag_number_id', selectedTagNumber) : '';
+        console.log("Form Data:", formData);
+        tag_number.find(item => item.id === selectedTagNumber)
+            ? formData.append('tag_number_id', selectedTagNumber)
+            : formData.append('tag_number_id', ''); // If no tag number is selected, append an empty string
+        
+        // selectedTagNumber ? formData.append('tag_number_id', selectedTagNumber) : '';
 
         try {
             setIsSubmitting(true);
             const res = await updateHistoricalMemorandum(id, formData);
             if (res.success) {
-                Swal.fire("Berhasil!", "success add historical memorandum!", "success");
+                Swal.fire("Berhasil!", "success update historical memorandum!", "success");
                 navigate('/historical_memorandum');
             } else {
                 setValidation(res.response?.data.errors || []);
-                Swal.fire("Error!", "failed add historical memorandum!", "error");
+                Swal.fire("Error!", "failed update historical memorandum!", "error");
             }
         } catch (error) {
-            console.error("Error adding historical memorandum:", error);
+            console.error("Error updating historical memorandum:", error);
             setValidation(error.response?.data.errors || []);
-            Swal.fire("Error!", "something went wrong add historical memorandum!", "error");
+            Swal.fire("Error!", "something went wrong update historical memorandum!", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -105,52 +153,116 @@ const EditHistoricalMemorandum = () => {
                 >
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                         <div className='w-full space-y-1'>
+                            <label className='text-emerald-950' htmlFor='unit_id'>
+                                Area <sup className='text-red-500'>*</sup>
+                            </label>
+                            <select 
+                                name="unit_id" 
+                                id="unit_id" 
+                                className="w-full px-1 py-2 rounded-md"
+                                defaultValue={historicalMemorandum.unit_id}
+                                onChange={(e) => handleTagNumberByUnit(e.target.value)}
+                            >
+                                <option value="">Pilih Unit</option>
+                                {
+                                    unit.length > 0 ?
+                                    unit.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.unit_name}
+                                        </option>
+                                    ))
+                                    : <option value="">Tidak ada unit tersedia</option>
+                                }
+                            </select>
+                                {validation.unit_id && (
+                                    validation.unit_id.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                        </div>
+                        <div className='w-full space-y-1'>
+                            <label className='text-emerald-950' htmlFor='category_id'>
+                                Kategori Peralatan <sup className='text-red-500'>*</sup>
+                            </label>
+                            <select 
+                                name="category_id" 
+                                id="category_id" 
+                                className="w-full px-1 py-2 rounded-md"
+                                defaultValue={historicalMemorandum.category_id}
+                            >
+                                <option value="">Pilih Kategori Peralatan</option>
+                                {
+                                    category.length > 0 ?
+                                    category.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.category_name}
+                                        </option>
+                                    ))
+                                    : <option value="">Tidak ada Kategori Peralatan</option>
+                                }
+                            </select>
+                                {validation.category_id && (
+                                    validation.category_id.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                        </div>
+                    </div>
+                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                        <div className='w-full space-y-1'>
+                            <input type="hidden" name="tag_number_id" value={selectedTagNumber || ''} />
                             <label className='text-emerald-950'>
                                 Tag Number
                             </label>
                             <Autocomplete
                                 id="tag_number_id"
                                 options={Array.isArray(tag_number) ? tag_number : []}
-                                getOptionLabel={(option) => option.tag_number || ''}
-                                isOptionEqualToValue={(option, value) => option.id === value.id}
-                                value={tag_number.find((item) => item.id === selectedTagNumber) || null}
+                                getOptionLabel={(option) => option?.tag_number || ''}
+                                isOptionEqualToValue={(option, value) => option?.id === value?.id}
+                                value={
+                                    tag_number.find(item => item.id === selectedTagNumber) || null
+                                }
                                 onChange={(e, value) => {
                                     setSelectedTagNumber(value?.id || null);
                                 }}
                                 renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    name="tag_number_id" // Tambahkan name di sini
-                                    placeholder={'N/A'}
-                                    variant="outlined"
-                                    error={!!validation.tag_number_id}
-                                    helperText={
-                                    validation.tag_number_id &&
-                                    validation.tag_number_id.map((item, index) => (
-                                        <span key={index} className="text-red-600 text-sm">
-                                        {item}
-                                        </span>
-                                    ))
-                                    }
-                                />
+                                    <TextField
+                                        {...params}
+                                        placeholder={'N/A'}
+                                        variant="outlined"
+                                        error={!!validation.tag_number_id}
+                                        helperText={
+                                            validation.tag_number_id &&
+                                            validation.tag_number_id.map((item, index) => (
+                                                <span key={index} className="text-red-600 text-sm">
+                                                    {item}
+                                                </span>
+                                            ))
+                                        }
+                                    />
                                 )}
                             />
+
                         </div>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Judul Memorandum <sup className='text-red-500'>*</sup>{' '}
+                                No Dokumen <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <input
                             type='text'
-                            name='judul_memorandum'
-                            id='judul_memorandum'
-                            placeholder='Judul Memorandum'
-                            defaultValue={historicalMemorandum.judul_memorandum}
+                            name='no_dokumen'
+                            id='no_dokumen'
+                            placeholder='Nomor Dokumen'
                             className='w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                            defaultValue={historicalMemorandum.no_dokumen}
                             required
                             />
-                                {validation.judul_memorandum && (
-                                    validation.judul_memorandum.map((item, index) => (
+                                {validation.no_dokumen && (
+                                    validation.no_dokumen.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>
@@ -161,19 +273,19 @@ const EditHistoricalMemorandum = () => {
                     <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Jenis Memorandum <sup className='text-red-500'>*</sup>{' '}
+                                Perihal <sup className='text-red-500'>*</sup>{' '}
                             </label>
-                            <select
-                                className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                name="jenis_memorandum"
-                                id="jenis_memorandum"
-                                defaultValue={historicalMemorandum.jenis_memorandum}
-                            >
-                                <option value="0">Rekomendasi</option>
-                                <option value="1">Laporan Pekerjaan</option>
-                            </select>
-                                {validation.jenis_memorandum && (
-                                    validation.jenis_memorandum.map((item, index) => (
+                            <input
+                            type='text'
+                            name='perihal'
+                            id='perihal'
+                            placeholder='perihal'
+                            defaultValue={historicalMemorandum.perihal}
+                            className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                            required
+                            />
+                                {validation.perihal && (
+                                    validation.perihal.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>
@@ -182,21 +294,45 @@ const EditHistoricalMemorandum = () => {
                         </div>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Jenis Pekerjaan <sup className='text-red-500'>*</sup>{' '}
+                                Tipe Memo <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <select
                                 className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                                name="jenis_pekerjaan"
-                                id="jenis_pekerjaan"
-                                defaultValue={historicalMemorandum.jenis_pekerjaan}
+                                name="tipe_memorandum"
+                                id="tipe_memorandum"
+                                defaultValue={historicalMemorandum.tipe_memorandum}
                             >
-                                <option value="0">TA</option>
-                                <option value="1">Rutin</option>
-                                <option value="2">Non Rutin</option>
-                                <option value="3">Overhaul</option>
+                                <option value="0">Rekomendasi Rutin</option>
+                                <option value="1">Rekomendasi TA</option>
+                                <option value="2">Rekomendasi Overhaul</option>
+                                <option value="3">Dokumen Kajian/Evaluasi</option>
+                                <option value="4">Permintaan Tools</option>
+                                <option value="5">Dokumen Kantor Pusat</option>
                             </select>
-                                {validation.jenis_pekerjaan && (
-                                    validation.jenis_pekerjaan.map((item, index) => (
+                                {validation.tipe_memorandum && (
+                                    validation.tipe_memorandum.map((item, index) => (
+                                        <div key={index}>
+                                        <small className="text-red-600 text-sm">{item}</small>
+                                        </div>
+                                    ))
+                                )}
+                        </div>
+                    </div>
+                    <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                        <div className='w-full space-y-1'>
+                            <label className='text-emerald-950'>
+                                Tanggal Terbit <sup className='text-red-500'>*</sup>{' '}
+                            </label>
+                            <input
+                            type='date'
+                            name='tanggal_terbit'
+                            id='tanggal_terbit'
+                            defaultValue={historicalMemorandum.tanggal_terbit}
+                            className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                            required
+                            />
+                                {validation.tanggal_terbit && (
+                                    validation.tanggal_terbit.map((item, index) => (
                                         <div key={index}>
                                         <small className="text-red-600 text-sm">{item}</small>
                                         </div>
@@ -205,7 +341,7 @@ const EditHistoricalMemorandum = () => {
                         </div>
                         <div className='w-full space-y-1'>
                             <label className='text-emerald-950'>
-                                Dokumen Memorandum <sup className='text-red-500'>*</sup>{' '}
+                                Dokumen Memorandum
                             </label>
                             <input
                             type='file'
