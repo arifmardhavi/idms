@@ -56,13 +56,13 @@ const DashboardContract = () => {
                 {/* <div className="w-full flex flex-row justify-center">
                     <button className="text-lime-400 bg-emerald-950 w-fit text-center py-2 px-4 rounded cursor-pointer transform hover:scale-95 duration-75">Dashboard {contract.contract_name}</button>
                 </div> */}
-                <div className="flex flex-col lg:flex-row space-y-2 lg:space-x-2 lg:space-y-0" >
+                {contract.contract_type !=3 && <div className="flex flex-col lg:flex-row space-y-2 lg:space-x-2 lg:space-y-0" >
                     <div className="w-full lg:w-[50%] bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
                         <table className="w-full" >
                             <tr>
                                 <td>Judul Kontrak</td>
                                 <td>:</td>
-                                <td>{contract.contract_name}</td>
+                                <td className="w-[70%]">{contract.contract_name}</td>
                             </tr>
                             <tr>
                                 <td>No Kontrak</td>
@@ -113,9 +113,9 @@ const DashboardContract = () => {
                                     <Link
                                         to={`${base_public_url}contract/${contract.contract_file}`}
                                         target='_blank'
-                                        className='bg-emerald-950 text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                                        className='bg-emerald-950 text-lime-400 underline px-2 rounded-md hover:underline cursor-pointer'
                                     >
-                                        {contract.contract_file}
+                                        Preview
                                     </Link>
                                 </td>
                             </tr>
@@ -189,7 +189,7 @@ const DashboardContract = () => {
                                             <Link
                                                 to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
                                                 target='_blank'
-                                                className='bg-emerald-950 text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                                                className='underline px-2 text-sm rounded-md hover:underline cursor-pointer'
                                             >
                                                 {contract.meeting_notes}
                                             </Link>
@@ -208,7 +208,98 @@ const DashboardContract = () => {
                             </tr>
                         </table>
                     </div>
-                </div>
+                </div>}
+                {contract.contract_type == 3 && <div className="flex flex-col lg:flex-row space-y-2 lg:space-x-2 lg:space-y-0" >
+                    <div className="w-full bg-lime-400 shadow-sm px-2 py-4 rounded-lg">
+                        <table className="w-full" >
+                            <tr>
+                                <td>Judul PO</td>
+                                <td>:</td>
+                                <td className="w-[70%]">{contract.contract_name}</td>
+                            </tr>
+                            <tr>
+                                <td>No PO</td>
+                                <td>:</td>
+                                <td>{contract.no_contract}</td>
+                            </tr>
+                            <tr>
+                                <td>Nama Vendor</td>
+                                <td>:</td>
+                                <td>{contract.vendor_name}</td>
+                            </tr>
+                            <tr>
+                                <td>Nomor Vendor</td>
+                                <td>:</td>
+                                <td>{contract.no_vendor}</td>
+                            </tr>
+                            <tr>
+                                <td>Pengawas</td>
+                                <td>:</td>
+                                <td>{contract.pengawas}</td>
+                            </tr>
+                            <tr>
+                                <td>Tipe Kontrak</td>
+                                <td>:</td>
+                                <td>{contract.contract_type == '1' ? 'Lumpsum' : contract.contract_type == '2' ? 'Unit Price' : 'PO Material'}</td>
+                            </tr>
+                            <tr>
+                                <td>Nilai Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                {new Intl.NumberFormat('id-ID', {
+                                style: 'currency',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                                }).format(contract.contract_price)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Mulai</td>
+                                <td>:</td>
+                                <td>
+                                {new Intl.DateTimeFormat('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                }).format(new Date(contract.contract_start_date))}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Berakhir</td>
+                                <td>:</td>
+                                <td>
+                                {new Intl.DateTimeFormat('id-ID', {
+                                    day: '2-digit',
+                                    month: 'long',
+                                    year: 'numeric',
+                                }).format(new Date(contract.contract_end_date))}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Dokumen Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                    <Link
+                                        to={`${base_public_url}contract/${contract.contract_file}`}
+                                        target='_blank'
+                                        className='bg-emerald-950 text-lime-400 underline px-2 rounded-md hover:underline cursor-pointer'
+                                    >
+                                        {contract.contract_file}
+                                    </Link>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Status Kontrak</td>
+                                <td>:</td>
+                                <td>
+                                    <span className="bg-emerald-950 text-lime-400 px-2 rounded-md">
+                                        {contract.contract_status == '1' ? 'Berjalan' : 'Selesai'}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>}
                 <div className="w-full p-2 flex flex-row justify-center">
                     <Link to={`/contract/edit/${id}`} className="text-lime-400 bg-emerald-950 w-full md:w-64 text-center py-2 px-4 rounded">
                             Update
@@ -239,9 +330,12 @@ const DashboardContract = () => {
                     </div>
                 </>
             }
-            <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+            {contract.contract_type == 3 &&<div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                <LumpsumProgress />
+            </div>}
+            {contract.contract_type != 3 && <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                 <Amandemen />
-            </div>
+            </div>}
         </div>
     </div>
   )

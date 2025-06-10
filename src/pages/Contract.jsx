@@ -83,20 +83,21 @@ const Contract = () => {
         { 
             field: 'contract_type', 
             headerName: 'Tipe',
-            valueGetter: (params) => params == 1 ? 'Lumpsum' : 'Unit Price',
+            valueGetter: (params) => params == 1 ? 'Lumpsum' : params == 2 ? 'Unit Price' : 'PO Material',
+            width: 120,
             renderCell: (params) => (
-              <div className={`${params.row.contract_type == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-                {params.row.contract_type == '1' ? 'Lumpsum' : 'Unit Price'}
+              <div className={`${params.row.contract_type == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center text-xs text-center items-center`}>
+                {params.row.contract_type == '1' ? 'Lumpsum' : params.row.contract_type == '2' ? 'Unit Price' : 'PO Material'}
               </div>
             )
         },
         { 
             field: 'pengawas', 
             headerName: 'Pengawas',
-            valueGetter: (params) => params == 1 ? 'Maintenance Execution' : params == 0 ? 'Inspection' : '-',
+            valueGetter: (params) => params == 1 ? 'Maintenance Execution' : params == 0 ? 'Inspection' : params == 2 ? 'Procurement' : '-',
             renderCell: (params) => (
               <div className={`${params.row.pengawas == '1' ? 'bg-lime-300 text-emerald-950' : params.row.pengawas == '0' ? 'text-lime-300 bg-emerald-950' : 'text-white bg-red-500'} my-2 p-2 text-xs text-center rounded flex flex-col justify-center items-center`}>
-                {params.row.pengawas == '1' ? 'Maintenance Execution' : params.row.pengawas == '0' ? 'Inspection' : '-'}
+                {params.row.pengawas == '1' ? 'Maintenance Execution' : params.row.pengawas == '0' ? 'Inspection' : params.row.pengawas == '2' ? 'Procurement' : '-'}
               </div>
             )
         },
@@ -120,11 +121,11 @@ const Contract = () => {
           width: 130,
           renderCell: (params) => (
             <div className='py-4'>
-              {new Intl.DateTimeFormat('id-ID', {
+              {params.value ? new Intl.DateTimeFormat('id-ID', {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric',
-              }).format(new Date(params.value))}
+              }).format(new Date(params.value)) : '-'}
             </div>
           ),
         },

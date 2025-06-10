@@ -35,6 +35,7 @@ import MonitoringContract from './components/contract/MonitoringContract.jsx';
 import HistoricalMemorandum from './pages/HistoricalMemorandum.jsx';
 import AddHistoricalMemorandum from './components/historical/AddHistoricalMemorandum.jsx';
 import EditHistoricalMemorandum from './components/historical/EditHistoricalMemorandum.jsx';
+import LampiranMemo from './components/historical/LampiranMemo.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -75,6 +76,7 @@ const router = createBrowserRouter([
       { path: '/contract/monitoring', element: <MonitoringContract /> },
       { path: '/historical_memorandum/tambah', element: <AddHistoricalMemorandum /> },
       { path: '/historical_memorandum/edit/:id', element: <EditHistoricalMemorandum /> },
+      { path: '/historical_memorandum/lampiran/:id', element: <LampiranMemo /> },
     ],
   },
 ]);

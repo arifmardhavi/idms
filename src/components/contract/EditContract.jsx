@@ -18,6 +18,7 @@ const EditContract = () => {
   const [isLoading, setLoading] = useState(true);
   const base_public_url = api_public;
   const [IsKOM, setIsKOM] = useState(false);
+  const [kom, setKom] = useState(true);
 
   useEffect(() => {
     fetchContract();
@@ -29,6 +30,7 @@ const EditContract = () => {
       const data = await getContractById(id);
       setContract(data.data);
       setIsKOM(data.data.kom == 1 ? true : false);
+      setKom(data.data.contract_type != 3);
   
       const formattedPrice = formatNumber(data.data.initial_contract_price);
       setContractPrice(formattedPrice);
@@ -61,6 +63,21 @@ const EditContract = () => {
     const rawContractPrice = contractPrice.replace(/,/g, '');
     const formData = new FormData(e.target);
     formData.append('initial_contract_price', rawContractPrice);
+    if(!kom) {
+      formData.append('contract_price', rawContractPrice);
+    }
+
+    if (kom) {
+        formData.append('contract_date', e.target.contract_date.value);
+        formData.append('kom', e.target.kom.value);
+      }
+      if (IsKOM || !kom) {
+        formData.append('contract_start_date', e.target.contract_start_date.value);
+        formData.append('contract_end_date', e.target.contract_end_date.value);
+      }
+      if (IsKOM) {
+        formData.append('meeting_notes', e.target.meeting_notes.files[0]);
+      }
 
     console.log(formData);
 
@@ -198,6 +215,53 @@ const EditContract = () => {
                 </div>
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
+                      <label htmlFor="pengawas">Pengawas<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="pengawas"
+                          id="pengawas"
+                          defaultValue={contract.pengawas}
+                      >
+                          <option value="0">Inspection</option>
+                          <option value="1">Maintenance Execution</option>
+                          <option value="2">Procurement</option>
+                      </select>
+                      {validation.pengawas && (
+                          validation.pengawas.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                  <div className='w-full'>
+                      <label htmlFor="contract_type">Contract Type<sup className='text-red-500'>*</sup></label>
+                      <select
+                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
+                          name="contract_type"
+                          id="contract_type"
+                          defaultValue={contract.contract_type}
+                          onChange={(e) => {
+                            const selectedValue = e.target.value;
+                            setKom(selectedValue !== '3');
+                            setIsKOM(false);
+                          }}
+                      >
+                          <option value="1">Lumpsum</option>
+                          <option value="2">Unit Price</option>
+                          <option value="3">PO Material</option>
+                      </select>
+                      {validation.contract_type && (
+                          validation.contract_type.map((item, index) => (
+                          <div key={index}>
+                              <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                          ))
+                      )}
+                  </div>
+                </div>
+                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                  {kom && <div className='w-full'>
                     <label className='text-emerald-950'>
                       Contract Date <sup className='text-red-500'>*</sup>
                     </label>
@@ -216,47 +280,7 @@ const EditContract = () => {
                         </div>
                       ))
                     )}
-                  </div>
-                  <div className='w-full'>
-                      <label htmlFor="contract_type">Contract Type<sup className='text-red-500'>*</sup></label>
-                      <select
-                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                          name="contract_type"
-                          id="contract_type"
-                          defaultValue={contract.contract_type}
-                      >
-                          <option value="1">Lumpsum</option>
-                          <option value="2">Unit Price</option>
-                      </select>
-                      {validation.contract_type && (
-                          validation.contract_type.map((item, index) => (
-                          <div key={index}>
-                              <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                          ))
-                      )}
-                  </div>
-                </div>
-                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
-                  <div className='w-full'>
-                      <label htmlFor="pengawas">Pengawas<sup className='text-red-500'>*</sup></label>
-                      <select
-                          className="w-full px-1 py-2 border border-gray-300 rounded-md"
-                          name="pengawas"
-                          id="pengawas"
-                          defaultValue={contract.pengawas}
-                      >
-                          <option value="0">Inspection</option>
-                          <option value="1">Maintenance Execution</option>
-                      </select>
-                      {validation.pengawas && (
-                          validation.pengawas.map((item, index) => (
-                          <div key={index}>
-                              <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                          ))
-                      )}
-                  </div>
+                  </div>}
                   <div className='w-full'>
                     <label className='text-emerald-950'>
                       Contract Price <sup className='text-red-500'>*</sup>{' '}
@@ -280,6 +304,46 @@ const EditContract = () => {
                     )}
                   </div>
                 </div>
+                {!kom && <div className='flex flex-row space-x-2'>
+                    <div className='w-full'>
+                      <label htmlFor='contract_start_date' className='text-emerald-950'>
+                        Kontrak Mulai
+                      </label>
+                      <input
+                        type='date'
+                        name='contract_start_date'
+                        id='contract_start_date'
+                        defaultValue={contract.contract_start_date}
+                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                      />
+                      {validation.contract_start_date && (
+                        validation.contract_start_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <div className='w-full'>
+                      <label htmlFor='contract_end_date' className='text-emerald-950'>
+                        Kontrak Berakhir
+                      </label>
+                      <input
+                        type='date'
+                        name='contract_end_date'
+                        id='contract_end_date'
+                        defaultValue={contract.contract_end_date}
+                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                      />
+                      {validation.contract_end_date && (
+                        validation.contract_end_date.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>}
                 <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
                     <label className='text-emerald-950'>
@@ -317,6 +381,7 @@ const EditContract = () => {
                         )}
                     </div>
                   </div>
+                  
                   <div className='w-full'>
                       <label htmlFor="contract_status">Contract Status<sup className='text-red-500'>*</sup></label>
                       <select
@@ -336,7 +401,8 @@ const EditContract = () => {
                           ))
                       )}
                   </div>
-                  <div className='w-full'>
+                  
+                  {kom && <div className='w-full'>
                       <label htmlFor="kom">KOM<sup className='text-red-500'>*</sup></label>
                       <select
                           className="w-full px-1 py-2 border border-gray-300 rounded-md"
@@ -357,7 +423,7 @@ const EditContract = () => {
                           </div>
                           ))
                       )}
-                  </div>
+                  </div>}
                 </div>
                 <div>
                 {IsKOM && (

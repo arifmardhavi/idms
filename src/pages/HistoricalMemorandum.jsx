@@ -11,6 +11,7 @@ import { IconCloudDownload } from "@tabler/icons-react"
 import { IconPencil } from "@tabler/icons-react"
 import { IconCircleMinus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
+import { IconEye } from "@tabler/icons-react"
 
 const HistoricalMemorandum = () => {
     const [historicalMemorandum, setHistoricalMemorandum] = useState([])
@@ -73,7 +74,7 @@ const HistoricalMemorandum = () => {
             valueGetter: (params) => params ? params.tag_number : '-', 
             width: 200,  
             renderCell: (params) => <div className="py-4">{params.row.tag_number_id ? params.row.tag_number.tag_number : '-'}</div> },
-        { field: 'no_dokumen', headerName: 'No Dokumen', width: 200,  renderCell: (params) => <div className="py-4"><Link className="underline text-lime-500" to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`} target="_blank">{params.value}</Link></div> },
+        { field: 'no_dokumen', headerName: 'No Dokumen', width: 200,  renderCell: (params) => <div className="py-4"><Link className="underline font-semibold text-lime-800" to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`} target="_blank">{params.value}</Link></div> },
         { field: 'perihal', headerName: 'Perihal', width: 200,  renderCell: (params) => <div className="py-4">{params.value}</div> },
         { 
             field: 'tipe_memorandum', 
@@ -126,6 +127,20 @@ const HistoricalMemorandum = () => {
               </Link>
             </div>
           ),
+        },
+        {
+            field: 'lampiran_memo',
+            headerName: 'Lampiran',
+            width: 100,
+            renderCell: (params) => (
+            <div className='py-4 pl-4'>
+                <Link to={`/historical_memorandum/lampiran/${params.row.id}`}
+                className=' text-lime-500'
+                >
+                <IconEye stroke={2} />
+                </Link>
+            </div>
+            ),
         },
         {
             field: 'actions',
