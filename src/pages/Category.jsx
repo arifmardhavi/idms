@@ -19,6 +19,9 @@ import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
 import { IconTrash } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
+import { IconLoader2 } from '@tabler/icons-react';
 
 const Category = () => {
   const [category, setCategory] = useState([]);
@@ -29,6 +32,7 @@ const Category = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const token = localStorage.getItem('token');
   const userLevel = String(jwtDecode(token).level_user);
+  const [hide, setHide] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -206,11 +210,11 @@ const Category = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder='Cari data disini...'
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
       className='text-lime-300 px-4 py-4 border outline-none'
       quickFilterParser={(searchInput) =>
         searchInput
-          .split(',')
+          .split(';')
           .map((value) => value.trim())
           .filter((value) => value !== '')
       }
@@ -219,8 +223,16 @@ const Category = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         {/* Get Category */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
@@ -236,7 +248,11 @@ const Category = () => {
             </motion.a>
           </div>
           <div>
-          {loading ? <p>Loading...</p> : <DataGrid
+          {loading ? 
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            : <DataGrid
               rows={category}
               columns={columns}
               disableColumnFilter

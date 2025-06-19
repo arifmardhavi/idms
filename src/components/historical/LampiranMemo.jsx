@@ -12,6 +12,8 @@ import { useEffect } from "react"
 import { api_public } from '../../services/config';
 import { IconPlus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
+import { IconArrowLeft } from "@tabler/icons-react"
+import { IconArrowRight } from "@tabler/icons-react"
 
 const LampiranMemo = () => {
   const { id } = useParams();
@@ -20,6 +22,7 @@ const LampiranMemo = () => {
   const [lampiran, setLampiran] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const base_public_url = api_public;
+  const [hide, setHide] = useState(false);
 
   useEffect(() => {
     fetchLampiran();
@@ -115,11 +118,11 @@ const LampiranMemo = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder='Cari data disini...'
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
       className='text-lime-300 px-4 py-4 border outline-none'
       quickFilterParser={(searchInput) =>
         searchInput
-          .split(',')
+          .split(';')
           .map((value) => value.trim())
           .filter((value) => value !== '')
       }
@@ -133,8 +136,16 @@ const LampiranMemo = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         {/* get Lampiran Historical  */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs

@@ -8,6 +8,8 @@ import { useEffect } from "react"
 import { getTagnumber } from "../../services/tagnumber.service"
 import { addEngineeringData } from "../../services/engineering_data.service"
 import Swal from "sweetalert2"
+import { IconArrowLeft } from "@tabler/icons-react"
+import { IconArrowRight } from "@tabler/icons-react"
 
 const AddEngineeringData = () => {
   const [loading, setLoading] = useState(false)
@@ -16,6 +18,7 @@ const AddEngineeringData = () => {
   const [validation, setValidation] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
+  const [hide, setHide] = useState(false)
 
   useEffect(() => {
     fetchTagNumbers()
@@ -57,8 +60,16 @@ const AddEngineeringData = () => {
   }
   return (
     <div className='flex flex-col md:flex-row w-full'>
-        <Header />
-        <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+        { !hide && <Header />}
+        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+          <div className='md:flex hidden'>
+            <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+              <IconArrowLeft />
+            </div>
+          </div>
+          <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+            <IconArrowRight />
+          </div>
           <Breadcrumbs
               aria-label='breadcrumb'
               className="uppercase"

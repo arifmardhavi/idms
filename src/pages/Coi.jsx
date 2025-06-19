@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
 import { api_public } from '../services/config';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
+import { IconLoader2 } from '@tabler/icons-react';
 
 const Coi = () => {
   const [coi, setCoi] = useState([]);
@@ -371,11 +372,11 @@ const Coi = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder='Cari data disini...'
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
       className='text-lime-300 px-4 py-4 border outline-none'
       quickFilterParser={(searchInput) =>
         searchInput
-          .split(',')
+          .split(';')
           .map((value) => value.trim())
           .filter((value) => value !== '')
       }
@@ -435,7 +436,11 @@ const Coi = () => {
             </div>
           </div>
           <div>
-          {loading ? <p>Loading...</p> : <DataGrid
+          {loading ? 
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            : <DataGrid
               rows={coi}
               columns={columns}
               checkboxSelection

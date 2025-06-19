@@ -11,11 +11,15 @@ import Spk from "./Spk";
 import SpkProgress from "./SpkProgress";
 import LumpsumProgress from "./LumpsumProgress";
 import Amandemen from "./amandemen/Amandemen";
+import { IconArrowRight } from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 const DashboardContract = () => {
     const {id} = useParams();
     const [contract, setContract] = useState([]);
     const [isLoading, setLoading] = useState(true);
     const base_public_url = api_public;
+    const [hide, setHide] = useState(false);
 
     useEffect(() => {
         fetchContract();
@@ -34,8 +38,16 @@ const DashboardContract = () => {
     };
   return (
     <div className='flex flex-col md:flex-row w-full'>
-        <Header />
-        <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+        { !hide && <Header />}
+        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+          <div className='md:flex hidden'>
+            <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+              <IconArrowLeft />
+            </div>
+          </div>
+          <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+            <IconArrowRight />
+          </div>
             <Breadcrumbs
                 aria-label='breadcrumb'
                 className="uppercase"
@@ -51,7 +63,9 @@ const DashboardContract = () => {
                 </Link>
                 <Typography className='text-lime-500'>Dashboard Contract</Typography>
             </Breadcrumbs>
-            { isLoading ? <div>Loading...</div> : <div className='w-full space-y-2 bg-white shadow-sm px-2 py-4 rounded-lg'>
+            { isLoading ? <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> : <div className='w-full space-y-2 bg-white shadow-sm px-2 py-4 rounded-lg'>
                 <h1 className="text-xl uppercase font-bold" >Detail Contract</h1>
                 {/* <div className="w-full flex flex-row justify-center">
                     <button className="text-lime-400 bg-emerald-950 w-fit text-center py-2 px-4 rounded cursor-pointer transform hover:scale-95 duration-75">Dashboard {contract.contract_name}</button>

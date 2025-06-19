@@ -10,6 +10,8 @@ import { getTypeByCategory } from '../../services/type.service';
 import { getTagnumberByTypeUnit } from '../../services/tagnumber.service';
 import Swal from 'sweetalert2';
 import * as motion from 'motion/react-client';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
 
 const AddSkhp = () => {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ const AddSkhp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
   const [tagnumberId, setTagnumberId] = useState([]);
+  const [hide, setHide] = useState(false);
 
   useEffect(() => {
     fetchPlo();
@@ -115,8 +118,16 @@ const AddSkhp = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs
             aria-label='breadcrumb'

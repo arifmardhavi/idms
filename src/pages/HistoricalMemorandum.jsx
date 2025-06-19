@@ -12,11 +12,14 @@ import { IconPencil } from "@tabler/icons-react"
 import { IconCircleMinus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
 import { IconEye } from "@tabler/icons-react"
+import { IconArrowLeft } from "@tabler/icons-react"
+import { IconArrowRight } from "@tabler/icons-react"
 
 const HistoricalMemorandum = () => {
     const [historicalMemorandum, setHistoricalMemorandum] = useState([])
     const [loading, setLoading] = useState(true)
     const base_public_url = api_public;
+    const [hide, setHide] = useState(false)
 
     useEffect(() => {
         fetchHistoricalMemorandum()
@@ -168,23 +171,31 @@ const HistoricalMemorandum = () => {
     ];
 
     const CustomQuickFilter = () => (
-        <GridToolbarQuickFilter
-        placeholder='Cari data disini...'
-        className='text-lime-300 px-4 py-4 border outline-none'
-        quickFilterParser={(searchInput) =>
-            searchInput
-            .split(',')
-            .map((value) => value.trim())
-            .filter((value) => value !== '')
-        }
-        />
-    );
+    <GridToolbarQuickFilter
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
+      className='text-lime-300 px-4 py-4 border outline-none'
+      quickFilterParser={(searchInput) =>
+        searchInput
+          .split(';')
+          .map((value) => value.trim())
+          .filter((value) => value !== '')
+      }
+    />
+  );
 
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-        <Header />
-        <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+        { !hide && <Header />}
+        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+            <div className='md:flex hidden'>
+                <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+                    <IconArrowLeft />
+                </div>
+            </div>
+            <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+                <IconArrowRight />
+            </div>
             <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                 <div className='flex flex-row justify-between'>
                     <h1 className='text-xl font-bold uppercase'>Historical Memorandum</h1>

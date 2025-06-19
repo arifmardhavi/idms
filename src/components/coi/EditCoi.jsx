@@ -19,6 +19,9 @@ import {
 } from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
 import { api_public } from '../../services/config';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
+import { IconLoader2 } from '@tabler/icons-react';
 const EditCoi = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -40,6 +43,7 @@ const EditCoi = () => {
   const [validation, setValidation] = useState([]);
   const [tagnumberId, setTagnumberId] = useState([]);
   const base_public_url = api_public;
+  const [hide, setHide] = useState(false);
   
   useEffect(() => {
     fetchPlo();
@@ -191,8 +195,16 @@ const EditCoi = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+          <div className='md:flex hidden'>
+            <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+              <IconArrowLeft />
+            </div>
+          </div>
+          <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+            <IconArrowRight />
+          </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs
             aria-label='breadcrumb'
@@ -208,7 +220,11 @@ const EditCoi = () => {
             </Link>
             <Typography className='text-lime-500'>Edit COI</Typography>
           </Breadcrumbs>
-          {isLoading ? <div>Loading...</div> : (
+          {isLoading ?
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            :(
             <div>
               <form
                 encType='multipart/form-data'

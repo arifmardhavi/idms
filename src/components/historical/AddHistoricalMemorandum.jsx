@@ -10,6 +10,8 @@ import { addHistoricalMemorandum } from "../../services/historical_memorandum.se
 import Swal from "sweetalert2"
 import { getUnit } from "../../services/unit.service"
 import { getCategory } from "../../services/category.service"
+import { IconArrowLeft } from "@tabler/icons-react"
+import { IconArrowRight } from "@tabler/icons-react"
 
 const AddHistoricalMemorandum = () => {
     const [validation, setValidation] = useState([])
@@ -20,6 +22,7 @@ const AddHistoricalMemorandum = () => {
     const [selectedTagNumber, setSelectedTagNumber] = useState(null)
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [hide, setHide] = useState(false);
 
     useEffect(() => {
         fetchUnit()
@@ -92,8 +95,16 @@ const AddHistoricalMemorandum = () => {
     }
   return (
     <div className='flex flex-col md:flex-row w-full'>
-        <Header />
-        <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+        { !hide && <Header />}
+        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+            <div className='md:flex hidden'>
+                <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+                    <IconArrowLeft />
+                </div>
+            </div>
+            <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+                <IconArrowRight />
+            </div>
             <Breadcrumbs
                 aria-label='breadcrumb'
                 className="uppercase"

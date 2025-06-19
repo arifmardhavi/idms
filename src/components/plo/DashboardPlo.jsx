@@ -11,6 +11,9 @@ import { IconCloudDownload, IconChevronRight } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { getPlo, ploCountDueDays } from "../../services/plo.service";
 import { api_public } from "../../services/config";
+import { IconArrowRight } from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 
 const DashboardPlo = () => {
 
@@ -20,6 +23,7 @@ const DashboardPlo = () => {
   const [clickPlo, setclickPlo] = useState(null);
   const [clickRla, setclickRla] = useState(null);
   const [filteredPlo, setFilteredPlo] = useState([]);
+  const [hide, setHide] = useState(false);
   
   const base_public_url = api_public;
 
@@ -326,11 +330,11 @@ const DashboardPlo = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder='Cari data disini...'
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
       className='text-lime-300 px-4 py-4 border outline-none'
       quickFilterParser={(searchInput) =>
         searchInput
-          .split(',')
+          .split(';')
           .map((value) => value.trim())
           .filter((value) => value !== '')
       }
@@ -376,8 +380,16 @@ const DashboardPlo = () => {
   };
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         <Breadcrumbs
           aria-label='breadcrumb'
           separator={
@@ -398,7 +410,11 @@ const DashboardPlo = () => {
         </Breadcrumbs>
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-        {loading ? <p>Loading...</p> : (
+        {loading ? 
+          <div className="flex flex-col items-center justify-center h-20">
+              <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+          </div> 
+        : (
           <div className='flex flex-col md:flex-row justify-evenly'>
             <div className="flex flex-col items-center">
               <span>PLO</span>

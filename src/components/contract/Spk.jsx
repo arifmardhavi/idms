@@ -10,6 +10,7 @@ import { IconPlus } from "@tabler/icons-react";
 import Swal from "sweetalert2";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { api_public } from '../../services/config';
+import { IconLoader2 } from "@tabler/icons-react";
 
 const Spk = () => {
     
@@ -167,14 +168,14 @@ const Spk = () => {
 
     const CustomQuickFilter = () => (
         <GridToolbarQuickFilter
-        placeholder='Cari data disini...'
-        className='text-lime-300 px-4 py-4 border outline-none'
-        quickFilterParser={(searchInput) =>
-            searchInput
-            .split(',')
-            .map((value) => value.trim())
-            .filter((value) => value !== '')
-        }
+            placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
+            className='text-lime-300 px-4 py-4 border outline-none'
+            quickFilterParser={(searchInput) =>
+                searchInput
+                .split(';')
+                .map((value) => value.trim())
+                .filter((value) => value !== '')
+            }
         />
     );
 
@@ -192,7 +193,11 @@ const Spk = () => {
                     </Link>
                 </div>
             </div>
-            { isLoading ? <div>Loading...</div> : 
+            {isLoading ?
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            : 
                 <DataGrid
                     rows={spk}
                     columns={columns}

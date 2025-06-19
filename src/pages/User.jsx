@@ -9,9 +9,11 @@ import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
 import { IconPlus } from '@tabler/icons-react'
-import { use } from 'react'
 import { IconEye } from '@tabler/icons-react';
 import { IconEyeClosed } from '@tabler/icons-react';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
+import { IconLoader2 } from '@tabler/icons-react';
 
 const User = () => {
     const [IsUser, setIsUser] = useState([])
@@ -22,6 +24,7 @@ const User = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [validation, setValidation] = useState([]);
     const [editUser, setEditUser] = useState({});
+    const [hide, setHide] = useState(false);
     useEffect(() => {
       fetchUsers();
     }, [])
@@ -155,20 +158,34 @@ const User = () => {
             },
     ];
 
-   const CustomQuickFilter = () => (
-        <GridToolbarQuickFilter
-        placeholder="Cari data disini..."
-        className="text-lime-300 px-4 py-4 border outline-none"
-        />
-    );
+  const CustomQuickFilter = () => (
+    <GridToolbarQuickFilter
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
+      className='text-lime-300 px-4 py-4 border outline-none'
+      quickFilterParser={(searchInput) =>
+        searchInput
+          .split(';')
+          .map((value) => value.trim())
+          .filter((value) => value !== '')
+      }
+    />
+  );
 
      
 
 
   return (
     <div className="flex flex-col md:flex-row w-full">
-      <Header />
-      <div className="flex flex-col md:pl-64 w-full px-2 py-4 space-y-3">
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         {/* Get user */}
         <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
           <div className="flex flex-row justify-between">
@@ -195,7 +212,11 @@ const User = () => {
             </div>
           </div>
           <div>
-            {Loading ? <p>Loading...</p> : <DataGrid
+            {Loading ? 
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            : <DataGrid
               rows={IsUser}
               columns={columns}
               disableColumnFilter

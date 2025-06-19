@@ -13,6 +13,8 @@ import { addDatasheet, deleteDatasheet, getDatasheetByEngineering } from "../../
 import { useEffect } from "react"
 import { IconRefresh } from "@tabler/icons-react"
 import { IconLoader2 } from "@tabler/icons-react"
+import { IconArrowLeft } from "@tabler/icons-react"
+import { IconArrowRight } from "@tabler/icons-react"
 
 const Datasheet = () => {
   const { id } = useParams();
@@ -21,6 +23,7 @@ const Datasheet = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [Datasheet, setDatasheet] = useState([]);
   const base_public_url = api_public;
+  const [hide, setHide] = useState(false);
 
   useEffect(() => {
     fetchDatasheet();
@@ -121,11 +124,11 @@ const Datasheet = () => {
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
-      placeholder='Cari data disini...'
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
       className='text-lime-300 px-4 py-4 border outline-none'
       quickFilterParser={(searchInput) =>
         searchInput
-          .split(',')
+          .split(';')
           .map((value) => value.trim())
           .filter((value) => value !== '')
       }
@@ -134,8 +137,16 @@ const Datasheet = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         {/* get Datasheet  */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs

@@ -144,14 +144,14 @@ const Amandemen = () => {
 
     const CustomQuickFilter = () => (
         <GridToolbarQuickFilter
-        placeholder='Cari data disini...'
-        className='text-lime-300 px-4 py-4 border outline-none'
-        quickFilterParser={(searchInput) =>
+          placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
+          className='text-lime-300 px-4 py-4 border outline-none'
+          quickFilterParser={(searchInput) =>
             searchInput
-            .split(',')
-            .map((value) => value.trim())
-            .filter((value) => value !== '')
-        }
+              .split(';')
+              .map((value) => value.trim())
+              .filter((value) => value !== '')
+          }
         />
     );
 

@@ -7,6 +7,9 @@ import { useState, useEffect } from 'react';
 import { addPlo } from '../../services/plo.service';
 import { ActiveUnit } from '../../services/unit.service';
 import Swal from 'sweetalert2';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
+import * as motion from 'motion/react-client';
 
 const AddPlo = () => {
   const navigate = useNavigate();
@@ -15,6 +18,7 @@ const AddPlo = () => {
   const [selectedUnit, setSelectedUnit] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
+  const [hide, setHide] = useState(false);
 
   useEffect(() => {
     fetchUnits();
@@ -70,8 +74,16 @@ const AddPlo = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      <Header />
-      <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs
             aria-label='breadcrumb'
@@ -265,17 +277,28 @@ const AddPlo = () => {
                     </div>
                   </div>
                 )}
-                <button
-                  type='submit'
-                  className={`w-full px-4 py-2 rounded-lg ${
-                    isSubmitting
-                      ? 'bg-gray-500 cursor-not-allowed'
-                      : 'bg-emerald-950 text-white'
-                  }`}
-                  disabled={isSubmitting} // Disable tombol jika sedang submit
-                >
-                  {isSubmitting ? 'Processing...' : 'Save'}
-                </button>
+                <div className='w-full flex flex-row space-x-2 py-2'>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 0.99 }}
+                    type='submit'
+                    className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-emerald-950 text-white'
+                    }`}
+                    disabled={isSubmitting} // Disable tombol jika sedang submit
+                  >
+                    {isSubmitting ? 'Processing...' : 'Save'}
+                  </motion.button>
+                  <button
+                    type='button'
+                    className='w-1/3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 mr-2'
+                    onClick={() => navigate('/plo')}
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             </form>
           </div>

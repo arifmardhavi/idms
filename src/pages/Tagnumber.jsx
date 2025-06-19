@@ -12,6 +12,9 @@ import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
 import { IconTrash } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
+import { IconLoader2 } from '@tabler/icons-react';
 
 const Tagnumber = () => {
   const [tagnumber, setTagnumber] = useState([]);
@@ -25,6 +28,7 @@ const [filteredTypes, setFilteredTypes] = useState([]);
 const [loading, setLoading] = useState(false);
 const [validation, setValidation] = useState([]);
 const [isSubmitting, setIsSubmitting] = useState(false);
+const [hide, setHide] = useState(false);
 const token = localStorage.getItem('token');
 const userLevel = String(jwtDecode(token).level_user);
 
@@ -245,27 +249,29 @@ const handleDelete = async (id) => {
   ];
 
   const CustomQuickFilter = () => (
-  <GridToolbarQuickFilter
-    placeholder="Cari data disini..."
-    className="text-lime-300 px-4 py-4 border outline-none"
-    quickFilterParser={(searchInput) => {
-      if (searchInput.includes('||')) {
-        return searchInput.split('||').map(value => value.trim()).filter(value => value !== '');
-      } else {
-        return searchInput.split(',').map(value => value.trim()).filter(value => value !== '');
+    <GridToolbarQuickFilter
+      placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
+      className='text-lime-300 px-4 py-4 border outline-none'
+      quickFilterParser={(searchInput) =>
+        searchInput
+          .split(';')
+          .map((value) => value.trim())
+          .filter((value) => value !== '')
       }
-    }}
-  />
-);
-
-  // get tag number 
-
-
-
+    />
+  );
   return (
-    <div className="flex flex-col md:flex-row w-full">
-        <Header />
-        <div className="flex flex-col md:pl-64 w-full px-2 py-4 space-y-3">
+    <div className='flex flex-col md:flex-row w-full'>
+      { !hide && <Header />}
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+            <IconArrowLeft />
+          </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArrowRight />
+        </div>
           {/* Get Tag Number */}
           <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
             <div className="flex flex-row justify-between">
@@ -281,7 +287,11 @@ const handleDelete = async (id) => {
               </motion.a>
             </div>
             <div>
-            {loading ? <p>Loading...</p> :<DataGrid
+            {loading ? 
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            : <DataGrid
                 rows={tagnumber}
                 columns={columns}
                 disableColumnFilter
@@ -678,7 +688,7 @@ const handleDelete = async (id) => {
           )}
           {/* Edit Type */}
 
-        </div>
+      </div>
     </div>
   )
 }
