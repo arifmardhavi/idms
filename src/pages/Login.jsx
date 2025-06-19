@@ -60,7 +60,7 @@ const Login = () => {
                                 <button onClick={() => setShowPassword(!showPassword)} type="button" className="border border-lime-400 text-lime-400 rounded-md p-2">{showPassword ? <IconEye /> : <IconEyeClosed />}</button>
                             </div>
                             <div className="flex flex-col justify-center items-center my-2">
-                                <button type="submit" className="bg-lime-400 text-emerald-950 rounded-md p-2 w-full md:w-96" disabled={isSubmitting}>Login</button>
+                                <button type="submit" className={`${isSubmitting ? 'bg-gray-500 cursor-not-allowed text-white' : 'bg-lime-400 text-emerald-950'} rounded-md p-2 w-full md:w-96`} disabled={isSubmitting}>{isSubmitting ? 'Processing...' : 'Login'}</button>
                             </div>
                         </form>
                     </div>

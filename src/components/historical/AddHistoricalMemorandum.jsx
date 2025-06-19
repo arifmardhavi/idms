@@ -129,7 +129,7 @@ const AddHistoricalMemorandum = () => {
                                 onChange={(e) => handleTagNumberByUnit(e.target.value)}
                             >
                                 <option value="">Pilih Unit</option>
-                                {/* <option value="0">All Area</option> */}
+                                <option value="0">All Area</option>
                                 {
                                     unit.length > 0 ?
                                     unit.map((item) => (

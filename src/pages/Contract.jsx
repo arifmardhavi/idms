@@ -132,11 +132,24 @@ const Contract = () => {
         {
           field: 'durasi_mpp',
           headerName: 'Sisa MPP',
+          valueGetter : (params) => params.sisa,
           width: 100,
           renderCell: (params) => 
           <div className='py-4 flex flex-row justify-center items-center'>
-            <p className={`${params.value.color == 'red' ? 'bg-red-500' : params.value.color == 'green' ? 'bg-green-500' : params.value.color == 'yellow' ? 'bg-yellow-500' : params.value.color == 'blue' ? 'bg-blue-500' : 'bg-emerald-950'} text-white rounded-full w-fit p-2 font-bold`}>
-              {params.value.sisa}
+            <p className={`${params.row.durasi_mpp.color == 'red' ? 'bg-red-500' : params.row.durasi_mpp.color == 'green' ? 'bg-green-500' : params.row.durasi_mpp.color == 'yellow' ? 'bg-yellow-500' : params.row.durasi_mpp.color == 'blue' ? 'bg-blue-500' : 'bg-emerald-950'} text-white rounded-full w-fit p-2 font-bold`}>
+              {params.value}
+            </p>
+          </div>,
+        },
+        {
+          field: 'actual_progress',
+          headerName: 'Aktual Progress',
+          valueGetter: (params) => `${params}%`,
+          width: 150,
+          renderCell: (params) => 
+          <div className='py-4 flex flex-row justify-center items-center'>
+            <p >
+              {params.value}
             </p>
           </div>,
         },

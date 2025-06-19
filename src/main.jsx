@@ -36,6 +36,11 @@ import HistoricalMemorandum from './pages/HistoricalMemorandum.jsx';
 import AddHistoricalMemorandum from './components/historical/AddHistoricalMemorandum.jsx';
 import EditHistoricalMemorandum from './components/historical/EditHistoricalMemorandum.jsx';
 import LampiranMemo from './components/historical/LampiranMemo.jsx';
+import EngineeringData from './pages/EngineeringData.jsx';
+import Datasheet from './components/engineering_data/Datasheet.jsx';
+import Ga_Drawing from './components/engineering_data/Ga_Drawing.jsx';
+import AddEngineeringData from './components/engineering_data/AddEngineeringData.jsx';
+import EditEngineeringData from './components/engineering_data/EditEngineeringData.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -56,6 +61,7 @@ const router = createBrowserRouter([
       { path: '/skhp', element: <Skhp /> },
       { path: '/contract', element: <Contract /> },
       { path: '/historical_memorandum', element: <HistoricalMemorandum /> },
+      { path: '/engineering_data', element: <EngineeringData /> },
       { path: '/plo/dashboard', element: <DashboardPlo /> },
       { path: '/plo/tambah', element: <AddPlo /> },
       { path: '/plo/edit/:id', element: <EditPlo /> },
@@ -77,6 +83,10 @@ const router = createBrowserRouter([
       { path: '/historical_memorandum/tambah', element: <AddHistoricalMemorandum /> },
       { path: '/historical_memorandum/edit/:id', element: <EditHistoricalMemorandum /> },
       { path: '/historical_memorandum/lampiran/:id', element: <LampiranMemo /> },
+      { path: '/engineering_data/ga_drawing/:id', element: <Ga_Drawing /> },
+      { path: '/engineering_data/datasheet/:id', element: <Datasheet /> },
+      { path: '/engineering_data/tambah', element: <AddEngineeringData /> },
+      { path: '/engineering_data/edit/:id', element: <EditEngineeringData /> },
     ],
   },
 ]);

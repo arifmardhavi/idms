@@ -75,7 +75,7 @@ const EditContract = () => {
         formData.append('contract_start_date', e.target.contract_start_date.value);
         formData.append('contract_end_date', e.target.contract_end_date.value);
       }
-      if (IsKOM) {
+      if (IsKOM && e.target.meeting_notes.files[0] != null ) {
         formData.append('meeting_notes', e.target.meeting_notes.files[0]);
       }
 

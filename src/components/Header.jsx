@@ -13,6 +13,7 @@ import { apiLogout } from '../services/config';
 import Swal from 'sweetalert2';
 import { IconContract } from '@tabler/icons-react';
 import { IconClipboardText } from '@tabler/icons-react';
+import { IconServerCog } from '@tabler/icons-react';
 
 const SidesMenu = [
   { name: 'Home', icon: <IconHome />, path: '/' },
@@ -25,6 +26,7 @@ const SidesMenu = [
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
   { name: 'Historical Memorandum', icon: <IconClipboardText />, path: '/historical_memorandum', tab: 'regulatorycompliance' },
+  { name: 'Engineering Data', icon: <IconServerCog />, path: '/engineering_data', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {
@@ -97,6 +99,15 @@ const Header = () => {
     </motion.div>
   );
 
+  const renderDirectLink = (tab, icon, label) => (
+    <motion.div whileTap={{ scale: 0.9 }} initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, scale: { type: 'spring', bounce: 0.4 } }}
+      className={`flex items-center space-x-2 p-2 cursor-pointer hover:text-lime-300 hover:border-lime-300 hover:border-l-4 rounded-md ${activeMenu(tab)}`}>
+      {icon}
+      <span className='text-sm'>{label}</span>
+    </motion.div>
+  );
+
   return (
     <>
       {/* Desktop */}
@@ -113,8 +124,8 @@ const Header = () => {
         )}
         {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
         {renderMenu('regulatorycompliance')}
-        <Link to={'/contract'} className='cursor-pointer'>{renderTab('contract', <IconContract />, 'Contract')}</Link>
-        <div onClick={handleLogout} className='cursor-pointer'>{renderTab('logout', <IconLogout />, 'Logout')}</div>
+        <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
+        <div onClick={handleLogout} className='cursor-pointer'>{renderDirectLink('logout', <IconLogout />, 'Logout')}</div>
       </div>
 
       {/* Mobile */}

@@ -2,66 +2,68 @@ import { Breadcrumbs, Modal, Typography } from "@mui/material"
 import Header from "../Header"
 import { IconChevronRight } from "@tabler/icons-react"
 import { Link, useParams } from "react-router-dom"
-import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid"
-import { GridLogicOperator } from '@mui/x-data-grid';
-import * as motion from 'motion/react-client';
-import { useState } from "react"
-import { IconCircleMinus } from "@tabler/icons-react"
-import { addLampiran, deleteLampiran, getLampiranByHistorical } from "../../services/lampiran_memo.service"
-import { useEffect } from "react"
-import { api_public } from '../../services/config';
 import { IconPlus } from "@tabler/icons-react"
+import { DataGrid, GridLogicOperator, GridToolbarQuickFilter } from "@mui/x-data-grid"
+import { useState } from "react"
+import { api_public } from '../../services/config';
+import * as motion from 'motion/react-client';
+import { IconCircleMinus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
+import { addGaDrawing, deleteGaDrawing, getGaDrawingByEngineering } from "../../services/ga_drawing.service"
+import { useEffect } from "react"
+import { IconLoader2 } from "@tabler/icons-react"
+import { IconRefresh } from "@tabler/icons-react"
 
-const LampiranMemo = () => {
+const Ga_Drawing = () => {
   const { id } = useParams();
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [lampiran, setLampiran] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [GaDrawing, setGaDrawing] = useState([]);
   const base_public_url = api_public;
 
   useEffect(() => {
-    fetchLampiran();
-  }, [id])
+    fetchDrawing();
+  }, [id]);
 
-  const fetchLampiran = async () => {
+
+  const fetchDrawing = async () => {
     try {
       setLoading(true);
-      const data = await getLampiranByHistorical(id);
-      setLampiran(data.data);
+      const data = await getGaDrawingByEngineering(id);
+      setGaDrawing(data.data);
     } catch (error) {
-      console.error("Error fetching Lampiran Historical:", error);
+      console.error("Error fetching Ga Drawing:", error);
     } finally {
       setLoading(false);
     }
   }
 
   const handleSubmit = async (e) => {
-    setIsSubmitting(true);
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const formData = new FormData(e.target);
-      formData.append('historical_memorandum_id', id);
-      const res = await addLampiran(formData);
+      formData.append('engineering_data_id', id);
+      const res = await addGaDrawing(formData);
       if (res.success) {
-        Swal.fire("Berhasil!", "Lampiran Historical berhasil tambahkan!", "success");
-        fetchLampiran();
+        Swal.fire("Berhasil!", "GA Drawing file berhasil tambahkan!", "success");
+        fetchDrawing();
         setOpen(false);
       } else {
         console.log(res.response.data.errors);
       }
     } catch (error) {
-      console.error("Error adding Lampiran Historical:", error);
+      console.error("Error adding Ga Drawing:", error);
     } finally {
       setIsSubmitting(false);
     }
   }
-
+  
   const handleDelete = async (row) => {
     const result = await Swal.fire({
       title: "Apakah Anda yakin?",
-      text: "File Lampiran Historical akan dihapus secara permanen!",
+      text: "File GA Drawing akan dihapus secara permanen!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Ya, hapus!",
@@ -70,24 +72,24 @@ const LampiranMemo = () => {
 
     if (result.isConfirmed) {
       try {
-        const res = await deleteLampiran(row.id);
+        const res = await deleteGaDrawing(row.id);
         if (res.success) {
-          Swal.fire("Berhasil!", "Lampiran Historical berhasil dihapus!", "success");
-          fetchLampiran();
+          Swal.fire("Berhasil!", "GA Drawing berhasil dihapus!", "success");
+          fetchDrawing();
         } else {
-          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Lampiran Historical!", "error");
+          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus GA Drawing!", "error");
         }
       } catch (error) {
         console.log(error);
-        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Lampiran Historical!", "error");
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus GA Drawing!", "error");
       }
     }
   };
 
   const columns = [
-    { field: 'lampiran_memo', headerName: 'Lampiran Historical', width:400, renderCell: (params) => <div className="py-4">
+    { field: 'drawing_file', headerName: 'GA Drawing', width:400, renderCell: (params) => <div className="py-4">
       <Link
-        to={`${base_public_url}historical_memorandum/lampiran/${params.value}`}
+        to={`${base_public_url}engineering_data/ga_drawing/${params.value}`}
         target='_blank'
         className='text-lime-500 underline'
       >
@@ -111,7 +113,11 @@ const LampiranMemo = () => {
         </div>
       ),
     },
-  ];
+  ]
+
+  const handleClose = () => {
+      setOpen(false);
+  };
 
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
@@ -125,17 +131,11 @@ const LampiranMemo = () => {
       }
     />
   );
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-
   return (
     <div className='flex flex-col md:flex-row w-full'>
       <Header />
       <div className='flex flex-col md:pl-64 w-full px-2 py-4 space-y-3'>
-        {/* get Lampiran Historical  */}
+        {/* get GA Drawing  */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs
             aria-label='breadcrumb'
@@ -146,18 +146,30 @@ const LampiranMemo = () => {
             <Link className='hover:underline text-emerald-950' to='/'>
               Home
             </Link>
-            <Link className='hover:underline text-emerald-950' to='/historical_memorandum'>
-              Historical Memorandum
+            <Link className='hover:underline text-emerald-950' to='/engineering_data'>
+              Engineering Data
             </Link>
-            <Typography className='text-lime-500'>Lampiran </Typography>
+            <Typography className='text-lime-500'>GA Drawing </Typography>
           </Breadcrumbs>
           {/* <p className='text-emerald-950 text-md font-semibold uppercase w-full text-center'>{lampiran[0].historical_memorandum.perihal}</p> */}
           <div>
             <div className="flex flex-row justify-end py-2">
-              <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
-                <IconPlus className='hover:rotate-180 transition duration-500' />
-                <span>Tambah Lampiran</span>
-              </button>
+              <div className='flex flex-row justify-end items-center space-x-2'>
+                <button
+                    className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
+                    onClick={fetchDrawing}
+                >
+                    <IconRefresh className='hover:rotate-180 transition duration-500' />
+                    <span>Refresh</span>
+                </button>
+                <button
+                    onClick={() => setOpen(true)}
+                    className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
+                >
+                    <IconPlus className='hover:rotate-180 transition duration-500' />
+                    <span>Tambah</span>
+                </button>
+              </div>
               <Modal
                 open={open}
                 onClose={handleClose}
@@ -181,12 +193,12 @@ const LampiranMemo = () => {
                   <form method="post" encType="multipart/form-data" onSubmit={handleSubmit}>
                     <div className="m-2">
                       <div className="text-emerald-950">
-                        Upload Lampiran Historical
+                        Upload GA Drawing
                       </div>
                       <input
                         type="file"
-                        id="lampiran_memo"
-                        name="lampiran_memo"
+                        id="drawing_file"
+                        name="drawing_file"
                         className="w-full p-2 rounded border"
                       />
                     </div>
@@ -208,9 +220,13 @@ const LampiranMemo = () => {
               </Modal>
 
             </div>
-            {loading ? <p>Loading...</p> : 
+            {loading 
+            ? <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            : 
             <DataGrid
-              rows={lampiran}
+              rows={GaDrawing}
               columns={columns}
               disableColumnFilter
               disableColumnSelector
@@ -247,4 +263,4 @@ const LampiranMemo = () => {
   )
 }
 
-export default LampiranMemo
+export default Ga_Drawing

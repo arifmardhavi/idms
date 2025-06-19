@@ -159,11 +159,12 @@ const EditHistoricalMemorandum = () => {
                             <select 
                                 name="unit_id" 
                                 id="unit_id" 
-                                className="w-full px-1 py-2 rounded-md"
+                                className="w-full px-1 py-2 border border-gray-300 rounded-md"
                                 defaultValue={historicalMemorandum.unit_id}
                                 onChange={(e) => handleTagNumberByUnit(e.target.value)}
                             >
                                 <option value="">Pilih Unit</option>
+                                <option value="0">All Area</option>
                                 {
                                     unit.length > 0 ?
                                     unit.map((item) => (
@@ -189,7 +190,7 @@ const EditHistoricalMemorandum = () => {
                             <select 
                                 name="category_id" 
                                 id="category_id" 
-                                className="w-full px-1 py-2 rounded-md"
+                                className="w-full px-1 py-2 border border-gray-300 rounded-md"
                                 defaultValue={historicalMemorandum.category_id}
                             >
                                 <option value="">Pilih Kategori Peralatan</option>

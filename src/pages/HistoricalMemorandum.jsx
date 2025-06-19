@@ -61,9 +61,9 @@ const HistoricalMemorandum = () => {
     const columns = [
         { field: 'unit', 
             headerName: 'Area',
-            valueGetter: (params) => params ? params.unit_name : '-', 
+            valueGetter: (params) => params ? params.unit_name : 'All Area', 
             width: 150,  
-            renderCell: (params) => <div className="py-4">{params.row.unit.unit_name ? params.row.unit.unit_name : '-'}</div> },
+            renderCell: (params) => <div className="py-4">{params.row.unit_id != '0' ? (params.row.unit.unit_name ? params.row.unit.unit_name : 'All Area') : 'All Area'}</div> },
         { field: 'category', 
             headerName: 'Kategori Peralatan',
             valueGetter: (params) => params ? params.category_name : '-', 
