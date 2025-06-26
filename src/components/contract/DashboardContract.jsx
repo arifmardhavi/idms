@@ -21,6 +21,20 @@ const DashboardContract = () => {
     const base_public_url = api_public;
     const [hide, setHide] = useState(false);
 
+    // Ambil userLevel global sekali saja
+    const [userLevel, setUserLevel] = useState('');
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        let level = '';
+        try {
+            level = String(JSON.parse(atob(token.split('.')[1])).level_user);
+        } catch (e) {
+            console.error('Invalid token', e);
+        }
+        setUserLevel(level);
+    }, []);
+
     useEffect(() => {
         fetchContract();
     }, [id]);
@@ -314,11 +328,13 @@ const DashboardContract = () => {
                         </table>
                     </div>
                 </div>}
-                <div className="w-full p-2 flex flex-row justify-center">
-                    <Link to={`/contract/edit/${id}`} className="text-lime-400 bg-emerald-950 w-full md:w-64 text-center py-2 px-4 rounded">
+                {userLevel !== '3' && (
+                    <div className="w-full p-2 flex flex-row justify-center">
+                        <Link to={`/contract/edit/${id}`} className="text-lime-400 bg-emerald-950 w-full md:w-64 text-center py-2 px-4 rounded">
                             Update
-                    </Link>
-                </div>
+                        </Link>
+                    </div>
+                )}
             </div>}
 
             { contract.contract_type == '2' && 
@@ -347,7 +363,7 @@ const DashboardContract = () => {
             {contract.contract_type == 3 &&<div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                 <LumpsumProgress />
             </div>}
-            {contract.contract_type != 3 && <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                {contract.contract_type != 3 && userLevel !== '3' && <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                 <Amandemen />
             </div>}
         </div>

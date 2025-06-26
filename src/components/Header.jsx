@@ -25,8 +25,8 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'Historical Memorandum', icon: <IconClipboardText />, path: '/historical_memorandum', tab: 'regulatorycompliance' },
-  { name: 'Engineering Data', icon: <IconServerCog />, path: '/engineering_data', tab: 'regulatorycompliance' },
+  // { name: 'Historical Memorandum', icon: <IconClipboardText />, path: '/historical_memorandum', tab: 'regulatorycompliance' },
+  // { name: 'Engineering Data', icon: <IconServerCog />, path: '/engineering_data', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {
@@ -116,15 +116,26 @@ const Header = () => {
           <img className='w-24 xl:w-32 border-r-2 border-slate-300' src='/images/kpi-putih.png' alt='Logo Pertamina' />
           <span className='text-md xl:text-xl font-bold'>IDMS</span>
         </div>
-        {userLevel !== '2' && (
+        {(userLevel === '1' || userLevel === '2' || userLevel === '99') && (
           <>
-            {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
-            {renderMenu('masterdata')}
+            {userLevel !== '2' && (
+              <>
+                {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
+                {renderMenu('masterdata')}
+              </>
+            )}
+            {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
+            {renderMenu('regulatorycompliance')}
+            <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
+            <Link to={'/historical_memorandum'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Historical Memorandum')}>{renderDirectLink('historical_memorandum', <IconClipboardText />, 'Historical Memorandum')}</Link>
+            <Link to={'/engineering_data'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Engineering Data')}>{renderDirectLink('engineering_data', <IconServerCog />, 'Engineering Data')}</Link>
           </>
         )}
-        {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
-        {renderMenu('regulatorycompliance')}
-        <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
+        {userLevel === '3' && (
+          <>
+            <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
+          </>
+        )}
         <div onClick={handleLogout} className='cursor-pointer'>{renderDirectLink('logout', <IconLogout />, 'Logout')}</div>
       </div>
 

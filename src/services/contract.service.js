@@ -9,3 +9,4 @@ export const updateContract = async (id, data) => await apiPost(`${endpoint}/${i
 export const deleteContract = async (id) => await apiDelete(`${endpoint}/${id}`);
 export const deleteContractFile = async (id, data) => await apiPut(`${endpoint}/deletefile/${id}`, data);
 export const getMonitoringContract = async () => await apiGet('monitoring_contract');
+export const getContractByUser = async () => await apiGet('contracts/user');

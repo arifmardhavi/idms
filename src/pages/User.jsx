@@ -14,6 +14,10 @@ import { IconEyeClosed } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
+import { Autocomplete, TextField, Tooltip } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { IconKey } from '@tabler/icons-react';
+import { getContract } from '../services/contract.service';
 
 const User = () => {
     const [IsUser, setIsUser] = useState([])
@@ -25,9 +29,25 @@ const User = () => {
     const [validation, setValidation] = useState([]);
     const [editUser, setEditUser] = useState({});
     const [hide, setHide] = useState(false);
+    const [isLevel, setIsLevel] = useState(false);
+    const [contract, setContract] = useState(false);
+  const [selectedContract, setSelectedContract] = useState([]);
     useEffect(() => {
       fetchUsers();
+      fetchContract();
     }, [])
+
+    const fetchContract = async() => {
+      try {
+        setLoading(true);
+        const data = await getContract();
+        setContract(data.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
     const fetchUsers = async () => {
       try {
@@ -43,10 +63,16 @@ const User = () => {
 
     const handleAddUser = async (e) => {
       e.preventDefault();
+      try {
       setIsSubmitting(true);
       const formData = new FormData(e.target);
-      const data = await addUser(formData);
-      try {
+      formData.delete('contract_id[]');
+      selectedContract.forEach((id) => {
+        formData.append('contract_id[]', id);
+      });
+      console.log(formData);
+
+        const data = await addUser(formData);
         if (data.success) {
           fetchUsers();
           setIsSubmitting(false);
@@ -71,28 +97,68 @@ const User = () => {
       setAddMode(false);
       setEditMode(true);
       setEditUser(row);
+      // Initialize isLevel and selectedContract based on user being edited
+      setIsLevel(row.level_user === 3);
+      if (row.contracts && Array.isArray(row.contracts)) {
+        setSelectedContract(row.contracts);
+      } else {
+        setSelectedContract([]);
+      }
     }
 
     // update User
     const handleUpdate = async (event) => {
       event.preventDefault();
-      setIsSubmitting(true);
-      const formData = new FormData(event.target);
-      const data = Object.fromEntries(formData);
       try {
-        await updateUser(editUser.id, data);
-        Swal.fire('Berhasil!', 'user berhasil diperbarui!', 'success');
-        fetchUsers();
-        setEditMode(false);
-        setEditUser(null);
-        setValidation([]);
+        setIsSubmitting(true);
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        // Ambil level_user dengan pasti
+        const levelUser = form.level_user.value;
+        formData.set('level_user', levelUser); // pastikan dikirim, walau tidak berubah
+
+        // Hapus semua kemungkinan duplikat field kontrak
+        formData.delete('contract_id');
+        formData.delete('contract_id[]');
+
+        // Jika vendor, kirim semua kontrak
+        if (levelUser === '3' || parseInt(levelUser) === 3) {
+          selectedContract.forEach((id) => {
+            formData.append('contract_id[]', id);
+          });
+        }
+
+        // DEBUG: lihat semua yang dikirim
+        // for (let [key, val] of formData.entries()) {
+        //   console.log(`${key}: ${val}`);
+        // }
+
+        const data = await updateUser(editUser.id, formData);
+
+        if (data.success) {
+          Swal.fire('Berhasil!', 'User berhasil diperbarui!', 'success');
+          fetchUsers();
+          setEditMode(false);
+          setEditUser({});
+          setValidation([]);
+          setSelectedContract([]);
+          setIsLevel(false);
+        } else {
+          setValidation(data.response?.data?.errors || []);
+          Swal.fire('Gagal!', 'Terjadi kesalahan saat memperbarui User!', 'error');
+        }
       } catch (error) {
-        console.log(error.response.data.errors);
-        setValidation(error.response?.data.errors || []);
+        console.error(error);
+        setValidation(error.response?.data?.errors || []);
         Swal.fire('Gagal!', 'Terjadi kesalahan saat memperbarui User!', 'error');
+      } finally {
+        setIsSubmitting(false);
       }
-      setIsSubmitting(false);
     };
+
+
     
     // Nonaktifkan User
     const handleNonactive = async (user) => {
@@ -137,6 +203,17 @@ const User = () => {
               width: 150,
               renderCell: (params) => (
                 <div className="flex flex-row justify-center py-2 items-center space-x-2">
+                  <Tooltip title="Features" placement="left">
+                    <Link to={`/features/${params.row.id}`}>
+                        <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                        >
+                        <IconKey stroke={2} />
+                        </motion.button>
+                    </Link>
+                  </Tooltip>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -201,7 +278,7 @@ const User = () => {
                     <span>Refresh</span>
                 </motion.a>
                 <motion.button
-                    onClick={() => {setAddMode(true); setEditMode(false);}}
+                    onClick={() => {setAddMode(true); setEditMode(false); setValidation([]); setSelectedContract([]); setIsLevel(false); setIsSubmitting(false);}}
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 1.1 }}
                     className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
@@ -351,9 +428,11 @@ const User = () => {
                         className="w-full px-1 py-2 border border-gray-300 rounded-md"
                         name="level_user"
                         id="level_user"
+                        onChange={(e) => {e.target.value == 3 ? setIsLevel(true) : setIsLevel(false)}}
                       >
                         <option value="2">Users</option>
                         <option value="1">Admin</option>
+                        <option value="3">Vendor</option>
                       </select>
                       {validation.level_user && (
                         validation.level_user.map((item, index) => (
@@ -363,6 +442,7 @@ const User = () => {
                         ))
                       )}
                     </div>
+                    
                     <div className='w-full'>
                       <label htmlFor="status">Status<sup className='text-red-500'>*</sup></label>
                       <select
@@ -384,6 +464,42 @@ const User = () => {
                   </div>
                 </div>
                 <div className='flex flex-row space-x-1'>
+                  { isLevel && 
+                    <div className='w-full'>
+                      <label htmlFor="status">Pilih Kontrak<sup className='text-red-500'>*</sup></label>
+                      <Autocomplete
+                        multiple
+                        id="contract_id"
+                        options={Array.isArray(contract) ? contract : []}
+                        getOptionLabel={(option) => option.contract_name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={contract.filter((item) => selectedContract.includes(item.id))}
+                        onChange={(e, value) => {
+                            setSelectedContract(value.map((item) => item.id));
+                        }}
+                        renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            name="contract_id" // Bisa disesuaikan ke "contract_id[]" jika backend butuh array
+                            placeholder={'N/A'}
+                            variant="outlined"
+                            error={!!validation.contract_id}
+                            helperText={
+                            validation.contract_id &&
+                            validation.contract_id.map((item, index) => (
+                                <span key={index} className="text-red-600 text-sm">
+                                {item}
+                                </span>
+                            ))
+                            }
+                        />
+                        )}
+                    />
+                      
+                    </div>
+                  }
+                </div>
+                <div className='flex flex-row space-x-1'>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
@@ -400,7 +516,7 @@ const User = () => {
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
                     className="w-1/3 bg-slate-400 text-white py-2 rounded-md uppercase"
-                    onClick={() => setAddMode(false)}
+                    onClick={() => {setAddMode(false); setValidation([]); setSelectedContract([]); setIsLevel(false); setIsSubmitting(false);}}
                   >
                     Cancel
                   </motion.button>
@@ -515,9 +631,11 @@ const User = () => {
                         name="level_user"
                         id="level_user"
                         defaultValue={editUser.level_user}
+                        onChange={(e) => {e.target.value == 3 ? setIsLevel(true) : setIsLevel(false)}}
                       >
                         <option value="2">Users</option>
                         <option value="1">Admin</option>
+                        <option value="3">Vendor</option>
                       </select>
                       {validation.level_user && (
                         validation.level_user.map((item, index) => (
@@ -548,9 +666,45 @@ const User = () => {
                     </div>
                   </div>
                 </div>
+                { isLevel && 
+                  <div className='flex flex-row space-x-1'>
+                    <div className='w-full'>
+                      <label htmlFor="status">Pilih Kontrak<sup className='text-red-500'>*</sup></label>
+                      <Autocomplete
+                        multiple
+                        id="contract_id"
+                        options={Array.isArray(contract) ? contract : []}
+                        getOptionLabel={(option) => option.contract_name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={contract.filter((item) => selectedContract.includes(item.id))}
+                        onChange={(e, value) => {
+                            setSelectedContract(value.map((item) => item.id));
+                        }}
+                        renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            name="contract_id" // Bisa disesuaikan ke "contract_id[]" jika backend butuh array
+                            placeholder={'N/A'}
+                            variant="outlined"
+                            error={!!validation.contract_id}
+                            helperText={
+                            validation.contract_id &&
+                            validation.contract_id.map((item, index) => (
+                                <span key={index} className="text-red-600 text-sm">
+                                {item}
+                                </span>
+                            ))
+                            }
+                        />
+                        )}
+                    />
+                      
+                    </div>
+                  </div>
+                }
                 <div className='flex flex-row space-x-1'>
                   <motion.button
-                  type='submit'
+                    type='submit'
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
                     className={`w-2/3 bg-emerald-950 text-emerald-950 py-2 rounded-md uppercase ${
@@ -567,7 +721,7 @@ const User = () => {
                     whileTap={{ scale: 0.9 }}
                     whileHover={{ scale: 0.98 }}
                     className="w-1/3 bg-slate-400 text-white py-2 rounded-md uppercase"
-                    onClick={() => {setEditMode(false); setEditUser({})}}
+                    onClick={() => {setIsSubmitting(false); setEditMode(false); setEditUser({})}}
                   >
                     Cancel
                   </motion.button>

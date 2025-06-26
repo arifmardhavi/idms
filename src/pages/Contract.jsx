@@ -8,7 +8,7 @@ import * as motion from 'motion/react-client';
 import { DataGrid, GridLogicOperator, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { api_public } from '../services/config';
 import { useEffect, useState } from "react";
-import { deleteContract, getContract } from "../services/contract.service";
+import { deleteContract, getContract, getContractByUser } from "../services/contract.service";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { IconPencil } from "@tabler/icons-react";
 import { IconCircleMinus } from "@tabler/icons-react";
@@ -18,21 +18,37 @@ import { IconLoader2 } from "@tabler/icons-react";
 import { Tooltip } from "@mui/material";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconArrowRight } from "@tabler/icons-react";
+import { jwtDecode } from "jwt-decode";
+
 const Contract = () => {
     const [contract, setContract] = useState([]);
     // const [selectedRows, setSelectedRows] = useState([]);
     const [loading, setLoading] = useState(false);
     const base_public_url = api_public;
     const [hide, setHide] = useState(false)
+    const [userLevel, setUserLevel] = useState('');
 
     useEffect(() => {
-        fetchContract();
+        const token = localStorage.getItem('token');
+        let level = '';
+        try {
+            level = String(jwtDecode(token).level_user);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+        setUserLevel(level);
+        fetchContract(level);
     }, []);
 
-    const fetchContract = async () => {
+    const fetchContract = async (level) => {
         try {
             setLoading(true);
-            const data = await getContract();
+            let data;
+            if (level === '3') {
+                data = await getContractByUser();
+            } else {
+                data = await getContract();
+            }
             setContract(data.data);
             console.log(data.data);
         } catch (error) {
@@ -57,7 +73,7 @@ const Contract = () => {
                 const res = await deleteContract(row.id);
                 if (res.success) {
                     Swal.fire("Berhasil!", "Contract berhasil dihapus!", "success");
-                    fetchContract();
+                    fetchContract(userLevel);
                 } else {
                     Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Contract!", "error");
                 }
@@ -226,28 +242,32 @@ const Contract = () => {
                         </motion.button>
                     </Link>
                   </Tooltip>
-                  <Tooltip title="Edit" placement="top">
-                    <Link to={`/contract/edit/${params.row.id}`}>
+                  {userLevel !== '3' && (
+                    <>
+                      <Tooltip title="Edit" placement="top">
+                        <Link to={`/contract/edit/${params.row.id}`}>
+                            <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                            // onClick={() => handleEdit(params.row)}
+                            >
+                            <IconPencil stroke={2} />
+                            </motion.button>
+                        </Link>
+                      </Tooltip>
+                      <Tooltip title="Delete" placement="top">
                         <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
-                        // onClick={() => handleEdit(params.row)}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+                            onClick={() => handleDelete(params.row)}
                         >
-                        <IconPencil stroke={2} />
+                            <IconCircleMinus stroke={2} />
                         </motion.button>
-                    </Link>
-                  </Tooltip>
-                  <Tooltip title="Delete" placement="top">
-                    <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
-                        onClick={() => handleDelete(params.row)}
-                    >
-                        <IconCircleMinus stroke={2} />
-                    </motion.button>
-                  </Tooltip>
+                      </Tooltip>
+                    </>
+                  )}
                 </div>
             ),
         },

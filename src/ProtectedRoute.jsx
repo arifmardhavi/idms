@@ -38,6 +38,22 @@ const ProtectedRoute = () => {
 
     
     const masterDataPaths = ["/unit", "/category", "/type", "/tagnumber"];
+    const allPaths = [
+      "/unit", "/category", "/type", "/tagnumber",
+      "/user", "/features", "/plo", "/coi", "/skhp",
+      "/historical_memorandum", "/engineering_data", "/user", "/features"
+    ];
+    const allowedPathsVendor = [
+      "/",
+      "/dashboard", 
+      "/contract", 
+      '/contract/dashboard/:id',
+      '/contract/addspk/:id',
+      '/contract/editspk/:id/:spk_id',
+      '/contract/addamandemen/:id',
+      '/contract/editamandemen/:id/:amandemen_id',
+      '/contract/monitoring',
+    ];
 
     if (levelUser === "2" && masterDataPaths.includes(location.pathname)) {
       Swal.fire({
@@ -47,6 +63,26 @@ const ProtectedRoute = () => {
         confirmButtonText: 'OK'
       }).then(() => navigate('/'));
       return null;
+    }
+
+    // Perbaikan untuk levelUser 3: cek path dengan regex untuk path dinamis
+    if (levelUser === "3") {
+      const allowedPathsVendorRegex = allowedPathsVendor.map(path => {
+        // Escape special regex chars except : for params
+        const escaped = path.replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        // Replace :param with regex to match any segment
+        return new RegExp("^" + escaped.replace(/\\:([^\/]+)/g, "[^/]+") + "$");
+      });
+      const isAllowed = allowedPathsVendorRegex.some(regex => regex.test(location.pathname));
+      if (!isAllowed) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Akses Ditolak!',
+          text: 'Vendor hanya dapat mengakses fitur Contract.',
+          confirmButtonText: 'OK'
+        }).then(() => navigate('/contract'));
+        return null;
+      }
     }
 
     return <Outlet />;

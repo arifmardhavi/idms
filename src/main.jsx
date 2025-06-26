@@ -41,6 +41,7 @@ import Datasheet from './components/engineering_data/Datasheet.jsx';
 import Ga_Drawing from './components/engineering_data/Ga_Drawing.jsx';
 import AddEngineeringData from './components/engineering_data/AddEngineeringData.jsx';
 import EditEngineeringData from './components/engineering_data/EditEngineeringData.jsx';
+import Features from './pages/Features.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -60,6 +61,7 @@ const router = createBrowserRouter([
       { path: '/coi', element: <Coi /> },
       { path: '/skhp', element: <Skhp /> },
       { path: '/contract', element: <Contract /> },
+      { path: '/features/:id', element: <Features /> },
       { path: '/historical_memorandum', element: <HistoricalMemorandum /> },
       { path: '/engineering_data', element: <EngineeringData /> },
       { path: '/plo/dashboard', element: <DashboardPlo /> },
