@@ -14,6 +14,7 @@ import { IconPlus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
+import { jwtDecode } from "jwt-decode"
 
 const LampiranMemo = () => {
   const { id } = useParams();
@@ -23,8 +24,17 @@ const LampiranMemo = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const base_public_url = api_public;
   const [hide, setHide] = useState(false);
+  const [userLevel, setUserLevel] = useState('');
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    let level = '';
+    try {
+        level = String(jwtDecode(token).level_user);
+    } catch (error) {
+        console.error('Invalid token:', error);
+    }
+    setUserLevel(level);
     fetchLampiran();
   }, [id])
 
@@ -97,7 +107,7 @@ const LampiranMemo = () => {
         {params.value}
       </Link>
     </div> },
-    {
+    ...(userLevel !== '4' && userLevel !== '5' ? [{
       field: 'actions',
       headerName: 'Aksi',
       width: 150,
@@ -113,7 +123,7 @@ const LampiranMemo = () => {
           </motion.button>
         </div>
       ),
-    },
+    }] : []),
   ];
 
   const CustomQuickFilter = () => (
@@ -165,10 +175,10 @@ const LampiranMemo = () => {
           {/* <p className='text-emerald-950 text-md font-semibold uppercase w-full text-center'>{lampiran[0].historical_memorandum.perihal}</p> */}
           <div>
             <div className="flex flex-row justify-end py-2">
-              <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
+              { userLevel !== '4' && userLevel !== '5' && <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
                 <IconPlus className='hover:rotate-180 transition duration-500' />
                 <span>Tambah Lampiran</span>
-              </button>
+              </button>}
               <Modal
                 open={open}
                 onClose={handleClose}

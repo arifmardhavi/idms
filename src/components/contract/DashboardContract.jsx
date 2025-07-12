@@ -14,6 +14,7 @@ import Amandemen from "./amandemen/Amandemen";
 import { IconArrowRight } from "@tabler/icons-react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
+import { jwtDecode } from "jwt-decode";
 const DashboardContract = () => {
     const {id} = useParams();
     const [contract, setContract] = useState([]);
@@ -26,13 +27,13 @@ const DashboardContract = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        let level = '';
-        try {
-            level = String(JSON.parse(atob(token.split('.')[1])).level_user);
-        } catch (e) {
-            console.error('Invalid token', e);
-        }
-        setUserLevel(level);
+            let level = '';
+            try {
+                level = String(jwtDecode(token).level_user);
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+            setUserLevel(level);
     }, []);
 
     useEffect(() => {
@@ -328,7 +329,7 @@ const DashboardContract = () => {
                         </table>
                     </div>
                 </div>}
-                {userLevel !== '3' && (
+                {userLevel !== '3' && userLevel !== '4' && (
                     <div className="w-full p-2 flex flex-row justify-center">
                         <Link to={`/contract/edit/${id}`} className="text-lime-400 bg-emerald-950 w-full md:w-64 text-center py-2 px-4 rounded">
                             Update
@@ -339,9 +340,9 @@ const DashboardContract = () => {
 
             { contract.contract_type == '2' && 
             <>
-                <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                { userLevel !== '3' && <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                     <Spk />
-                </div>
+                </div> }
                 <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                     <SpkProgress  />
                 </div>
@@ -349,12 +350,12 @@ const DashboardContract = () => {
             }
             { contract.contract_type == '1' &&
                 <>
-                    <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                    {userLevel !== '3' && <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                         <Termin onAddedTermin={fetchContract} />
-                    </div>
-                    <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
+                    </div>}
+                    {userLevel !== '3' && <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                         {isLoading ? <div>Loading...</div> : <Billing onAddedBilling={fetchContract} /> }
-                    </div>
+                    </div>}
                     <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                         <LumpsumProgress />
                     </div>

@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import { Box, Modal } from "@mui/material";
 import { getContractById } from "../../services/contract.service";
 import { IconLoader2 } from "@tabler/icons-react";
+import { jwtDecode } from "jwt-decode";
 
 const LumpsumProgress = () => {
     
@@ -27,6 +28,7 @@ const LumpsumProgress = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedWeek, setSelectedWeek] = useState('');
     const [editProgress, setEditProgress] = useState('');
+    const [userLevel, setUserLevel] = useState('');
 
     const style = {
         position: 'absolute',
@@ -41,6 +43,14 @@ const LumpsumProgress = () => {
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        let level = '';
+        try {
+            level = String(jwtDecode(token).level_user);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+        setUserLevel(level);
         fetchProgress();
         fetchContract();
     }, [id]);
@@ -180,7 +190,7 @@ const LumpsumProgress = () => {
             </Link>
         </div> },
         
-        {
+        ...(userLevel !== '4' && userLevel !== '5' ? [{
             field: 'actions',
             headerName: 'Aksi',
             width: 150,
@@ -204,7 +214,7 @@ const LumpsumProgress = () => {
                     </motion.button>
                 </div>
             ),
-        },
+        }] : []),
     ];
 
     const CustomQuickFilter = () => (
@@ -224,7 +234,7 @@ const LumpsumProgress = () => {
     <div>
         <div className='flex flex-row justify-between py-2'>
             <h1 className='text-xl font-bold uppercase'>Progress Pekerjaan</h1>
-            <div className='flex flex-row justify-end items-center space-x-2'>
+            { userLevel !== '4' && userLevel !== '5' && <div className='flex flex-row justify-end items-center space-x-2'>
                 <button
                     onClick={() => setOpen(true)}
                     className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
@@ -232,7 +242,7 @@ const LumpsumProgress = () => {
                     <IconPlus className='hover:rotate-180 transition duration-500' />
                     <span>Tambah</span>
                 </button>
-            </div>
+            </div>}
         </div>
         {/* modals add */}
         <Modal 

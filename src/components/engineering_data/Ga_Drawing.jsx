@@ -9,12 +9,14 @@ import { api_public } from '../../services/config';
 import * as motion from 'motion/react-client';
 import { IconCircleMinus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
-import { addGaDrawing, deleteGaDrawing, getGaDrawingByEngineering } from "../../services/ga_drawing.service"
+import { addGaDrawing, deleteGaDrawing, getGaDrawingByEngineering, updateGaDrawing } from "../../services/ga_drawing.service"
 import { useEffect } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { IconRefresh } from "@tabler/icons-react"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
+import { IconPencil } from "@tabler/icons-react"
+import { jwtDecode } from "jwt-decode"
 
 const Ga_Drawing = () => {
   const { id } = useParams();
@@ -24,8 +26,21 @@ const Ga_Drawing = () => {
   const [GaDrawing, setGaDrawing] = useState([]);
   const base_public_url = api_public;
   const [hide, setHide] = useState(false);
+  const [editDrawing, setEditDrawing] = useState(null);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [validation, setValidation] = useState([]);
+  const [userLevel, setUserLevel] = useState('')
+  
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    let level = '';
+    try {
+        level = String(jwtDecode(token).level_user);
+    } catch (error) {
+        console.error('Invalid token:', error);
+    }
+    setUserLevel(level);
     fetchDrawing();
   }, [id]);
 
@@ -62,6 +77,31 @@ const Ga_Drawing = () => {
       setIsSubmitting(false);
     }
   }
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData(e.target);
+      formData.append('engineering_data_id', id);
+      console.log(formData);
+      const res = await updateGaDrawing(editDrawing.id, formData);
+      if (res.success) {
+        Swal.fire("Berhasil!", "Drawing berhasil diupdate!", "success");
+        fetchDrawing();
+      } else {
+        setValidation(res.response?.data.errors || []);
+        // Swal.fire("Error!", "something went wrong " . error.response?.data.errors.Drawing_file, "error");
+        console.log(res.response.data.errors);
+      }
+    } catch (error) {
+      setValidation(error.response?.data.errors || []);
+      // Swal.fire("Error!", "something went wrong " . error.response?.data.errors.Drawing_file, "error");
+      console.error("Error updating Drawing:", error);
+    } finally {
+      setOpenEdit(false);
+      setIsSubmitting(false);
+    }
+  }
   
   const handleDelete = async (row) => {
     const result = await Swal.fire({
@@ -88,6 +128,16 @@ const Ga_Drawing = () => {
       }
     }
   };
+  const fetchDrawingById = async (row) => {
+      try {
+          setEditDrawing(row);
+          setOpenEdit(true);
+      } catch (error) {
+          console.error("Error fetching Drawing:", error);
+      } finally {
+          setLoading(false);
+      }
+  };
 
   const columns = [
     { field: 'drawing_file', headerName: 'GA Drawing', width:400, renderCell: (params) => <div className="py-4">
@@ -100,11 +150,33 @@ const Ga_Drawing = () => {
       </Link>
     </div> },
     {
+      field: 'date_drawing',
+      headerName: 'Tanggal Terbit',
+      width: 130,
+      renderCell: (params) => (
+        <div className='py-4'>
+          {params.value ? new Intl.DateTimeFormat('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          }).format(new Date(params.value)) : '-'}
+        </div>
+      ),
+    },
+    ...(userLevel !== '4' && userLevel !== '5' ? [{
       field: 'actions',
       headerName: 'Aksi',
       width: 150,
       renderCell: (params) => (
         <div className='flex flex-row justify-center py-2 items-center space-x-2'>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+            onClick={() => fetchDrawingById(params.row)}
+          >
+            <IconPencil stroke={2} />
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
@@ -115,11 +187,14 @@ const Ga_Drawing = () => {
           </motion.button>
         </div>
       ),
-    },
+    }] : [])
   ]
 
   const handleClose = () => {
       setOpen(false);
+  };
+  const handleCloseEdit = () => {
+      setOpenEdit(false);
   };
 
   const CustomQuickFilter = () => (
@@ -173,13 +248,13 @@ const Ga_Drawing = () => {
                     <IconRefresh className='hover:rotate-180 transition duration-500' />
                     <span>Refresh</span>
                 </button>
-                <button
+                { userLevel !== '4' && userLevel !== '5' && <button
                     onClick={() => setOpen(true)}
                     className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                 >
                     <IconPlus className='hover:rotate-180 transition duration-500' />
                     <span>Tambah</span>
-                </button>
+                </button>}
               </div>
               <Modal
                 open={open}
@@ -213,6 +288,17 @@ const Ga_Drawing = () => {
                         className="w-full p-2 rounded border"
                       />
                     </div>
+                    <div className="m-2">
+                      <div className="text-emerald-950">
+                        Tanggal Terbit
+                      </div>
+                      <input
+                        type="date"
+                        id="date_drawing"
+                        name="date_drawing"
+                        className="w-full p-2 rounded border"
+                      />
+                    </div>
                     <div className="flex flex-row justify-center items-center">
                       <button
                         type="submit"
@@ -229,6 +315,88 @@ const Ga_Drawing = () => {
                   </form>
                 </div>
               </Modal>
+
+              {/* start modal edit drawing */}
+              <Modal
+                open={openEdit}
+                onClose={handleCloseEdit}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '30%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    background: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                    minWidth: '330px',
+                  }}
+                >
+                  <h2 id="modal-modal-title" className="text-emerald-950 font-bold uppercase text-center">Edit drawing</h2>
+                  {editDrawing && <form method="post" encType="multipart/form-data" onSubmit={handleSubmitEdit}>
+                    <div className="m-2">
+                      <div className="text-emerald-950">
+                        Upload drawing
+                      </div>
+                      <input
+                        type="file"
+                        id="drawing_file"
+                        name="drawing_file"
+                        className="w-full p-2 rounded border"
+                      />
+                      {validation.drawing_file && validation.drawing_file.map((item, index) => (
+                        <div key={index} className="text-red-600 text-sm">
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                    {editDrawing && editDrawing && editDrawing.drawing_file && <div className="m-2 bg-lime-300 text-emerald-950 p-1">
+                      <Link 
+                        to={`${base_public_url}engineering_data/ga_drawing/${editDrawing.drawing_file}`} 
+                        target='_blank'
+                        className="hover:underline" 
+                      >
+                        {editDrawing.drawing_file}
+                      </Link>
+                    </div>}
+                    <div className="m-2">
+                      <div className="text-emerald-950">
+                        Tanggal Terbit
+                      </div>
+                      <input
+                        type="date"
+                        id="date_drawing"
+                        name="date_drawing"
+                        className="w-full p-2 rounded border"
+                        defaultValue={editDrawing.date_drawing}
+                      />
+                      {validation.date_drawing && validation.date_drawing.map((item, index) => (
+                        <div key={index} className="text-red-600 text-sm">
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex flex-row justify-center items-center">
+                      <button
+                        type="submit"
+                        className={`px-4 py-2 text-sm rounded hover:scale-110 transition duration-100 ${
+                        isSubmitting
+                          ? 'bg-gray-500 cursor-not-allowed'
+                          : 'bg-emerald-950 text-lime-300'
+                      }`}
+                      disabled={isSubmitting} // Disable tombol jika sedang submit
+                    >
+                      {isSubmitting ? 'Processing...' : 'Save'}
+                      </button>
+                    </div>
+                  </form>}
+                </div>
+              </Modal>
+              {/* end modal edit drawing */}
 
             </div>
             {loading 
@@ -255,7 +423,7 @@ const Ga_Drawing = () => {
               }}
               initialState={{
                 pagination: {
-                  paginationModel: { pageSize: 5, page: 0 },
+                  paginationModel: { pageSize: 10, page: 0 },
                 },
                 filter: {
                   filterModel: {
@@ -265,7 +433,7 @@ const Ga_Drawing = () => {
                   },
                 },
               }}
-              pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
+              pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
             />}
           </div>
         </div>

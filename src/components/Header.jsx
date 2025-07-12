@@ -14,6 +14,8 @@ import Swal from 'sweetalert2';
 import { IconContract } from '@tabler/icons-react';
 import { IconClipboardText } from '@tabler/icons-react';
 import { IconServerCog } from '@tabler/icons-react';
+import { IconHelpSquareRounded } from '@tabler/icons-react';
+import { api_public } from '../services/config';
 
 const SidesMenu = [
   { name: 'Home', icon: <IconHome />, path: '/' },
@@ -34,6 +36,7 @@ const Header = () => {
   const [openMobile, setOpenMobile] = useState(false);
   const token = localStorage.getItem('token');
   let userLevel = '';
+  const base_public_url = api_public;
 
   const handleLogout = async (event) => {
     event.preventDefault();
@@ -116,9 +119,9 @@ const Header = () => {
           <img className='w-24 xl:w-32 border-r-2 border-slate-300' src='/images/kpi-putih.png' alt='Logo Pertamina' />
           <span className='text-md xl:text-xl font-bold'>IDMS</span>
         </div>
-        {(userLevel === '1' || userLevel === '2' || userLevel === '99') && (
+        {(userLevel === '1' || userLevel === '2' || userLevel === '4' || userLevel === '99') && (
           <>
-            {userLevel !== '2' && (
+            {userLevel !== '2' && userLevel !== '4' && (
               <>
                 {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
                 {renderMenu('masterdata')}
@@ -127,8 +130,15 @@ const Header = () => {
             {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
             {renderMenu('regulatorycompliance')}
             <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
-            <Link to={'/historical_memorandum'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Historical Memorandum')}>{renderDirectLink('historical_memorandum', <IconClipboardText />, 'Historical Memorandum')}</Link>
-            <Link to={'/engineering_data'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Engineering Data')}>{renderDirectLink('engineering_data', <IconServerCog />, 'Engineering Data')}</Link>
+            <Link to={'/historical_memorandum'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Historical Memorandum')}>{renderDirectLink('Historical Memorandum', <IconClipboardText />, 'Historical Memorandum')}</Link>
+            <Link to={'/engineering_data'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Engineering Data')}>{renderDirectLink('Engineering Data', <IconServerCog />, 'Engineering Data')}</Link>
+          </>
+        )}
+        {userLevel === '5' && (
+          <>
+            {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
+            {renderMenu('regulatorycompliance')}
+            <Link to={'/engineering_data'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Engineering Data')}>{renderDirectLink('Engineering Data', <IconServerCog />, 'Engineering Data')}</Link>
           </>
         )}
         {userLevel === '3' && (
@@ -136,6 +146,8 @@ const Header = () => {
             <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
           </>
         )}
+        <hr className='border-gray-700' />
+        <Link to={`${base_public_url}user_guides/USER GUIDE IDMS.pdf`} target='_blank' className='cursor-pointer' onClick={() => localStorage.setItem('active', 'User Guides')}>{renderDirectLink('User Guides', <IconHelpSquareRounded />, 'User Guides')}</Link>
         <div onClick={handleLogout} className='cursor-pointer'>{renderDirectLink('logout', <IconLogout />, 'Logout')}</div>
       </div>
 

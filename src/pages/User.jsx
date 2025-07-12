@@ -15,9 +15,8 @@ import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import { Autocomplete, TextField, Tooltip } from '@mui/material';
-import { Link } from 'react-router-dom';
-import { IconKey } from '@tabler/icons-react';
 import { getContract } from '../services/contract.service';
+import { jwtDecode } from 'jwt-decode';
 
 const User = () => {
     const [IsUser, setIsUser] = useState([])
@@ -31,7 +30,15 @@ const User = () => {
     const [hide, setHide] = useState(false);
     const [isLevel, setIsLevel] = useState(false);
     const [contract, setContract] = useState(false);
-  const [selectedContract, setSelectedContract] = useState([]);
+    const [selectedContract, setSelectedContract] = useState([]);
+    const token = localStorage.getItem('token');
+    let userLevel = '';
+    try {
+        userLevel = String(jwtDecode(token).level_user);
+      } catch (error) {
+        console.error('Invalid token:', error);
+        localStorage.removeItem('token');
+      }
     useEffect(() => {
       fetchUsers();
       fetchContract();
@@ -53,7 +60,7 @@ const User = () => {
       try {
         setLoading(true);
         const data = await getUser();
-        setIsUser(data.data);
+        userLevel == 99 ? setIsUser(data.data) : setIsUser(data.data.filter((item) => item.level_user != 99));
       } catch (err) {
         console.error(err);
       } finally {
@@ -114,6 +121,7 @@ const User = () => {
 
         const form = event.target;
         const formData = new FormData(form);
+        console.log(selectedContract);
 
         // Ambil level_user dengan pasti
         const levelUser = form.level_user.value;
@@ -122,22 +130,27 @@ const User = () => {
         // Hapus semua kemungkinan duplikat field kontrak
         formData.delete('contract_id');
         formData.delete('contract_id[]');
+        formData.append('contract_id', selectedContract);
 
-        // Jika vendor, kirim semua kontrak
-        if (levelUser === '3' || parseInt(levelUser) === 3) {
-          selectedContract.forEach((id) => {
-            formData.append('contract_id[]', id);
-          });
-        }
+        console.log(formData);
 
-        // DEBUG: lihat semua yang dikirim
-        // for (let [key, val] of formData.entries()) {
-        //   console.log(`${key}: ${val}`);
+        // // Jika vendor, kirim semua kontrak
+        // if (levelUser === '3' || parseInt(levelUser) === 3) {
+        //   selectedContract.forEach((id) => {
+        //     formData.append('contract_id[]', id);
+        //   });
         // }
+
+        // // DEBUG: lihat semua yang dikirim
+        // // for (let [key, val] of formData.entries()) {
+        // //   console.log(`${key}: ${val}`);
+        // // }
 
         const data = await updateUser(editUser.id, formData);
 
         if (data.success) {
+          console.log(data);
+          console.log(formData);
           Swal.fire('Berhasil!', 'User berhasil diperbarui!', 'success');
           fetchUsers();
           setEditMode(false);
@@ -188,51 +201,55 @@ const User = () => {
         { field: 'fullname', headerName: 'Nama', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
         { field: 'email', headerName: 'Email', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
         { 
-              field: 'status', 
-              headerName: 'Status',
-              valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
-              renderCell: (params) => (
-                <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-                  {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
-                </div>
-              )
-            },
-            {
-              field: 'actions',
-              headerName: 'Aksi',
-              width: 150,
-              renderCell: (params) => (
-                <div className="flex flex-row justify-center py-2 items-center space-x-2">
-                  <Tooltip title="Features" placement="left">
-                    <Link to={`/features/${params.row.id}`}>
-                        <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
-                        >
-                        <IconKey stroke={2} />
-                        </motion.button>
-                    </Link>
-                  </Tooltip>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
-                    onClick={() => {setEditMode(false); handleClickEdit(params.row);}}
-                  >
-                    <IconPencil stroke={2} />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
-                    onClick={() => handleNonactive(params.row)}
-                  >
-                    <IconCircleMinus stroke={2} />
-                  </motion.button>
-                </div>
-              ),
-            },
+          field: 'level_user', 
+          headerName: 'Level User',
+          width: 120,
+          valueGetter: (params) => params == 1 ? 'Admin' : params == 2 ? 'Inputer' : params == 3 ? 'Vendor' : params == 4 ? 'Viewer All' : params == 5 ? 'Viewer' : 'Super Admin',
+          renderCell: (params) => (
+            <div className={`${params.row.level_user == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+              {params.row.level_user == '1' ? 'Admin' : params.row.level_user == '2' ? 'Inputer' : params.row.level_user == '3' ? 'Vendor' : params.row.level_user == '4' ? 'Viewer All' : params.row.level_user == '5' ? 'Viewer' : 'Super Admin'}
+            </div>
+          )
+        },
+        { 
+          field: 'status', 
+          headerName: 'Status',
+          valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
+          renderCell: (params) => (
+            <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
+              {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
+            </div>
+          )
+        },
+        {
+          field: 'actions',
+          headerName: 'Aksi',
+          width: 150,
+          renderCell: (params) => (
+            <div className="flex flex-row justify-center py-2 items-center space-x-2">
+              <Tooltip title="Edit" placement="left">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                onClick={() => {setEditMode(false); handleClickEdit(params.row);}}
+              >
+                <IconPencil stroke={2} />
+              </motion.button>
+              </Tooltip>
+              <Tooltip title="Nonaktifkan" placement="right">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
+                onClick={() => handleNonactive(params.row)}
+              >
+                <IconCircleMinus stroke={2} />
+              </motion.button>
+              </Tooltip>
+            </div>
+          ),
+        },
     ];
 
   const CustomQuickFilter = () => (
@@ -311,7 +328,7 @@ const User = () => {
               }}
               initialState={{
                 pagination: {
-                  paginationModel: { pageSize: 5, page: 0 },
+                  paginationModel: { pageSize: 10, page: 0 },
                 },
                 filter: {
                   filterModel: {
@@ -321,7 +338,7 @@ const User = () => {
                   },
                 },
               }}
-              pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
+              pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
             /> }
           </div>
         </div>
@@ -430,9 +447,11 @@ const User = () => {
                         id="level_user"
                         onChange={(e) => {e.target.value == 3 ? setIsLevel(true) : setIsLevel(false)}}
                       >
-                        <option value="2">Users</option>
+                        <option value="2">Inputer</option>
                         <option value="1">Admin</option>
                         <option value="3">Vendor</option>
+                        <option value="4">Viewer All</option>
+                        <option value="5">Viewer</option>
                       </select>
                       {validation.level_user && (
                         validation.level_user.map((item, index) => (
@@ -633,9 +652,11 @@ const User = () => {
                         defaultValue={editUser.level_user}
                         onChange={(e) => {e.target.value == 3 ? setIsLevel(true) : setIsLevel(false)}}
                       >
-                        <option value="2">Users</option>
+                        <option value="2">Inputer</option>
                         <option value="1">Admin</option>
                         <option value="3">Vendor</option>
+                        <option value="4">Viewer All</option>
+                        <option value="5">Viewer</option>
                       </select>
                       {validation.level_user && (
                         validation.level_user.map((item, index) => (

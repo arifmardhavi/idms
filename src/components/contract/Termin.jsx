@@ -10,6 +10,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { Box, Modal } from "@mui/material";
 import Swal from "sweetalert2";
 import { IconLoader2 } from "@tabler/icons-react";
+import { jwtDecode } from "jwt-decode";
 
 const Termin = ({ onAddedTermin }) => {
     
@@ -19,6 +20,7 @@ const Termin = ({ onAddedTermin }) => {
     const [editTermin, setEditTermin] = useState([]);
     const [open, setOpen] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
+    const [userLevel, setUserLevel] = useState('');
 
     const style = {
         position: 'absolute',
@@ -33,6 +35,14 @@ const Termin = ({ onAddedTermin }) => {
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        let level = '';
+        try {
+            level = String(jwtDecode(token).level_user);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+        setUserLevel(level);
         fetchTermin();
     }, [id]);
 
@@ -137,7 +147,7 @@ const Termin = ({ onAddedTermin }) => {
     const columns = [
         { field: 'termin', headerName: 'Termin', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
         { field: "description", headerName: "Keterangan", width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
-        {
+        ...(userLevel !== '4' && userLevel !== '5' ? [{
             field: 'actions',
             headerName: 'Aksi',
             width: 150,
@@ -161,7 +171,7 @@ const Termin = ({ onAddedTermin }) => {
                     </motion.button>
                 </div>
             ),
-        },
+        }] : []),
     ];
 
     const CustomQuickFilter = () => (
@@ -181,12 +191,12 @@ const Termin = ({ onAddedTermin }) => {
         <div>
             <div className="flex flex-row justify-between py-2 items-center">
                 <span className="text-xl font-bold uppercase">Termin</span>
-                <button 
+                { userLevel !== '4' && userLevel !== '5' && <button 
                     className="p-2 bg-emerald-950 text-lime-400 text-sm rounded flex flex-row space-x-1 items-center"
                     onClick={() => setOpen(true)}
                 >
                     <IconPlus /> Tambah
-                </button>
+                </button>}
             </div>
             {/* modals add */}
             <Modal 

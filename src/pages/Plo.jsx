@@ -23,6 +23,7 @@ import { IconEye } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
+import { jwtDecode } from 'jwt-decode';
 
 const Plo = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -30,9 +31,18 @@ const Plo = () => {
   const [loading, setLoading] = useState(false);
   const base_public_url = api_public;
   const [hide, setHide] = useState(false);
+  const [userLevel, setUserLevel] = useState('')
   
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    let level = '';
+    try {
+        level = String(jwtDecode(token).level_user);
+    } catch (error) {
+        console.error('Invalid token:', error);
+    }
+    setUserLevel(level);
     fetchPlo();
   }, []);
 
@@ -331,7 +341,7 @@ const Plo = () => {
         </div>
       ),
     },
-    {
+    ...(userLevel !== '4' && userLevel !== '5' ? [{
       field: 'actions',
       headerName: 'Aksi',
       width: 150,
@@ -357,7 +367,7 @@ const Plo = () => {
           </motion.button>
         </div>
       ),
-    },
+    }] : [])
   ];
 
   const CustomQuickFilter = () => (
@@ -417,13 +427,13 @@ const Plo = () => {
                 <IconRefresh className='hover:rotate-180 transition duration-500' />
                 <span>Refresh</span>
               </motion.a>
-              <Link
+              { userLevel !== '4' && userLevel !== '5' && <Link
                 to='/plo/tambah'
                 className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
               >
                 <IconPlus className='hover:rotate-180 transition duration-500' />
                 <span>Tambah</span>
-              </Link>
+              </Link>}
             </div>
           </div>
           <div>

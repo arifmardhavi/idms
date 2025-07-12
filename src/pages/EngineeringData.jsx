@@ -14,13 +14,23 @@ import Swal from "sweetalert2"
 import { Badge } from "@mui/material"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
+import { jwtDecode } from "jwt-decode"
 
 const EngineeringData = () => {
     const [loading, setLoading] = useState(true)
     const [EngineeringData, setEngineeringData] = useState([])
     const [hide, setHide] = useState(false)
+    const [userLevel, setUserLevel] = useState('')
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        let level = '';
+        try {
+            level = String(jwtDecode(token).level_user);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+        setUserLevel(level);
         fetchEngineeringData()
     }, [])
 
@@ -103,18 +113,15 @@ const EngineeringData = () => {
             </div>
             ),
         },
-        {
+        ...(userLevel !== '4' && userLevel !== '5' ? [{
             field: 'actions',
             headerName: 'Aksi',
             width: 150,
             renderCell: (params) => (
                 <div className='flex flex-row justify-center py-2 items-center space-x-2'>
                     <Link to={`/engineering_data/edit/${params.row.id}`}>
-                        <button
-                        className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
-                        // onClick={() => handleEdit(params.row)}
-                        >
-                        <IconPencil stroke={2} />
+                        <button className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'>
+                            <IconPencil stroke={2} />
                         </button>
                     </Link>
                     <button
@@ -125,7 +132,7 @@ const EngineeringData = () => {
                     </button>
                 </div>
             ),
-        },
+        }] : [])
     ]
     
 
@@ -164,13 +171,13 @@ const EngineeringData = () => {
                             <IconRefresh className='hover:rotate-180 transition duration-500' />
                             <span>Refresh</span>
                         </button>
-                        <Link
+                        { userLevel !== '4' && userLevel !== '5' && <Link
                             to='/engineering_data/tambah'
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                         >
                             <IconPlus className='hover:rotate-180 transition duration-500' />
                             <span>Tambah</span>
-                        </Link>
+                        </Link>}
                     </div>
                 </div>
                 <div>

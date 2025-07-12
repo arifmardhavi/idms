@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { api_public } from '../../services/config';
 import { IconLoader2 } from "@tabler/icons-react";
+import { jwtDecode } from "jwt-decode";
 
 const Billing = ({onAddedBilling}) => {
     
@@ -24,6 +25,7 @@ const Billing = ({onAddedBilling}) => {
     const [open, setOpen] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const base_public_url = api_public;
+    const [userLevel, setUserLevel] = useState('');
 
     const style = {
         position: 'absolute',
@@ -38,6 +40,14 @@ const Billing = ({onAddedBilling}) => {
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        let level = '';
+        try {
+            level = String(jwtDecode(token).level_user);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
+        setUserLevel(level);
         fetchTermBilling();
         fetchTermin();
     }, [id]);
@@ -183,7 +193,7 @@ const Billing = ({onAddedBilling}) => {
               </div>
             ),
           },
-        {
+        ...(userLevel !== '4' && userLevel !== '5' ? [{
             field: 'actions',
             headerName: 'Aksi',
             width: 150,
@@ -207,7 +217,7 @@ const Billing = ({onAddedBilling}) => {
                     </motion.button>
                 </div>
             ),
-        },
+        }] : []),
     ];
 
     const CustomQuickFilter = () => (
@@ -227,12 +237,12 @@ const Billing = ({onAddedBilling}) => {
         <div>
             <div className="flex flex-row justify-between py-2 items-center">
                 <span className="text-xl font-bold uppercase">Status Penagihan</span>
-                <button 
+                { userLevel !== '4' && userLevel !== '5' && <button 
                     className="p-2 bg-emerald-950 text-lime-400 text-sm rounded flex flex-row space-x-1 items-center"
                     onClick={() => setOpen(true)}
                 >
                     <IconPlus /> Tambah
-                </button>
+                </button>}
             </div>
             {/* modals add */}
             <Modal 

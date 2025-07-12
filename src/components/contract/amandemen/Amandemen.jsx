@@ -10,13 +10,23 @@ import { IconPencil } from "@tabler/icons-react";
 import { IconCircleMinus } from "@tabler/icons-react";
 import * as motion from 'motion/react-client';
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 
 const Amandemen = () => {
     const { id } = useParams();
     const base_public_url = api_public;
     const [loading, setLoading] = useState(false);
     const [amandemen, setAmandemen] = useState([]);
+    const [userLevel, setUserLevel] = useState('');
     useEffect(() => {
+        const token = localStorage.getItem('token');
+            let level = '';
+            try {
+                level = String(jwtDecode(token).level_user);
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+            setUserLevel(level);
         fetchAmandemen();
     }, [id]);
     const fetchAmandemen = async () => {
@@ -113,7 +123,7 @@ const Amandemen = () => {
                 <IconCloudDownload />
             </Link>}
         </div> },
-        {
+        ...(userLevel !== '4' && userLevel !== '5' ? [{
             field: 'actions',
             headerName: 'Aksi',
             width: 150,
@@ -139,7 +149,7 @@ const Amandemen = () => {
                     </motion.button>
                 </div>
             ),
-        },
+        }] : []),
     ];
 
     const CustomQuickFilter = () => (
@@ -160,14 +170,14 @@ const Amandemen = () => {
         <div className='flex flex-row justify-between py-2'>
             <h1 className='text-xl font-bold uppercase'>Amandemen</h1>
             <div className='flex flex-row justify-end items-center space-x-2'>
-                <Link
+                { userLevel !== '4' && <Link
                     to={`/contract/addamandemen/${id}`}
                     // onClick={() => setOpen(true)}
                     className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                 >
                     <IconPlus className='hover:rotate-180 transition duration-500' />
                     <span>Tambah</span>
-                </Link>
+                </Link>}
             </div>
         </div>
         {loading ? (

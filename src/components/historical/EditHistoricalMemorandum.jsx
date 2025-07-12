@@ -3,14 +3,14 @@ import Header from "../Header"
 import { IconChevronRight } from "@tabler/icons-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
-import { getTagnumberByUnit } from "../../services/tagnumber.service"
+import { getTagnumber } from "../../services/tagnumber.service"
 import { useEffect } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { updateHistoricalMemorandum, getHistoricalMemorandumById } from "../../services/historical_memorandum.service"
 import Swal from "sweetalert2"
 import { api_public } from "../../services/config";
-import { getUnit } from "../../services/unit.service"
-import { getCategory } from "../../services/category.service"
+import { ActiveUnit } from "../../services/unit.service"
+import { ActiveCategory } from "../../services/category.service"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
 
@@ -22,7 +22,7 @@ const EditHistoricalMemorandum = () => {
     const [historicalMemorandum, setHistoricalMemorandum] = useState([])
     const [unit, setUnit] = useState([])
     const [category, setCategory] = useState([])
-    const [selectedTagNumber, setSelectedTagNumber] = useState(null)
+    const [selectedTagNumber, setSelectedTagNumber] = useState([])
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const base_public_url = api_public;
@@ -38,6 +38,7 @@ const EditHistoricalMemorandum = () => {
             await fetchUnit();
             await fetchCategory();
             await fetchHistoricalMemorandum();
+            await fetchTagnumber();
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -50,8 +51,12 @@ const EditHistoricalMemorandum = () => {
             setLoading(true);
             const data = await getHistoricalMemorandumById(id);
             setHistoricalMemorandum(data.data);
-            handleTagNumberByUnit(data.data.unit_id);
-            setSelectedTagNumber(data.data.tag_number_id);
+            setSelectedTagNumber(
+                data.data.tag_number_id
+                ? data.data.tag_number_id.split(',').map(id => parseInt(id.trim()))
+                : []
+            );
+
             console.log(data.data);
         } catch (error) {
             console.error("Error fetching historical memorandum:", error);
@@ -63,7 +68,7 @@ const EditHistoricalMemorandum = () => {
     const fetchUnit = async () => {
             try {
                 setLoading(true);
-                const data = await getUnit();
+                const data = await ActiveUnit();
                 setUnit(data.data);
                 console.log(data.data);
             } catch (error) {
@@ -75,7 +80,7 @@ const EditHistoricalMemorandum = () => {
         const fetchCategory = async () => {
             try {
                 setLoading(true);
-                const data = await getCategory();
+                const data = await ActiveCategory();
                 setCategory(data.data);
                 console.log(data.data);
             } catch (error) {
@@ -84,30 +89,25 @@ const EditHistoricalMemorandum = () => {
                 setLoading(false);
             }
         }
-    
-        const handleTagNumberByUnit = async (unit_id) => {
-            if(unit_id) {
-                try {
-                    const data = await getTagnumberByUnit(unit_id);
-                    setTagNumber(data.data);
-                } catch (error) {
-                    setTagNumber([]);
-                    console.error("Error fetching tag number:", error);
-                }
-            }else{
-                setTagNumber([]);
+
+        const fetchTagnumber = async () => {
+            try {
+                setLoading(true);
+                const data = await getTagnumber();
+                setTagNumber(data.data);
+                console.log(data.data);
+            } catch (error) {
+                console.error("Error fetching tag number:", error);
+            } finally {
+                setLoading(false);
             }
         }
+    
 
     const handleEditHistoricalMemorandum = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        console.log("Form Data:", formData);
-        tag_number.find(item => item.id === selectedTagNumber)
-            ? formData.append('tag_number_id', selectedTagNumber)
-            : formData.append('tag_number_id', ''); // If no tag number is selected, append an empty string
-        
-        // selectedTagNumber ? formData.append('tag_number_id', selectedTagNumber) : '';
+        selectedTagNumber.length > 0 ? formData.append('tag_number_id', selectedTagNumber) : '';
 
         try {
             setIsSubmitting(true);
@@ -172,7 +172,6 @@ const EditHistoricalMemorandum = () => {
                                 id="unit_id" 
                                 className="w-full px-1 py-2 border border-gray-300 rounded-md"
                                 defaultValue={historicalMemorandum.unit_id}
-                                onChange={(e) => handleTagNumberByUnit(e.target.value)}
                             >
                                 <option value="">Pilih Unit</option>
                                 <option value="0">All Area</option>
@@ -231,19 +230,19 @@ const EditHistoricalMemorandum = () => {
                                 Tag Number
                             </label>
                             <Autocomplete
+                                multiple
                                 id="tag_number_id"
                                 options={Array.isArray(tag_number) ? tag_number : []}
-                                getOptionLabel={(option) => option?.tag_number || ''}
-                                isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                                value={
-                                    tag_number.find(item => item.id === selectedTagNumber) || null
-                                }
+                                getOptionLabel={(option) => option.tag_number || ''}
+                                isOptionEqualToValue={(option, value) => option.id === value.id}
+                                value={tag_number.filter((item) => selectedTagNumber.includes(item.id))}
                                 onChange={(e, value) => {
-                                    setSelectedTagNumber(value?.id || null);
+                                    setSelectedTagNumber(value.map((item) => item.id));
                                 }}
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
+                                        name="tag_number_id"
                                         placeholder={'N/A'}
                                         variant="outlined"
                                         error={!!validation.tag_number_id}

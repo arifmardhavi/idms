@@ -14,14 +14,24 @@ import Swal from "sweetalert2"
 import { IconEye } from "@tabler/icons-react"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
+import { jwtDecode } from "jwt-decode"
 
 const HistoricalMemorandum = () => {
     const [historicalMemorandum, setHistoricalMemorandum] = useState([])
     const [loading, setLoading] = useState(true)
     const base_public_url = api_public;
     const [hide, setHide] = useState(false)
+    const [userLevel, setUserLevel] = useState('')
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+            let level = '';
+            try {
+                level = String(jwtDecode(token).level_user);
+            } catch (error) {
+                console.error('Invalid token:', error);
+            }
+            setUserLevel(level);
         fetchHistoricalMemorandum()
     }, [])
     const fetchHistoricalMemorandum = async () => {
@@ -31,11 +41,12 @@ const HistoricalMemorandum = () => {
             setHistoricalMemorandum(data.data);
             console.log(data.data);
         } catch (error) {
-            console.error("Error fetching contract:", error);
+            console.error("Error fetching historical memorandum:", error);
         } finally {
             setLoading(false);
         }
     }
+
     const handleDelete = async (row) => {
         const result = await Swal.fire({
           title: "Apakah Anda yakin?",
@@ -72,11 +83,24 @@ const HistoricalMemorandum = () => {
             valueGetter: (params) => params ? params.category_name : '-', 
             width: 200,  
             renderCell: (params) => <div className="py-4">{params.row.category.category_name ? params.row.category.category_name : '-'}</div> },
-        { field: 'tag_number', 
+        { field: 'tag_numbers', 
             headerName: 'Tag Number',
-            valueGetter: (params) => params ? params.tag_number : '-', 
-            width: 200,  
-            renderCell: (params) => <div className="py-4">{params.row.tag_number_id ? params.row.tag_number.tag_number : '-'}</div> },
+            valueGetter: (params) => params ? params.tag_number_id : '-', 
+            width: 150,  
+            renderCell: (params) => {
+                const tagNumbers = params.row.tag_numbers;
+                if (Array.isArray(tagNumbers) && tagNumbers.length > 0) {
+                    return (
+                        <div className="py-4 flex flex-col flex-center items-center">
+                            {tagNumbers.map((tag, index) => (
+                                <div className="m-1 p-1 bg-slate-300 rounded-full text-center w-fit" key={index}>{tag}</div>
+                            ))}
+                        </div>
+                    );
+                } else {
+                    return <div className="py-4">-</div>;
+                }
+            } },
         { field: 'no_dokumen', headerName: 'No Dokumen', width: 200,  renderCell: (params) => <div className="py-4"><Link className="underline font-semibold text-lime-800" to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`} target="_blank">{params.value}</Link></div> },
         { field: 'perihal', headerName: 'Perihal', width: 200,  renderCell: (params) => <div className="py-4">{params.value}</div> },
         { 
@@ -104,17 +128,6 @@ const HistoricalMemorandum = () => {
             </div>
           ),
         },
-        // { 
-        //     field: 'jenis_pekerjaan',
-        //     headerName: 'Jenis Pekerjaan', 
-        //     width: 160,
-        //     valueGetter: (params) => params == 0 ? 'ta' : params == 1 ? 'rutin' : params == 2 ? 'non rutin' : 'overhaul',
-        //     renderCell: (params) => (
-        //       <div className={`${params.row.jenis_pekerjaan == '0' ? 'bg-indigo-500 text-white' : params.row.jenis_pekerjaan == '1' ? 'text-white bg-blue-500' : params.row.jenis_pekerjaan == '2' ? 'bg-green-500 text-white' : 'text-emerald-950 bg-yellow-500'} my-2 p-2 rounded flex flex-col justify-center items-center`}>
-        //         {params.row.jenis_pekerjaan == '0' ? 'TA' : params.row.jenis_pekerjaan == '1' ? 'Rutin' : params.row.jenis_pekerjaan == '2' ? 'Non Rutin' : 'Overhaul'}
-        //       </div>
-        //     )
-        // },
         {
           field: 'memorandum_file',
           headerName: 'Memo File',
@@ -145,7 +158,7 @@ const HistoricalMemorandum = () => {
             </div>
             ),
         },
-        {
+        ...(userLevel !== '4' && userLevel !== '5' ? [{
             field: 'actions',
             headerName: 'Aksi',
             width: 150,
@@ -167,7 +180,7 @@ const HistoricalMemorandum = () => {
                   </button>
                 </div>
             ),
-        },
+        }] : []),
     ];
 
     const CustomQuickFilter = () => (
@@ -207,13 +220,13 @@ const HistoricalMemorandum = () => {
                             <IconRefresh className='hover:rotate-180 transition duration-500' />
                             <span>Refresh</span>
                         </button>
-                        <Link
+                        { userLevel !== '4' && userLevel !== '5' && <Link
                             to='/historical_memorandum/tambah'
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                         >
                             <IconPlus className='hover:rotate-180 transition duration-500' />
                             <span>Tambah</span>
-                        </Link>
+                        </Link>}
                     </div>
                 </div>
                 <div>

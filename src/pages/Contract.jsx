@@ -44,7 +44,7 @@ const Contract = () => {
         try {
             setLoading(true);
             let data;
-            if (level === '3') {
+            if (level == '3') {
                 data = await getContractByUser();
             } else {
                 data = await getContract();
@@ -242,7 +242,7 @@ const Contract = () => {
                         </motion.button>
                     </Link>
                   </Tooltip>
-                  {userLevel !== '3' && (
+                  {userLevel !== '3' && userLevel !== '4' && (
                     <>
                       <Tooltip title="Edit" placement="top">
                         <Link to={`/contract/edit/${params.row.id}`}>
@@ -313,18 +313,18 @@ const Contract = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
-                            onClick={fetchContract}
+                            onClick={() => fetchContract(userLevel)}
                         >
                             <IconRefresh className='hover:rotate-180 transition duration-500' />
                             <span>Refresh</span>
                         </motion.button>
-                        <Link
+                        { userLevel !== '3' && userLevel !== '4' && <Link
                             to='/contract/tambah'
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                         >
                             <IconPlus className='hover:rotate-180 transition duration-500' />
                             <span>Tambah</span>
-                        </Link>
+                        </Link>}
                     </div>
                 </div>
                 <div>

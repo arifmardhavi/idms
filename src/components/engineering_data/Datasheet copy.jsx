@@ -16,7 +16,6 @@ import { IconLoader2 } from "@tabler/icons-react"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
 import { IconPencil } from "@tabler/icons-react"
-import { jwtDecode } from "jwt-decode"
 
 const Datasheet = () => {
   const { id } = useParams();
@@ -29,18 +28,9 @@ const Datasheet = () => {
   const [editDatasheet, setEditDatasheet] = useState(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [validation, setValidation] = useState([]);
-  const [userLevel, setUserLevel] = useState('')
-  
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    let level = '';
-    try {
-        level = String(jwtDecode(token).level_user);
-    } catch (error) {
-        console.error('Invalid token:', error);
-    }
-    setUserLevel(level);
     fetchDatasheet();
   }, [id]);
 
@@ -84,7 +74,10 @@ const Datasheet = () => {
         setIsSubmitting(false);
         return;
       }
-      const res = await addDatasheet(formData);
+      const res = await addDatasheet(formData, (progressEvent) => {
+        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        setUploadProgress(percent);
+      });
       if (res.success) {
         Swal.fire("Berhasil!", "Datasheet file berhasil tambahkan!", "success");
         fetchDatasheet();
@@ -176,7 +169,7 @@ const Datasheet = () => {
         </div>
       ),
     },
-    ...(userLevel !== '4' && userLevel !== '5' ? [{
+    {
       field: 'actions',
       headerName: 'Aksi',
       width: 150,
@@ -200,7 +193,7 @@ const Datasheet = () => {
           </motion.button>
         </div>
       ),
-    }] : [])
+    },
   ]
 
   const handleClose = () => {
@@ -262,13 +255,13 @@ const Datasheet = () => {
                       <IconRefresh className='hover:rotate-180 transition duration-500' />
                       <span>Refresh</span>
                   </button>
-                  { userLevel !== '4' && userLevel !== '5' && <button
+                  <button
                       onClick={() => setOpen(true)}
                       className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
                   >
                       <IconPlus className='hover:rotate-180 transition duration-500' />
                       <span>Tambah</span>
-                  </button>}
+                  </button>
               </div>
               <Modal
                 open={open}
@@ -323,6 +316,20 @@ const Datasheet = () => {
                         </div>
                       ))}
                     </div>
+                    {isSubmitting && (
+                      <div className="w-full mt-2">
+                        <div className="text-center text-sm text-emerald-950 font-medium">
+                          Uploading... {uploadProgress}%
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+                          <div
+                            className="bg-emerald-950 h-2.5 rounded-full transition-all duration-200"
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex flex-row justify-center items-center">
                       <button
                         type="submit"
@@ -448,7 +455,7 @@ const Datasheet = () => {
               }}
               initialState={{
                 pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
+                  paginationModel: { pageSize: 5, page: 0 },
                 },
                 filter: {
                   filterModel: {
@@ -458,7 +465,7 @@ const Datasheet = () => {
                   },
                 },
               }}
-              pageSizeOptions={[ 10, 25, 50, { value: -1, label: 'All' }]}
+              pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
             />}
           </div>
         </div>
