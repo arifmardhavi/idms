@@ -4,6 +4,7 @@ const endpoint = "coi";
 
 export const getCoi = async () => await apiGet(endpoint);
 export const getCoiById = async (id) => await apiGet(`${endpoint}/${id}`);
+export const getCoiByTagNumber = async (id) => await apiGet(`${endpoint}/tag_number/${id}`);
 export const addCoi = async (data) => await apiPost(endpoint, data);
 export const updateCoi = async (id, data) => await apiPost(`${endpoint}/${id}?_method=PUT`, data);
 export const deleteCoi = async (id) => await apiDelete(`${endpoint}/${id}`);

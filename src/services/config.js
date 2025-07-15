@@ -76,6 +76,24 @@ export const apiPost = async (endpoint, data) => {
     }
 };
 
+export const apiPostProgress = async (endpoint, data, onUploadProgress) => {
+    try {
+        const headers = getAuthHeaders();
+        if (!headers) return;
+
+        const config = {
+            ...headers,
+            onUploadProgress, // <- tambahkan ini ke dalam config
+        };
+
+        const response = await axios.post(`${API_BASE_URL}${endpoint}`, data, config);
+        return response.data;
+    } catch (error) {
+        console.error("POST Error:", error);
+        throw error;
+    }
+};
+
 // Helper untuk request PUT
 export const apiPut = async (endpoint, data) => {
     try {

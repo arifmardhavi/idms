@@ -25,6 +25,33 @@ const LampiranMemo = () => {
   const base_public_url = api_public;
   const [hide, setHide] = useState(false);
   const [userLevel, setUserLevel] = useState('');
+  const [uploadProgress, setUploadProgress] = useState({});
+  const [animatedProgress, setAnimatedProgress] = useState({});
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimatedProgress((prev) => {
+        const updated = { ...prev };
+        Object.entries(uploadProgress).forEach(([filename, { value }]) => {
+          const current = prev[filename]?.value || 0;
+          const diff = value - current;
+
+          if (Math.abs(diff) > 0.01) {
+            updated[filename] = {
+              value: current + diff * 0.1, // naikkan 10% dari jarak setiap interval
+            };
+          } else {
+            updated[filename] = { value }; // capai target
+          }
+        });
+        return updated;
+      });
+    }, 30); // update setiap 30ms untuk smooth
+
+    return () => clearInterval(interval);
+  }, [uploadProgress]);
+
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -51,25 +78,81 @@ const LampiranMemo = () => {
   }
 
   const handleSubmit = async (e) => {
-    setIsSubmitting(true);
     e.preventDefault();
-    try {
-      const formData = new FormData(e.target);
-      formData.append('historical_memorandum_id', id);
-      const res = await addLampiran(formData);
-      if (res.success) {
-        Swal.fire("Berhasil!", "Lampiran Historical berhasil tambahkan!", "success");
-        fetchLampiran();
-        setOpen(false);
-      } else {
-        console.log(res.response.data.errors);
-      }
-    } catch (error) {
-      console.error("Error adding Lampiran Historical:", error);
-    } finally {
-      setIsSubmitting(false);
+    const files = e.target.lampiran_memo.files;
+
+    if (files.length > 10) {
+      Swal.fire("Batas Terlampaui", "Maksimal 10 file!", "warning");
+      return;
     }
-  }
+
+    setIsSubmitting(true);
+    let failedFiles = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const formData = new FormData();
+      formData.append('lampiran_memo[]', files[i]);
+      formData.append('historical_memorandum_id', id);
+
+      try {
+        await addLampiran(formData, (progressEvent) => {
+          const rawPercent = (progressEvent.loaded / progressEvent.total) * 100;
+          const percentDisplay = rawPercent.toFixed(2).replace('.', ',') + '%';
+
+          setUploadProgress((prev) => ({
+            ...prev,
+            [files[i].name]: {
+              value: rawPercent,
+              display: percentDisplay
+            }
+          }));
+        });
+      } catch (error) {
+        const fileName = files[i].name;
+
+        if (error?.response?.status === 422) {
+          const errorData = error.response.data.errors;
+          const matchingErrors = [];
+
+          for (const [key, messages] of Object.entries(errorData)) {
+            const match = key.match(/^lampiran_memo\.(\d+)$/);
+            if (match && parseInt(match[1]) === 0) {
+              matchingErrors.push(...messages);
+            }
+          }
+
+          failedFiles.push({
+            name: fileName,
+            error: matchingErrors.length > 0 ? matchingErrors.join('; ') : 'Validasi gagal.'
+          });
+        } else {
+          failedFiles.push({
+            name: fileName,
+            error: error?.response?.data?.message || 'Terjadi kesalahan saat upload.'
+          });
+        }
+
+        console.error(`Gagal mengunggah file ${fileName}:`, error);
+      }
+    }
+
+    setIsSubmitting(false);
+    fetchLampiran();
+    setOpen(false);
+    setUploadProgress({}); // reset progress
+
+    if (failedFiles.length > 0) {
+      const list = failedFiles.map(f => `• ${f.name} (${f.error})`).join('\n');
+      Swal.fire({
+        icon: "warning",
+        title: `${failedFiles.length} file gagal diunggah`,
+        html: `<pre class="text-left text-sm whitespace-pre-wrap">${list}</pre>`,
+      });
+    } else {
+      Swal.fire("Sukses", "Semua file berhasil diunggah!", "success");
+    }
+  };
+
 
   const handleDelete = async (row) => {
     const result = await Swal.fire({
@@ -207,7 +290,9 @@ const LampiranMemo = () => {
                       <input
                         type="file"
                         id="lampiran_memo"
-                        name="lampiran_memo"
+                        name="lampiran_memo[]"
+                        multiple
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.rar"
                         className="w-full p-2 rounded border"
                       />
                     </div>
@@ -225,6 +310,34 @@ const LampiranMemo = () => {
                       </button>
                     </div>
                   </form>
+                  {Object.keys(uploadProgress).length > 0 && (
+                    <div className="mt-4 space-y-4">
+                      {Object.entries(uploadProgress).map(([filename, { value }]) => {
+                        const animated = animatedProgress[filename]?.value || 0;
+                        const percentText = animated.toFixed(2).replace('.', ',') + '%';
+
+                        return (
+                          <div key={filename}>
+                            <div className="text-sm text-emerald-950 mb-1">{filename}</div>
+                            <div className="w-full bg-gray-200 rounded h-2 overflow-hidden">
+                              <div
+                                className="bg-emerald-600 h-2 rounded transition-all duration-200 ease-in-out"
+                                style={{ width: `${animated}%` }}
+                              ></div>
+                            </div>
+                            {animated < 100 && (
+                              <div className="text-center text-sm text-emerald-950 font-medium">
+                                Uploading... {percentText}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+
+
                 </div>
               </Modal>
 
