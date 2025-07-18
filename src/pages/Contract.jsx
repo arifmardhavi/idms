@@ -19,6 +19,10 @@ import { Tooltip } from "@mui/material";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconArrowRight } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { getWITDateLong } from '../utils/dateHelpers';
+import { getExcelColor, getExcelTextColor } from "../utils/excelColor";
 
 const Contract = () => {
     const [contract, setContract] = useState([]);
@@ -83,6 +87,136 @@ const Contract = () => {
             }
         }
     };
+
+    const handleExportToExcel = async () => {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Contract Data');
+
+      worksheet.columns = [
+        { header: 'No Vendor', key: 'no_vendor', width: 18 },
+        { header: 'Nama Vendor', key: 'vendor_name', width: 35 },
+        { header: 'No Contract', key: 'no_contract', width: 32 },
+        { header: 'Nama Contract', key: 'contract_name', width: 35 },
+        { header: 'Tipe', key: 'contract_type', width: 11 },
+        { header: 'Pengawas', key: 'pengawas', width: 20 },
+        { header: 'Price', key: 'contract_price', width: 16, style: { numFmt: '#,##0' } },
+        { header: 'Contract Date', key: 'contract_date', width: 13 },
+        { header: 'Sisa MPP', key: 'durasi_mpp', width: 9 },
+        // { header: 'Progress Aktual', key: 'actual_progress', width: 15 },
+        { header: 'Deviasi Progress', key: 'monitoring_progress', width: 14 },
+        { header: 'Sisa Nilai Kontrak', key: 'sisa_nilai', width: 16, style: { numFmt: '#,##0' } },
+        { header: 'Status', key: 'contract_status', width: 7 },
+      ];
+
+      contract.forEach((item) => {
+        worksheet.addRow({
+          no_vendor: item.no_vendor || '',
+          vendor_name: item.vendor_name || '',
+          no_contract: item.no_contract || '',
+          contract_name: item.contract_name || '',
+          contract_type: item.contract_type == 1 ? 'Lumpsum' : item.contract_type == 2 ? 'Unit Price' : 'PO Material',
+          pengawas: item.pengawas === 0 ? 'Inspection' : item.pengawas === 1 ? 'Maintenance Execution' : item.pengawas === 2 ? 'Procurement' : '-',
+          contract_price: item.contract_price,
+          contract_date: item.contract_date,
+          durasi_mpp: item.durasi_mpp?.sisa,
+          // actual_progress: `${item.actual_progress}%`,
+          monitoring_progress: item.monitoring_progress?.deviation,
+          sisa_nilai: item.sisa_nilai?.sisa,
+          contract_status: item.contract_status == 1 ? 'Aktif' : 'Selesai',
+        });
+
+        const lastRow = worksheet.lastRow;
+        const no_contract = lastRow.getCell('no_contract');
+
+        // Tambahkan hyperlink + style biru underline
+        if (item.no_contract && item.contract_file) {
+          no_contract.value = {
+            text: item.no_contract,
+            hyperlink: `${api_public}contract/${item.contract_file}`,
+          };
+          no_contract.font = {
+            color: { argb: getExcelColor('blue') },
+            underline: true,
+          };
+        }
+      });
+
+      // Style Header
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'A7F3D0' },
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+
+      // Set border & isi cell kosong
+      worksheet.eachRow({ includeEmpty: true }, (row) => {
+        const totalColumns = worksheet.columnCount;
+        for (let col = 1; col <= totalColumns; col++) {
+          const cell = row.getCell(col);
+          if (cell.value === undefined || cell.value === null) {
+            cell.value = '';
+          }
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+          };
+        }
+      });
+
+      // Pewarnaan berdasarkan data.color
+      worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+        if (rowNumber === 1) return;
+
+        const itemIndex = rowNumber - 2;
+        const item = contract[itemIndex];
+
+        const durasi_mppCell = row.getCell('durasi_mpp');
+        const deviationCell = row.getCell('monitoring_progress');
+        const sisa_nilaiCell = row.getCell('sisa_nilai');
+
+        const formatColoredCell = (cell, colorName) => {
+          const raw = cell.value;
+          if (raw === null || raw === undefined || raw === '') {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: getExcelColor('gray') },
+            };
+            cell.font = { color: { argb: 'FF000000' } };
+            return;
+          }
+
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: getExcelColor(colorName) },
+          };
+          cell.font = { color: { argb: getExcelTextColor(colorName) } };
+        };
+
+        formatColoredCell(durasi_mppCell, item.durasi_mpp?.color, );
+        formatColoredCell(deviationCell, item.monitoring_progress?.color);
+        formatColoredCell(sisa_nilaiCell, item.sisa_nilai?.color);
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      saveAs(blob, `contract-export-${getWITDateLong()}.xlsx`);
+    };
+
 
     const columns = [
         { field: 'no_vendor', headerName: 'No Vendor', width: 200, renderCell: (params) => <div className="py-4">{params.value}</div> },
@@ -309,6 +443,15 @@ const Contract = () => {
                             <IconChartPie className='hover:rotate-180 transition duration-500' />
                             <span>Dashboard</span>
                         </Link> */}
+                        <motion.button
+                          onClick={handleExportToExcel}
+                          whileTap={{ scale: 0.9 }}
+                          whileHover={{ scale: 1.1 }}
+                          className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                        >
+                          <IconCloudDownload />
+                          <span>Export Excel</span>
+                        </motion.button>
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}

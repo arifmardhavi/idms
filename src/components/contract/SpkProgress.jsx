@@ -104,6 +104,23 @@ const SpkProgress = () => {
         e.preventDefault();
         setOpen(true);
         const formData = new FormData(e.target);
+        // Ganti koma dengan titik
+        const plan = formData.get('plan_progress').replace(',', '.');
+        const actual = formData.get('actual_progress').replace(',', '.');
+
+        const decimalRegex = /^\d+([.,]\d{1,2})?$/;
+
+        if (!decimalRegex.test(plan)) {
+            alert("Plan progress tidak valid");
+            return;
+        }
+        if (!decimalRegex.test(actual)) {
+            alert("Actual progress tidak valid");
+            return;
+        }
+
+        formData.set('plan_progress', plan);
+        formData.set('actual_progress', actual);
         setIsSubmitting(true);
         try {
             const res = await addSpkProgress(formData);
@@ -111,6 +128,8 @@ const SpkProgress = () => {
                 Swal.fire("Berhasil!", "sukses menambahkan progress pekerjaan!", "success");
                 setOpen(false);
                 setSelectedSpk('');
+                setSelectedWeek('');
+                setValidation([]);
                 fetchSpkProgress();
             } else {
                 setValidation(res.response?.data.errors || []);
@@ -128,20 +147,41 @@ const SpkProgress = () => {
         e.preventDefault();
         const SpkProgressId = editspkProgress.id;
         const formData = new FormData(e.target);
+        // Ganti koma dengan titik
+        const plan = formData.get('plan_progress').replace(',', '.');
+        const actual = formData.get('actual_progress').replace(',', '.');
+
+        const decimalRegex = /^\d+([.,]\d{1,2})?$/;
+
+        if (!decimalRegex.test(plan)) {
+            alert("Plan progress tidak valid");
+            return;
+        }
+        if (!decimalRegex.test(actual)) {
+            alert("Actual progress tidak valid");
+            return;
+        }
+
+        formData.set('plan_progress', plan);
+        formData.set('actual_progress', actual);
         try {
             const res = await updateSpkProgress(SpkProgressId, formData);
             if (res.success) {
                 setOpenEdit(false);
                 Swal.fire("Berhasil!", "sukses update progress pekerjaan!", "success");
                 setSelectedSpk('');
+                setSelectedWeek('');
+                setValidation([]);
+                setEditSpkProgress('');
                 fetchSpkProgress();
             } else {
                 setValidation(res.response?.data.errors || []);
-                Swal.fire("Error!", "failed update spk!", "error");
+                // Swal.fire("Error!", "failed update spk!", "error");
             }
         } catch (error) {
             console.error("Error update progress:", error);
-            Swal.fire("Error!", "something went wrong Update!", "error");
+            setValidation(error.response?.data.errors || []);
+            // Swal.fire("Error!", "something went wrong Update!", "error");
         } finally {
             setIsSubmitting(false);
         }
@@ -346,10 +386,10 @@ const SpkProgress = () => {
                                     Plan Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                                 </label>
                                 <input
-                                    type='number'
+                                    type='text'
                                     name='plan_progress'
                                     id='plan_progress'
-                                    placeholder='ex: 10'
+                                    placeholder='Gunakan titik atau koma untuk desimal (contoh: 10.5 atau 10,5)'
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                                 />
@@ -366,10 +406,10 @@ const SpkProgress = () => {
                                     Aktual Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                                 </label>
                                 <input
-                                    type='number'
+                                    type='text'
                                     name='actual_progress'
                                     id='actual_progress'
-                                    placeholder="ex: 10"
+                                    placeholder="Gunakan titik atau koma untuk desimal (contoh: 10.5 atau 10,5)"
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                                 />
@@ -504,10 +544,10 @@ const SpkProgress = () => {
                                     Plan Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                                 </label>
                                 <input
-                                    type='number'
+                                    type='text'
                                     name='plan_progress'
                                     id='plan_progress'
-                                    placeholder='ex: 10'
+                                    placeholder='Gunakan titik atau koma untuk desimal (contoh: 10.5 atau 10,5)'
                                     defaultValue={editspkProgress.plan_progress}
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
@@ -525,10 +565,10 @@ const SpkProgress = () => {
                                     Aktual Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                                 </label>
                                 <input
-                                    type='number'
+                                    type='text'
                                     name='actual_progress'
                                     id='actual_progress'
-                                    placeholder='ex: 10'
+                                    placeholder='Gunakan titik atau koma untuk desimal (contoh: 10.5 atau 10,5)'
                                     defaultValue={editspkProgress.actual_progress}
                                     required
                                     className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'

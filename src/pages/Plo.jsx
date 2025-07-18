@@ -24,6 +24,11 @@ import { IconArrowRight } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
+// import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { getWITDateLong } from '../utils/dateHelpers';
+
 
 const Plo = () => {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -94,8 +99,159 @@ const Plo = () => {
     Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
   };
 
+  const handleExportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('PLO Data');
 
-  // get PLO
+    worksheet.columns = [
+      { header: 'Unit', key: 'unit', width: 15 },
+      { header: 'Nomor PLO', key: 'no_certificate', width: 32 },
+      { header: 'Issue Date', key: 'issue_date', width: 15 },
+      { header: 'Inspection Due Date', key: 'overdue_date', width: 18 },
+      { header: 'Due Days', key: 'due_days', width: 10 },
+      { header: 'RLA Certificate', key: 'rla_certificate', width: 32 },
+      { header: 'RLA Issue Date', key: 'rla_issue', width: 18 },
+      { header: 'RLA Due Date', key: 'rla_overdue', width: 18 },
+      { header: 'RLA Due Days', key: 'rla_due_days', width: 12 },
+    ];
+
+    plo.forEach((item) => {
+      worksheet.addRow({
+        unit: item.unit?.unit_name || '',
+        no_certificate: item.no_certificate,
+        issue_date: item.issue_date,
+        overdue_date: item.overdue_date,
+        due_days: item.due_days,
+        rla_issue: item.rla_issue,
+        rla_certificate: item.rla_certificate,
+        rla_overdue: item.rla_overdue,
+        rla_due_days: item.rla_due_days,
+      });
+      const lastRow = worksheet.lastRow;
+      
+      const no_certificate = lastRow.getCell('no_certificate');
+      const rla_certificate = lastRow.getCell('rla_certificate');
+
+      // No Certificate
+      if (item.no_certificate && item.plo_certificate) {
+        no_certificate.value = {
+          text: item.no_certificate,
+          hyperlink: `${api_public}plo/certificates/${item.plo_certificate}`,
+        };
+        no_certificate.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+
+      // RLA Certificate
+      if (item.rla_certificate) {
+        rla_certificate.value = {
+          text: item.rla_certificate,
+          hyperlink: `${api_public}plo/rla/${item.rla_certificate}`,
+        };
+        rla_certificate.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+    });
+
+    // Style header
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'A7F3D0' }, // warna hijau muda
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+
+    worksheet.eachRow({ includeEmpty: true }, (row) => {
+      // Dapatkan jumlah kolom dari worksheet (agar semua cell dilintasi, termasuk yang kosong)
+      const totalColumns = worksheet.columnCount;
+
+      for (let col = 1; col <= totalColumns; col++) {
+        const cell = row.getCell(col);
+
+        // Paksa set isi kosong jika memang kosong (agar cell terbuat dan bisa diborder)
+        if (cell.value === undefined || cell.value === null) {
+          cell.value = ''; // Supaya cell eksis
+        }
+
+        // Tambahkan border
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      }
+    });
+
+    // Mulai dari baris ke-2 karena baris ke-1 adalah header
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return; // skip header
+
+      const dueDaysCell = row.getCell('due_days');
+      const rlaDueDaysCell = row.getCell('rla_due_days');
+
+      const formatDueDaysCell = (cell) => {
+        const raw = cell.value;
+        // Kalau kosong/null/undefined
+        if (raw === null || raw === undefined || raw === '') {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'E5E7EB' }, // abu-abu Tailwind slate-200
+          };
+          cell.font = { color: { argb: '000000' } }; // teks hitam
+          return;
+        }
+
+        const value = Number(raw);
+        if (isNaN(value)) return;
+
+        if (value <= 0) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'DC2626' }, // merah
+          };
+          cell.font = { color: { argb: 'FFFFFF' } }; // putih
+        } else if (value < 272) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FACC15' }, // kuning
+          };
+          cell.font = { color: { argb: '000000' } }; // hitam
+        } else {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '065F46' }, // hijau tua
+          };
+          cell.font = { color: { argb: 'FFFFFF' } }; // putih
+        }
+      };
+
+      formatDueDaysCell(dueDaysCell);
+      formatDueDaysCell(rlaDueDaysCell);
+    });
+
+    // Save
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `plo-export-${getWITDateLong()}.xlsx`);
+  };
+
   const columns = [
     {
       field: 'unit',
@@ -407,6 +563,16 @@ const Plo = () => {
               Dashboard PLO
             </Link>
             <div className='flex flex-row justify-end items-center space-x-2'>
+              <motion.button
+                onClick={handleExportToExcel}
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }}
+                className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+              >
+                <IconCloudDownload />
+                <span>Export Excel</span>
+              </motion.button>
+
               {selectedRows.length > 0 && (
                 <motion.button
                   onClick={handleDownloadSelected}

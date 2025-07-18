@@ -25,6 +25,9 @@ import { IconArrowRight } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { getWITDateLong } from '../utils/dateHelpers';
 
 const Coi = () => {
   const [coi, setCoi] = useState([]);
@@ -51,6 +54,7 @@ const Coi = () => {
       setLoading(true);
       const data = await getCoi();
       setCoi(data.data);
+      // console.log(data.data);
     } catch (error) {
       console.error("Error fetching COI:", error);
     } finally {
@@ -92,6 +96,182 @@ const Coi = () => {
 
     downloadSelectedCoi(selectedRows);
     Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+  };
+
+  const handleExportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('COI Data');
+
+    worksheet.columns = [
+      { header: 'PLO', key: 'plo', width: 15 },
+      { header: 'Tag Number', key: 'tag_number', width: 18 },
+      { header: 'No Certificate', key: 'no_certificate', width: 32 },
+      { header: 'Issue Date', key: 'issue_date', width: 15 },
+      { header: 'Inspection Due Date', key: 'overdue_date', width: 18 },
+      { header: 'Due Days', key: 'due_days', width: 10 },
+      { header: 'RLA Certificate', key: 'rla_certificate', width: 32 },
+      { header: 'RLA Issue Date', key: 'rla_issue', width: 15 },
+      { header: 'RLA Due Date', key: 'rla_overdue', width: 15 },
+      { header: 'RLA Due Days', key: 'rla_due_days', width: 12 },
+      { header: 'Re-Engineering File', key: 're_engineer_certificate', width: 32 },
+    ];
+
+
+    coi.forEach((item) => {
+      worksheet.addRow({
+        plo: item.plo?.unit?.unit_name || '',
+        tag_number: item.tag_number?.tag_number || '',
+        no_certificate: item.no_certificate,
+        issue_date: item.issue_date,
+        overdue_date: item.overdue_date,
+        due_days: item.due_days,
+        rla_certificate: item.rla_certificate || '',
+        rla_issue: item.rla_issue,
+        rla_overdue: item.rla_overdue,
+        rla_due_days: item.rla_due_days,
+        re_engineer_certificate: item.re_engineer_certificate || '',
+      });
+
+      const lastRow = worksheet.lastRow;
+
+      const no_certificate = lastRow.getCell('no_certificate');
+      const rla_certificate = lastRow.getCell('rla_certificate');
+      const re_engineer_certificate = lastRow.getCell('re_engineer_certificate');
+
+      // No Certificate
+      if (item.no_certificate && item.coi_certificate) {
+        no_certificate.value = {
+          text: item.no_certificate,
+          hyperlink: `${api_public}coi/certificates/${item.coi_certificate}`,
+        };
+        no_certificate.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+
+      // RLA Certificate
+      if (item.rla_certificate) {
+        rla_certificate.value = {
+          text: item.rla_certificate,
+          hyperlink: `${api_public}coi/rla/${item.rla_certificate}`,
+        };
+        rla_certificate.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+
+      // Re-Engineer Certificate
+      if (item.re_engineer_certificate) {
+        re_engineer_certificate.value = {
+          text: item.re_engineer_certificate,
+          hyperlink: `${api_public}coi/re_engineer/${item.re_engineer_certificate}`,
+        };
+        re_engineer_certificate.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+    });
+
+
+
+    // Style header
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'A7F3D0' }, // warna hijau muda
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+
+    worksheet.eachRow({ includeEmpty: true }, (row) => {
+      // Dapatkan jumlah kolom dari worksheet (agar semua cell dilintasi, termasuk yang kosong)
+      const totalColumns = worksheet.columnCount;
+
+      for (let col = 1; col <= totalColumns; col++) {
+        const cell = row.getCell(col);
+
+        // Paksa set isi kosong jika memang kosong (agar cell terbuat dan bisa diborder)
+        if (cell.value === undefined || cell.value === null) {
+          cell.value = ''; // Supaya cell eksis
+        }
+
+        // Tambahkan border
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      }
+    });
+
+    // Mulai dari baris ke-2 karena baris ke-1 adalah header
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return; // skip header
+
+      const dueDaysCell = row.getCell('due_days');
+      const rlaDueDaysCell = row.getCell('rla_due_days');
+
+      const formatDueDaysCell = (cell) => {
+        const raw = cell.value;
+        // Kalau kosong/null/undefined
+        if (raw === null || raw === undefined || raw === '') {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'E5E7EB' }, // abu-abu Tailwind slate-200
+          };
+          cell.font = { color: { argb: '000000' } }; // teks hitam
+          return;
+        }
+
+        const value = Number(raw);
+        if (isNaN(value)) return;
+
+        if (value <= 0) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'DC2626' }, // merah
+          };
+          cell.font = { color: { argb: 'FFFFFF' } }; // putih
+        } else if (value < 272) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FACC15' }, // kuning
+          };
+          cell.font = { color: { argb: '000000' } }; // hitam
+        } else {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '065F46' }, // hijau tua
+          };
+          cell.font = { color: { argb: 'FFFFFF' } }; // putih
+        }
+      };
+
+      formatDueDaysCell(dueDaysCell);
+      formatDueDaysCell(rlaDueDaysCell);
+    });
+
+
+
+    // Save
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `coi-export-${getWITDateLong()}.xlsx`);
   };
 
 
@@ -168,8 +348,8 @@ const Coi = () => {
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
                 : diffDays < 272
-                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
+                ? 'bg-yellow-400 text-black' // Kurang dari 9 bulan
+                : 'bg-emerald-950 text-white' // Lebih dari 9 bulan
               } rounded-full w-fit p-2`}
             >
               {diffDays}
@@ -416,6 +596,15 @@ const Coi = () => {
               Dashboard COI
             </Link>
             <div className='flex flex-row justify-end items-center space-x-2'>
+              <motion.button
+                onClick={handleExportToExcel}
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }}
+                className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+              >
+                <IconCloudDownload />
+                <span>Export Excel</span>
+              </motion.button>
               {selectedRows.length > 0 && (
                 <motion.button
                   onClick={handleDownloadSelected}
