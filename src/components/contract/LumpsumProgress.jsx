@@ -97,6 +97,23 @@ const LumpsumProgress = () => {
         setOpen(true);
         const formData = new FormData(e.target);
         formData.append('contract_id', id);
+        // Ganti koma dengan titik
+        const plan = formData.get('plan_progress').replace(',', '.');
+        const actual = formData.get('actual_progress').replace(',', '.');
+
+        const decimalRegex = /^\d+([.,]\d{1,2})?$/;
+
+        if (!decimalRegex.test(plan)) {
+            alert("Plan progress tidak valid");
+            return;
+        }
+        if (!decimalRegex.test(actual)) {
+            alert("Actual progress tidak valid");
+            return;
+        }
+
+        formData.set('plan_progress', plan);
+        formData.set('actual_progress', actual);
         setIsSubmitting(true);
         try {
             const res = await addLumpsumProgress(formData);
@@ -122,6 +139,23 @@ const LumpsumProgress = () => {
         const ProgressId = editProgress.id;
         const formData = new FormData(e.target);
         formData.append('contract_id', id);
+        // Ganti koma dengan titik
+        const plan = formData.get('plan_progress').replace(',', '.');
+        const actual = formData.get('actual_progress').replace(',', '.');
+
+        const decimalRegex = /^\d+([.,]\d{1,2})?$/;
+
+        if (!decimalRegex.test(plan)) {
+            alert("Plan progress tidak valid");
+            return;
+        }
+        if (!decimalRegex.test(actual)) {
+            alert("Actual progress tidak valid");
+            return;
+        }
+
+        formData.set('plan_progress', plan);
+        formData.set('actual_progress', actual);
         try {
             const res = await updateLumpsumProgress(ProgressId, formData);
             if (res.success) {
@@ -295,7 +329,7 @@ const LumpsumProgress = () => {
                                 Plan Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <input
-                                type='number'
+                                type='text'
                                 name='plan_progress'
                                 id='plan_progress'
                                 placeholder='ex: 10'
@@ -315,7 +349,7 @@ const LumpsumProgress = () => {
                                 Aktual Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <input
-                                type='number'
+                                type='text'
                                 name='actual_progress'
                                 id='actual_progress'
                                 placeholder="ex: 10"
@@ -421,7 +455,7 @@ const LumpsumProgress = () => {
                                 Plan Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <input
-                                type='number'
+                                type='text'
                                 name='plan_progress'
                                 id='plan_progress'
                                 placeholder='ex: 10'
@@ -442,7 +476,7 @@ const LumpsumProgress = () => {
                                 Aktual Progress <small>(%)</small> <sup className='text-red-500'>*</sup>{' '}
                             </label>
                             <input
-                                type='number'
+                                type='text'
                                 name='actual_progress'
                                 id='actual_progress'
                                 placeholder='ex: 10'
