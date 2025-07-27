@@ -6,7 +6,7 @@ import { getTagnumber, addTagnumber, updateTagnumber, nonactiveTagnumber, delete
 import { ActiveUnit } from '../services/unit.service';
 import { ActiveCategory } from '../services/category.service';
 import { getTypeByCategory } from '../services/type.service';
-import { IconPencil } from '@tabler/icons-react';
+import { IconFileImport, IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
@@ -15,6 +15,7 @@ import { jwtDecode } from 'jwt-decode';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
+import ImportTagNumber from '../components/imports/ImportTagnumber';
 
 const Tagnumber = () => {
   const [tagnumber, setTagnumber] = useState([]);
@@ -31,6 +32,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
 const [hide, setHide] = useState(false);
 const token = localStorage.getItem('token');
 const userLevel = String(jwtDecode(token).level_user);
+const [importMode, setImportMode] = useState(false);
 
 useEffect(() => {
   fetchTagnumber();
@@ -260,6 +262,14 @@ const handleDelete = async (id) => {
       }
     />
   );
+
+  const handleImport = () => {
+    setImportMode(true);
+  }
+
+  const handleImportClose = () => {
+    setImportMode(false);
+  }
   return (
     <div className='flex flex-col md:flex-row w-full'>
       { !hide && <Header />}
@@ -272,19 +282,38 @@ const handleDelete = async (id) => {
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
           <IconArrowRight />
         </div>
+        <div className='w-full flex' >
+        { importMode && <ImportTagNumber onImportRefresh={fetchTagnumber} />}
+        </div>
           {/* Get Tag Number */}
           <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">Tag Number</h1>
-              <motion.a
-                href='/tagnumber'
+              { !importMode ? <button
+                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                onClick={() => handleImport()}
+              >
+                <IconFileImport stroke={2} />
+                <span>Import Data</span>
+              </button>
+              :
+              <button
+                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                onClick={() => handleImportClose()}
+              >
+                {/* <IconFileImport stroke={2} /> */}
+                <span>Cancel Import Data</span>
+              </button> 
+              }
+              <motion.div
+                onClick={() => fetchTagnumber()}
                 whileTap={{ scale: 0.9 }}
                 whileHover={{ scale: 1.1 }}
                 className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
               >
                 <IconRefresh className='hover:rotate-180 transition duration-500' />
                 <span>Refresh</span>
-              </motion.a>
+              </motion.div>
             </div>
             <div>
             {loading ? 
@@ -309,7 +338,7 @@ const handleDelete = async (id) => {
                 }}
                 initialState={{
                   pagination: {
-                    paginationModel: { pageSize: 5, page: 0 },
+                    paginationModel: { pageSize: 10, page: 0 },
                   },
                   filter: {
                     filterModel: {

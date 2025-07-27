@@ -430,7 +430,7 @@ const Datasheet = () => {
                         name="no_dokumen"
                         className="w-full p-2 rounded border"
                         placeholder="Masukkan nomor dokumen"
-                        required
+                        
                       />
                       {validation.no_dokumen && validation.no_dokumen.map((item, index) => (
                         <div key={index} className="text-red-600 text-sm">

@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut, apiDelete } from "./config";
+import { apiGet, apiPost, apiPut, apiDelete, apiPostProgress } from "./config";
 
 const endpoint = "tagnumbers";
 
@@ -13,3 +13,4 @@ export const addTagnumber = async (data) => await apiPost(endpoint, data);
 export const updateTagnumber = async (id, data) => await apiPut(`${endpoint}/${id}`, data);
 export const deleteTagnumber = async (id) => await apiDelete(`${endpoint}/${id}`);
 export const nonactiveTagnumber = async (id) => await apiPut(`${endpoint}/nonactive/${id}`, {});
+export const importTagnumber = async (data, onUploadProgress) => await apiPostProgress(`${endpoint}/import`, data, onUploadProgress);
