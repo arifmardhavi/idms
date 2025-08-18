@@ -105,50 +105,50 @@ const Ga_Drawing = () => {
         formData.append('date_drawing', e.target.date_drawing.value);
       }
       formData.append('drawing_file[]', files[i]);
-    formData.append('engineering_data_id', id);
+      formData.append('engineering_data_id', id);
 
-    try {
-      console.log(formData);
-      await addGaDrawing(formData, (progressEvent) => {
-        const rawPercent = (progressEvent.loaded / progressEvent.total) * 100;
-        const percentDisplay = rawPercent.toFixed(2).replace('.', ',') + '%';
+      try {
+        console.log(formData);
+        await addGaDrawing(formData, (progressEvent) => {
+          const rawPercent = (progressEvent.loaded / progressEvent.total) * 100;
+          const percentDisplay = rawPercent.toFixed(2).replace('.', ',') + '%';
 
-        setUploadProgress((prev) => ({
-          ...prev,
-          [files[i].name]: {
-            value: rawPercent,
-            display: percentDisplay
+          setUploadProgress((prev) => ({
+            ...prev,
+            [files[i].name]: {
+              value: rawPercent,
+              display: percentDisplay
+            }
+          }));
+        });
+      } catch (error) {
+        const fileName = files[i].name;
+
+        if (error?.response?.status === 422) {
+          const errorData = error.response.data.errors;
+          const matchingErrors = [];
+
+          for (const [key, messages] of Object.entries(errorData)) {
+            const match = key.match(/^drawing_file\.(\d+)$/);
+            if (match && parseInt(match[1]) === 0) {
+              matchingErrors.push(...messages);
+            }
           }
-        }));
-      });
-    } catch (error) {
-      const fileName = files[i].name;
 
-      if (error?.response?.status === 422) {
-        const errorData = error.response.data.errors;
-        const matchingErrors = [];
-
-        for (const [key, messages] of Object.entries(errorData)) {
-          const match = key.match(/^drawing_file\.(\d+)$/);
-          if (match && parseInt(match[1]) === 0) {
-            matchingErrors.push(...messages);
-          }
+          failedFiles.push({
+            name: fileName,
+            error: matchingErrors.length > 0 ? matchingErrors.join('; ') : 'Validasi gagal.'
+          });
+        } else {
+          failedFiles.push({
+            name: fileName,
+            error: error?.response?.data?.message || 'Terjadi kesalahan saat upload.'
+          });
         }
 
-        failedFiles.push({
-          name: fileName,
-          error: matchingErrors.length > 0 ? matchingErrors.join('; ') : 'Validasi gagal.'
-        });
-      } else {
-        failedFiles.push({
-          name: fileName,
-          error: error?.response?.data?.message || 'Terjadi kesalahan saat upload.'
-        });
+        console.error(`Gagal mengunggah file ${fileName}:`, error);
       }
-
-      console.error(`Gagal mengunggah file ${fileName}:`, error);
     }
-  }
 
     setIsSubmitting(false);
     fetchDrawing();

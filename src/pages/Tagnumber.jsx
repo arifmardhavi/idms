@@ -289,7 +289,7 @@ const handleDelete = async (id) => {
           <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">Tag Number</h1>
-              { !importMode ? <button
+              {/* { !importMode ? <button
                 className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
                 onClick={() => handleImport()}
               >
@@ -301,10 +301,9 @@ const handleDelete = async (id) => {
                 className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
                 onClick={() => handleImportClose()}
               >
-                {/* <IconFileImport stroke={2} /> */}
                 <span>Cancel Import Data</span>
               </button> 
-              }
+              } */}
               <motion.div
                 onClick={() => fetchTagnumber()}
                 whileTap={{ scale: 0.9 }}

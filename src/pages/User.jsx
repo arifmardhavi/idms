@@ -4,15 +4,13 @@ import { useEffect } from 'react'
 import { addUser, getUser, nonactiveUser, updateUser } from '../services/user.service'
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { IconPencil } from '@tabler/icons-react';
+import { IconColumnInsertLeft, IconColumnRemove, IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
 import { IconPlus } from '@tabler/icons-react'
 import { IconEye } from '@tabler/icons-react';
 import { IconEyeClosed } from '@tabler/icons-react';
-import { IconArrowLeft } from '@tabler/icons-react';
-import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import { Autocomplete, TextField, Tooltip } from '@mui/material';
 import { getContract } from '../services/contract.service';
@@ -274,11 +272,11 @@ const User = () => {
       <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
         <div className='md:flex hidden'>
           <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-            <IconArrowLeft />
+            <IconColumnRemove />
           </div>
         </div>
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconArrowRight />
+          <IconColumnInsertLeft />
         </div>
         {/* Get user */}
         <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">

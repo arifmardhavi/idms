@@ -43,6 +43,10 @@ import AddEngineeringData from './components/engineering_data/AddEngineeringData
 import EditEngineeringData from './components/engineering_data/EditEngineeringData.jsx';
 import Features from './pages/Features.jsx';
 import NewLogin from './pages/NewLogin.jsx';
+import LogActivities from './pages/LogActivities.jsx';
+import LogUser from './components/log_activity/LogUser.jsx';
+import LaporanInspection from './pages/LaporanInspection.jsx';
+import DetailLaporan from './components/laporan_inspection/DetailLaporan.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -94,6 +98,11 @@ const router = createBrowserRouter([
       { path: '/engineering_data/datasheet/:id', element: <Datasheet /> },
       { path: '/engineering_data/tambah', element: <AddEngineeringData /> },
       { path: '/engineering_data/edit/:id', element: <EditEngineeringData /> },
+      { path: '/log_activity', element: <LogActivities /> },
+      { path: '/log_activity/user/:id', element: <LogUser /> },
+      { path: '/laporan_inspection', element: <LaporanInspection /> },
+      { path: '/laporan_inspection/details/:id', element: <DetailLaporan /> },
+
     ],
   },
 ]);

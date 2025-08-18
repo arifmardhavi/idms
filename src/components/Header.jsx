@@ -1,11 +1,12 @@
 import { AnimatePresence } from 'motion/react';
 import * as motion from 'motion/react-client';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import {
   IconHome, IconBrandUnity, IconCategory, IconAlignBoxLeftMiddle, IconTag,
   IconStack2, IconRectangularPrism, IconArticle, IconX, IconUser,
-  IconDatabaseCog, IconFiles, IconFileAnalytics
+  IconDatabaseCog, IconFiles, IconFileAnalytics,
+  IconLogs
 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconLogout } from '@tabler/icons-react';
@@ -20,6 +21,7 @@ import { api_public } from '../services/config';
 const SidesMenu = [
   { name: 'Home', icon: <IconHome />, path: '/' },
   { name: 'Unit', icon: <IconBrandUnity />, path: '/unit', tab: 'masterdata' },
+  { name: 'Log Activity', icon: <IconLogs />, path: '/log_activity', tab: 'masterdata' },
   { name: 'Kategori Peralatan', icon: <IconCategory />, path: '/category', tab: 'masterdata' },
   { name: 'Tipe Peralatan', icon: <IconAlignBoxLeftMiddle />, path: '/type', tab: 'masterdata' },
   { name: 'Tag Number', icon: <IconTag />, path: '/tagnumber', tab: 'masterdata' },
@@ -37,17 +39,18 @@ const Header = () => {
   const token = localStorage.getItem('token');
   let userLevel = '';
   const base_public_url = api_public;
+  const Navigate = useNavigate();
 
   const handleLogout = async (event) => {
     event.preventDefault();
     try {
-      await apiLogout('/logout');
+      await apiLogout('logout', token);
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
       localStorage.clear();
       Swal.fire('Berhasil!', 'Logout berhasil!', 'success').then(() => {
-        window.location.href = '/login';
+        Navigate('/login');
       });
     }
   };
@@ -132,6 +135,7 @@ const Header = () => {
             <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
             <Link to={'/historical_memorandum'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Historical Memorandum')}>{renderDirectLink('Historical Memorandum', <IconClipboardText />, 'Historical Memorandum')}</Link>
             <Link to={'/engineering_data'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Engineering Data')}>{renderDirectLink('Engineering Data', <IconServerCog />, 'Engineering Data')}</Link>
+            <Link to={'/laporan_inspection'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Laporan Inspection')}>{renderDirectLink('Laporan Inspection', <IconServerCog />, 'Laporan Inspection')}</Link>
           </>
         )}
         {userLevel === '5' && (

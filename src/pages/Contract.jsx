@@ -8,14 +8,14 @@ import * as motion from 'motion/react-client';
 import { DataGrid, GridLogicOperator, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { api_public } from '../services/config';
 import { useEffect, useState } from "react";
-import { deleteContract, getContract, getContractByUser } from "../services/contract.service";
+import { deleteContract, getContract, getContractByUser, updateCurrentStatusContract } from "../services/contract.service";
 import { IconCloudDownload } from "@tabler/icons-react";
 import { IconPencil } from "@tabler/icons-react";
 import { IconCircleMinus } from "@tabler/icons-react";
 import Swal from "sweetalert2";
 import { IconSettings } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
-import { Tooltip } from "@mui/material";
+import { Box, Modal, Tooltip } from "@mui/material";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconArrowRight } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
@@ -23,6 +23,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
 import { getExcelColor, getExcelTextColor } from "../utils/excelColor";
+import { limitWords } from "../utils/text";
 
 const Contract = () => {
     const [contract, setContract] = useState([]);
@@ -31,6 +32,52 @@ const Contract = () => {
     const base_public_url = api_public;
     const [hide, setHide] = useState(false)
     const [userLevel, setUserLevel] = useState('');
+    const [open, setOpen] = useState(false);
+    const [contractId, setContractId] = useState(null);
+    // const [editOpen, setEditOpen] = useState(false);
+    const [currentStatus, setCurrentStatus] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleOpen = (row) => {
+      setContractId(row.id);
+      setCurrentStatus(row.current_status);
+      setOpen(true);
+    }
+
+    const handleCurrentStatusContract = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        formData.append('current_status', currentStatus);
+        try {
+          setIsSubmitting(true);
+          const res = await updateCurrentStatusContract(contractId, formData);
+          if (res.success) {
+            fetchContract();
+            handleClose();
+            Swal.fire("Berhasil!", "Current Status berhasil diperbarui!", "success");
+          } else {
+            console.log(res.response.data.errors);
+            handleClose();
+            const errorMsg = res.errors?.current_status?.join(', ') || res.message || "Terjadi kesalahan";
+            Swal.fire("Gagal!", errorMsg, "error");
+          }
+        } catch (error) {
+          console.error("Error updating laporan_inspection:", error);
+          handleClose();
+          const validationErrors = error.response.data.errors;
+          const errorMsg = validationErrors?.current_status?.join(', ') || "Validasi gagal";
+          Swal.fire("Gagal!", errorMsg, "error");
+        } finally {
+          setIsSubmitting(false);
+        }
+    };
+
+    const handleClose = () => {
+      setOpen(false);
+      setCurrentStatus(null);
+      setContractId(null);
+    }
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -318,6 +365,28 @@ const Contract = () => {
             </p>
           </div>,
         },
+        {
+          field: 'current_status',
+          headerName: 'Current Status',
+          width: 200,
+          renderCell: (params) => (
+            <div className='py-4 flex flex-row justify-center items-center'>
+              {params.value !== null 
+              ? 
+                <div className="cursor-crosshair hover:bg-slate-200 hover:rounded-xl p-2" onClick={() => handleOpen(params.row)}>
+                  <Tooltip title={params.value} placement="bottom" arrow>
+                    <p>
+                      {limitWords(params.value, 10)}
+                    </p>
+                  </Tooltip>
+ 
+                </div>
+              : 
+                <button className='px-2 py-1 bg-lime-300 text-emerald-950 text-sm rounded' onClick={() => handleOpen(params.row)} >ADD</button>
+              }
+            </div>
+          )
+        },
         { 
             field: 'sisa_nilai', 
             headerName: 'Sisa Nilai Kontrak',
@@ -511,6 +580,40 @@ const Contract = () => {
                 />}
                 </div>
             </div>
+
+            {/* modal current status */}
+            <Modal
+              open={open}
+              onClose={handleClose} 
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+
+              <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
+                <form onSubmit={(e) => handleCurrentStatusContract(e)} method="POST">
+                  <h1 className="text-xl uppercase text-gray-900 mb-4">
+                    Current Status
+                  </h1>
+                  <div className="flex flex-col space-y-2">
+                    <label htmlFor="tag_number">Current Status</label>
+                    <textarea
+                      name="current_status"
+                      placeholder="Masukkan Current Status"
+                      defaultValue={currentStatus}
+                      onChange={(e) => setCurrentStatus(e.target.value)}
+                      className="border border-slate-200 rounded-md p-2 w-full"
+                      rows={4}
+                    />
+
+                  </div>
+                  <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
+                    <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                    <button type="button" onClick={handleClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600">Batal</button>
+                  </div>
+                </form>
+              </Box>
+
+            </Modal>
         </div>
     </div>
   )

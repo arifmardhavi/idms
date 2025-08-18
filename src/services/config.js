@@ -50,13 +50,14 @@ export const apiGet = async (endpoint) => {
     }
 };
 
-export const apiLogout = async (endpoint) => {
+export const apiLogout = async (endpoint, token) => {
     try {
         const config = getAuthHeaders();
         if (!config) return;
 
-        const response = await axios.post(`${API_BASE_URL}${endpoint}`, config);
-        return response.data;
+        const response = await axios.post(`${API_BASE_URL}${endpoint}?token=${token}`, config);
+        console.log(response.data.message);
+        return response.data.message;
     } catch (error) {
         console.error("POST Error:", error);
         throw error;
