@@ -4,6 +4,8 @@ import { useState } from "react";
 import { IconChevronRight, IconColumnInsertLeft, IconColumnRemove } from "@tabler/icons-react";
 import { Breadcrumbs, Typography } from "@mui/material";
 import InternalInspection from "./InternalInspection";
+import ExternalInspection from "./ExternalInspection";
+import OnstreamInspection from "./OnstreamInspection";
 
 const DetailLaporan = () => {
   const [hide, setHide] = useState(false)
@@ -33,6 +35,12 @@ const DetailLaporan = () => {
         </Breadcrumbs>
         <div className='flex flex-col space-y-4 bg-white p-2 rounded-xl shadow-md'>
           <InternalInspection />
+        </div>
+        <div className='flex flex-col space-y-4 bg-white p-2 rounded-xl shadow-md'>
+          <ExternalInspection />
+        </div>
+        <div className='flex flex-col space-y-4 bg-white p-2 rounded-xl shadow-md'>
+          <OnstreamInspection />
         </div>
       </div>
     </div>
