@@ -6,6 +6,8 @@ import { Breadcrumbs, Typography } from "@mui/material";
 import InternalInspection from "./InternalInspection";
 import ExternalInspection from "./ExternalInspection";
 import OnstreamInspection from "./OnstreamInspection";
+import Surveillance from "./Surveillance";
+import BreakdownReport from "./BreakdownReport";
 
 const DetailLaporan = () => {
   const [hide, setHide] = useState(false)
@@ -41,6 +43,12 @@ const DetailLaporan = () => {
         </div>
         <div className='flex flex-col space-y-4 bg-white p-2 rounded-xl shadow-md'>
           <OnstreamInspection />
+        </div>
+        <div className='flex flex-col space-y-4 bg-white p-2 rounded-xl shadow-md'>
+          <BreakdownReport />
+        </div>
+        <div className='flex flex-col space-y-4 bg-white p-2 rounded-xl shadow-md'>
+          <Surveillance />
         </div>
       </div>
     </div>
