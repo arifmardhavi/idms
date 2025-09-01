@@ -25,6 +25,9 @@ import { IconLoader2 } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { getWITDateLong } from '../utils/dateHelpers';
 
 const Skhp = () => {
   const [skhp, setSkhp] = useState([]);
@@ -92,6 +95,172 @@ const Skhp = () => {
 
     downloadSelectedSkhp(selectedRows);
     Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+  };
+
+  const handleExportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('SKHP Data');
+
+    worksheet.columns = [
+      { header: 'Tag Number', key: 'tag_number', width: 18 },
+      { header: 'No SKHP', key: 'no_skhp', width: 32 },
+      { header: 'Issue Date', key: 'issue_date', width: 15 },
+      { header: 'Inspection Due Date', key: 'overdue_date', width: 18 },
+      { header: 'Due Days', key: 'due_days', width: 10 },
+      { header: 'FILE SKHP', key: 'file_skhp', width: 32 },
+      { header: 'OLD FILE SKHP', key: 'file_old_skhp', width: 32 },
+    ];
+
+    console.log(skhp);
+    skhp.forEach((item) => {
+      worksheet.addRow({
+        tag_number: item.tag_number?.tag_number || '',
+        no_skhp: item.no_skhp,
+        issue_date: item.issue_date,
+        overdue_date: item.overdue_date,
+        due_days: item.due_days,
+        file_skhp: item.file_skhp || '',
+        file_old_skhp: item.file_old_skhp || '',
+      });
+
+      const lastRow = worksheet.lastRow;
+
+      const no_skhp = lastRow.getCell('no_skhp');
+      const file_skhp = lastRow.getCell('file_skhp');
+      const file_old_skhp = lastRow.getCell('file_old_skhp');
+
+      // No skhp
+      if (item.no_skhp && item.file_skhp) {
+        no_skhp.value = {
+          text: item.no_skhp,
+          hyperlink: `${api_public}skhp/${item.file_skhp}`,
+        };
+        no_skhp.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+
+      // file skhp
+      if (item.file_skhp) {
+        file_skhp.value = {
+          text: item.file_skhp,
+          hyperlink: `${api_public}skhp/${item.file_skhp}`,
+        };
+        file_skhp.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+
+      // Re-Engineer Certificate
+      if (item.file_old_skhp) {
+        file_old_skhp.value = {
+          text: item.file_old_skhp,
+          hyperlink: `${api_public}skhp/${item.file_old_skhp}`,
+        };
+        file_old_skhp.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+    });
+
+
+
+    // Style header
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'A7F3D0' }, // warna hijau muda
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+
+    worksheet.eachRow({ includeEmpty: true }, (row) => {
+      // Dapatkan jumlah kolom dari worksheet (agar semua cell dilintasi, termasuk yang kosong)
+      const totalColumns = worksheet.columnCount;
+
+      for (let col = 1; col <= totalColumns; col++) {
+        const cell = row.getCell(col);
+
+        // Paksa set isi kosong jika memang kosong (agar cell terbuat dan bisa diborder)
+        if (cell.value === undefined || cell.value === null) {
+          cell.value = ''; // Supaya cell eksis
+        }
+
+        // Tambahkan border
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      }
+    });
+
+    // Mulai dari baris ke-2 karena baris ke-1 adalah header
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return; // skip header
+
+      const dueDaysCell = row.getCell('due_days');
+
+      const formatDueDaysCell = (cell) => {
+        const raw = cell.value;
+        // Kalau kosong/null/undefined
+        if (raw === null || raw === undefined || raw === '') {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'E5E7EB' }, // abu-abu Tailwind slate-200
+          };
+          cell.font = { color: { argb: '000000' } }; // teks hitam
+          return;
+        }
+
+        const value = Number(raw);
+        if (isNaN(value)) return;
+
+        if (value <= 0) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'DC2626' }, // merah
+          };
+          cell.font = { color: { argb: 'FFFFFF' } }; // putih
+        } else if (value < 272) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FACC15' }, // kuning
+          };
+          cell.font = { color: { argb: '000000' } }; // hitam
+        } else {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '065F46' }, // hijau tua
+          };
+          cell.font = { color: { argb: 'FFFFFF' } }; // putih
+        }
+      };
+
+      formatDueDaysCell(dueDaysCell);
+    });
+
+
+
+    // Save
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `skhp-export-${getWITDateLong()}.xlsx`);
   };
 
 
@@ -271,6 +440,15 @@ const Skhp = () => {
               Dashboard SKHP
             </Link>
             <div className='flex flex-row justify-end items-center space-x-2'>
+              <motion.button
+                onClick={handleExportToExcel}
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }}
+                className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+              >
+                <IconCloudDownload />
+                <span>Export Excel</span>
+              </motion.button>
               {selectedRows.length > 0 && (
                 <motion.button
                   onClick={handleDownloadSelected}
