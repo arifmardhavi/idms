@@ -47,6 +47,11 @@ import LogActivities from './pages/LogActivities.jsx';
 import LogUser from './components/log_activity/LogUser.jsx';
 import LaporanInspection from './pages/LaporanInspection.jsx';
 import DetailLaporan from './components/laporan_inspection/DetailLaporan.jsx';
+import Moc from './pages/Moc.jsx';
+import AddMoc from './components/moc/addMoc.jsx';
+import EditMoc from './components/moc/EditMoc.jsx';
+import ReadinessMaterial from './pages/ReadinessMaterial.jsx';
+import ReadinessJasa from './pages/ReadinessJasa.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -102,6 +107,12 @@ const router = createBrowserRouter([
       { path: '/log_activity/user/:id', element: <LogUser /> },
       { path: '/laporan_inspection', element: <LaporanInspection /> },
       { path: '/laporan_inspection/details/:id', element: <DetailLaporan /> },
+      { path: '/moc', element: <Moc /> },
+      { path: '/moc/tambah', element: <AddMoc /> },
+      { path: '/moc/edit/:id', element: <EditMoc /> },
+      { path: '/readiness_material', element: <ReadinessMaterial /> },
+      { path: '/readiness_jasa', element: <ReadinessJasa /> },
+
 
     ],
   },

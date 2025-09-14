@@ -6,7 +6,11 @@ import {
   IconHome, IconBrandUnity, IconCategory, IconAlignBoxLeftMiddle, IconTag,
   IconStack2, IconRectangularPrism, IconArticle, IconX, IconUser,
   IconDatabaseCog, IconFiles, IconFileAnalytics,
-  IconLogs
+  IconLogs,
+  IconHeartRateMonitor,
+  IconFileImport,
+  IconBone,
+  IconStretching2
 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconLogout } from '@tabler/icons-react';
@@ -29,6 +33,8 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
+  { name: 'Readiness Material', icon: <IconBone />, path: '/readiness_material', tab: 'readiness' },
+  { name: 'Readiness Jasa', icon: <IconStretching2 />, path: '/readiness_jasa', tab: 'readiness' },
   // { name: 'Historical Memorandum', icon: <IconClipboardText />, path: '/historical_memorandum', tab: 'regulatorycompliance' },
   // { name: 'Engineering Data', icon: <IconServerCog />, path: '/engineering_data', tab: 'regulatorycompliance' },
 ];
@@ -135,7 +141,10 @@ const Header = () => {
             <Link to={'/contract'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'contract')}>{renderDirectLink('contract', <IconContract />, 'Contract')}</Link>
             <Link to={'/historical_memorandum'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Historical Memorandum')}>{renderDirectLink('Historical Memorandum', <IconClipboardText />, 'Historical Memorandum')}</Link>
             <Link to={'/engineering_data'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Engineering Data')}>{renderDirectLink('Engineering Data', <IconServerCog />, 'Engineering Data')}</Link>
-            <Link to={'/laporan_inspection'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Laporan Inspection')}>{renderDirectLink('Laporan Inspection', <IconServerCog />, 'Laporan Inspection')}</Link>
+            <Link to={'/laporan_inspection'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'Laporan Inspection')}>{renderDirectLink('Laporan Inspection', <IconFileImport />, 'Laporan Inspection')}</Link>
+            {renderTab('readiness', <IconHeartRateMonitor />, 'Readiness TA')}
+            {renderMenu('readiness')}
+            {/* <Link to={'/moc'} className='cursor-pointer' onClick={() => localStorage.setItem('active', 'MOC')}>{renderDirectLink('MOC', <IconCircleDottedLetterC />, 'MOC')}</Link> */}
           </>
         )}
         {userLevel === '5' && (

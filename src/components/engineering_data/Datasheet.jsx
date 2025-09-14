@@ -243,6 +243,7 @@ const Datasheet = () => {
         const res = await deleteDatasheet(row.id);
         if (res.success) {
           Swal.fire("Berhasil!", "Datasheet berhasil dihapus!", "success");
+          setDatasheet([]);
           fetchDatasheet();
         } else {
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Datasheet!", "error");
@@ -627,12 +628,6 @@ const Datasheet = () => {
             <DataGrid
               rows={Datasheet}
               columns={columns}
-              disableColumnFilter
-              disableColumnSelector
-              disableDensitySelector
-              pagination
-              getRowId={(row) => row.id}
-              getRowHeight={() => 'auto'}
               slots={{ toolbar: CustomQuickFilter }}
               slotProps={{
                 toolbar: {

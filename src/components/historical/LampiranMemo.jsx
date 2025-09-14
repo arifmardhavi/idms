@@ -169,6 +169,7 @@ const LampiranMemo = () => {
         const res = await deleteLampiran(row.id);
         if (res.success) {
           Swal.fire("Berhasil!", "Lampiran Historical berhasil dihapus!", "success");
+          setLampiran([]);
           fetchLampiran();
         } else {
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Lampiran Historical!", "error");
@@ -346,33 +347,14 @@ const LampiranMemo = () => {
             <DataGrid
               rows={lampiran}
               columns={columns}
-              disableColumnFilter
-              disableColumnSelector
-              disableDensitySelector
-              pagination
-              getRowId={(row) => row.id}
-              getRowHeight={() => 'auto'}
               slots={{ toolbar: CustomQuickFilter }}
-              slotProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                  printOptions: { disableToolbarButton: true },
-                  csvOptions: { disableToolbarButton: true },
-                },
-              }}
               initialState={{
                 pagination: {
-                  paginationModel: { pageSize: 5, page: 0 },
-                },
-                filter: {
-                  filterModel: {
-                    items: [],
-                    quickFilterExcludeHiddenColumns: false,
-                    quickFilterLogicOperator: GridLogicOperator.And,
-                  },
+                  paginationModel: { page: 0, pageSize: 20 },
                 },
               }}
-              pageSizeOptions={[5, 10, 25, { value: -1, label: 'All' }]}
+              pageSizeOptions={[20, 50, 100, 200, { value: -1, label: 'All' }]}
+              // checkboxSelection
             />}
           </div>
         </div>

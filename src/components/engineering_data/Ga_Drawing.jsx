@@ -207,6 +207,7 @@ const Ga_Drawing = () => {
         const res = await deleteGaDrawing(row.id);
         if (res.success) {
           Swal.fire("Berhasil!", "GA Drawing berhasil dihapus!", "success");
+          setGaDrawing([]);
           fetchDrawing();
         } else {
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus GA Drawing!", "error");
@@ -612,12 +613,6 @@ const Ga_Drawing = () => {
             <DataGrid
               rows={GaDrawing}
               columns={columns}
-              disableColumnFilter
-              disableColumnSelector
-              disableDensitySelector
-              pagination
-              getRowId={(row) => row.id}
-              getRowHeight={() => 'auto'}
               slots={{ toolbar: CustomQuickFilter }}
               slotProps={{
                 toolbar: {
