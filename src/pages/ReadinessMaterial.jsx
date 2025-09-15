@@ -12,6 +12,11 @@ import { Link } from "react-router-dom";
 import { api_public } from "../services/config";
 import { addNotifMaterial, deleteNotifMaterial, updateNotifMaterial } from "../services/notif_material.service";
 import { addJobPlanMaterial, deleteJobPlanMaterial, updateJobPlanMaterial } from "../services/job_plan_material.service";
+import { addPrMaterial, deletePrMaterial, updatePrMaterial } from "../services/pr_material.service";
+import { addTenderMaterial, deleteTenderMaterial, updateTenderMaterial } from "../services/tender_material.service";
+import { addPoMaterial, deletePoMaterial, updatePoMaterial } from "../services/po_material.service";
+import { addFabrikasiMaterial, deleteFabrikasiMaterial, updateFabrikasiMaterial } from "../services/fabrikasi_material.service";
+import { addDeliveryMaterial, deleteDeliveryMaterial, updateDeliveryMaterial } from "../services/delivery_material.service";
 
 const ReadinessMaterial = () => {
   const base_public_url = api_public;
@@ -29,6 +34,11 @@ const ReadinessMaterial = () => {
   const [selectedReadiness, setSelectedReadiness] = useState([]);
   const [openNotif, setOpenNotif] = useState(false);
   const [openJobPlan, setOpenJobPlan] = useState(false);
+  const [openPr, setOpenPr] = useState(false);
+  const [openTender, setOpenTender] = useState(false);
+  const [openPo, setOpenPo] = useState(false);
+  const [openFabrikasi, setOpenFabrikasi] = useState(false);
+  const [openDelivery, setOpenDelivery] = useState(false);
 
   
 
@@ -469,6 +479,529 @@ const ReadinessMaterial = () => {
 
 
 
+  // PR area
+
+  const prOpen = (row) => {
+    setOpenPr(true);
+    setSelectedReadiness(row);
+    setSelectedId(row.id);
+  };
+
+  const prClose = () => {
+    setOpenPr(false);
+    setSelectedReadiness([]);
+    setSelectedId(null);
+    setValidation({});
+    setIsSubmitting(false);
+  }
+
+
+  const handleAddPr = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    formData.append('readiness_material_id', selectedId);
+    try {
+      setIsSubmitting(true);
+      const res = await addPrMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "PR Material berhasil ditambahkan!", "success");
+        prClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding PR Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleUpdatePr = async (e, id) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+      setIsSubmitting(true);
+      const res = await updatePrMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "PR Material berhasil diupdate!", "success");
+        prClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating PR Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const handleDeletePr = async (row) => {
+    setOpenPr(false);
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data PR Material akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await deletePrMaterial(row.id);
+            if (res.success) {
+                Swal.fire("Berhasil!", "PR Material berhasil dihapus!", "success");
+                fetchReadinessMaterial();
+            } else {
+                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus PR Material!", "error");
+            }
+        } catch (error) {
+            console.error("Error deleting  PR material:", error);
+            Swal.fire("Gagal!", "Terjadi kesalahan saat PR material!", "error");
+        }
+    } else {
+      setOpenPr(true);
+    }
+  };
+
+
+
+  // Tender area
+
+  const tenderOpen = (row) => {
+    setOpenTender(true);
+    setSelectedReadiness(row);
+    setSelectedId(row.id);
+  };
+
+  const tenderClose = () => {
+    setOpenTender(false);
+    setSelectedReadiness([]);
+    setSelectedId(null);
+    setValidation({});
+    setIsSubmitting(false);
+  }
+
+
+  const handleAddTender = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    formData.append('readiness_material_id', selectedId);
+    try {
+      setIsSubmitting(true);
+      const res = await addTenderMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Tender Material berhasil ditambahkan!", "success");
+        tenderClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding Tender Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleUpdateTender = async (e, id) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+      setIsSubmitting(true);
+      const res = await updateTenderMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Tender Material berhasil diupdate!", "success");
+        tenderClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating Tender Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleupdateStatusTender = async (status, id) => {
+    const formData = new FormData();
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await updateTenderMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Tender Material Selesai!", "success");
+        tenderClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating status Tender Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const handleDeleteTender = async (row) => {
+    setOpenTender(false);
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data Tender Material akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await deleteTenderMaterial(row.id);
+            if (res.success) {
+                Swal.fire("Berhasil!", "Tender Material berhasil dihapus!", "success");
+                fetchReadinessMaterial();
+            } else {
+                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Tender Material!", "error");
+            }
+        } catch (error) {
+            console.error("Error deleting  Tender material:", error);
+            Swal.fire("Gagal!", "Terjadi kesalahan saat Tender material!", "error");
+        }
+    } else {
+      setOpenTender(true);
+    }
+  };
+
+
+
+  // PO area
+
+  const poOpen = (row) => {
+    setOpenPo(true);
+    setSelectedReadiness(row);
+    setSelectedId(row.id);
+  };
+
+  const poClose = () => {
+    setOpenPo(false);
+    setSelectedReadiness([]);
+    setSelectedId(null);
+    setValidation({});
+    setIsSubmitting(false);
+  }
+
+
+  const handleAddPo = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    formData.append('readiness_material_id', selectedId);
+    try {
+      setIsSubmitting(true);
+      const res = await addPoMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "PO Material berhasil ditambahkan!", "success");
+        poClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding PO Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleUpdatePo = async (e, id) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+      setIsSubmitting(true);
+      const res = await updatePoMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "PO Material berhasil diupdate!", "success");
+        poClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating PO Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const handleDeletePo = async (row) => {
+    setOpenPo(false);
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data PO Material akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await deletePoMaterial(row.id);
+            if (res.success) {
+                Swal.fire("Berhasil!", "PO Material berhasil dihapus!", "success");
+                fetchReadinessMaterial();
+            } else {
+                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus PO Material!", "error");
+            }
+        } catch (error) {
+            console.error("Error deleting  PO material:", error);
+            Swal.fire("Gagal!", "Terjadi kesalahan saat PO material!", "error");
+        }
+    } else {
+      setOpenPo(true);
+    }
+  };
+
+
+
+  // Fabrikasi area
+
+  const fabrikasiOpen = (row) => {
+    setOpenFabrikasi(true);
+    setSelectedReadiness(row);
+    setSelectedId(row.id);
+  };
+
+  const fabrikasiClose = () => {
+    setOpenFabrikasi(false);
+    setSelectedReadiness([]);
+    setSelectedId(null);
+    setValidation({});
+    setIsSubmitting(false);
+  }
+
+
+  const handleAddFabrikasi = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    formData.append('readiness_material_id', selectedId);
+    try {
+      setIsSubmitting(true);
+      const res = await addFabrikasiMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Fabrikasi Material berhasil ditambahkan!", "success");
+        fabrikasiClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding Fabrikasi Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleUpdateFabrikasi = async (e, id) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+      setIsSubmitting(true);
+      const res = await updateFabrikasiMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Fabrikasi Material berhasil diupdate!", "success");
+        fabrikasiClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating Fabrikasi Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleupdateStatusFabrikasi = async (status, id) => {
+    const formData = new FormData();
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await updateFabrikasiMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Fabrikasi Material Selesai!", "success");
+        fabrikasiClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating status Fabrikasi Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const handleDeleteFabrikasi = async (row) => {
+    setOpenFabrikasi(false);
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data Fabrikasi Material akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await deleteFabrikasiMaterial(row.id);
+            if (res.success) {
+                Swal.fire("Berhasil!", "Fabrikasi Material berhasil dihapus!", "success");
+                fetchReadinessMaterial();
+            } else {
+                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Fabrikasi Material!", "error");
+            }
+        } catch (error) {
+            console.error("Error deleting  Fabrikasi material:", error);
+            Swal.fire("Gagal!", "Terjadi kesalahan saat Fabrikasi material!", "error");
+        }
+    } else {
+      setOpenFabrikasi(true);
+    }
+  };
+
+
+
+  // Delivery area
+
+  const deliveryOpen = (row) => {
+    setOpenDelivery(true);
+    setSelectedReadiness(row);
+    setSelectedId(row.id);
+  };
+
+  const deliveryClose = () => {
+    setOpenDelivery(false);
+    setSelectedReadiness([]);
+    setSelectedId(null);
+    setValidation({});
+    setIsSubmitting(false);
+  }
+
+
+  const handleAddDelivery = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    formData.append('readiness_material_id', selectedId);
+    try {
+      setIsSubmitting(true);
+      const res = await addDeliveryMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Delivery Material berhasil ditambahkan!", "success");
+        deliveryClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding Delivery Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleUpdateDelivery = async (e, id) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    try {
+      setIsSubmitting(true);
+      const res = await updateDeliveryMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Delivery Material berhasil diupdate!", "success");
+        deliveryClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating Delivery Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleupdateStatusDelivery = async (status, id) => {
+    const formData = new FormData();
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await updateDeliveryMaterial( id, formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Delivery Material Selesai!", "success");
+        deliveryClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error updating status Delivery Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const handleDeleteDelivery = async (row) => {
+    setOpenDelivery(false);
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Data Delivery Material akan dihapus secara permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await deleteDeliveryMaterial(row.id);
+            if (res.success) {
+                Swal.fire("Berhasil!", "Delivery Material berhasil dihapus!", "success");
+                fetchReadinessMaterial();
+            } else {
+                Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Delivery Material!", "error");
+            }
+        } catch (error) {
+            console.error("Error deleting  Delivery material:", error);
+            Swal.fire("Gagal!", "Terjadi kesalahan saat Delivery material!", "error");
+        }
+    } else {
+      setOpenDelivery(true);
+    }
+  };
+
+
+
 
 
 
@@ -521,6 +1054,91 @@ const ReadinessMaterial = () => {
             className={params.row?.job_plan_material?.status == 1 ? 'text-blue-500' : params.row?.job_plan_material?.status == 0 ? 'text-green-500' : 'text-slate-200'}
           >
             <Tooltip title={params.row?.job_plan_material ? 'Lihat Job Plan' : 'Tambah Job Plan'} placement="left" arrow>  
+              <IconPointFilled />
+            </Tooltip>
+          </button>
+        </div>
+      ),
+    },
+    {
+      field: 'pr_material',
+      headerName: 'PR',
+      width: 80,
+      renderCell: (params) => (
+        <div className='py-4 flex flex-row justify-center items-center'>
+          <button
+            onClick={() => prOpen(params.row)}
+            className={params.row?.pr_material ? 'text-blue-500' : 'text-slate-200'}
+          >
+            <Tooltip title={params.row?.pr_material ? 'Lihat PR' : 'Tambah PR'} placement="left" arrow>  
+              <IconPointFilled />
+            </Tooltip>
+          </button>
+        </div>
+      ),
+    },
+    {
+      field: 'tender_material',
+      headerName: 'Tender',
+      width: 80,
+      renderCell: (params) => (
+        <div className='py-4 flex flex-row justify-center items-center'>
+          <button
+            onClick={() => tenderOpen(params.row)}
+            className={params.row?.tender_material?.status == 1 ? 'text-blue-500' : params.row?.tender_material?.status == 0 ? 'text-green-500' : 'text-slate-200'}
+          >
+            <Tooltip title={params.row?.tender_material ? 'Lihat Tender' : 'Tambah Tender'} placement="left" arrow>  
+              <IconPointFilled />
+            </Tooltip>
+          </button>
+        </div>
+      ),
+    },
+    {
+      field: 'po_material',
+      headerName: 'PO',
+      width: 80,
+      renderCell: (params) => (
+        <div className='py-4 flex flex-row justify-center items-center'>
+          <button
+            onClick={() => poOpen(params.row)}
+            className={params.row?.po_material ? 'text-blue-500' : 'text-slate-200'}
+          >
+            <Tooltip title={params.row?.po_material ? 'Lihat PO' : 'Tambah PO'} placement="left" arrow>  
+              <IconPointFilled />
+            </Tooltip>
+          </button>
+        </div>
+      ),
+    },
+    {
+      field: 'fabrikasi_material',
+      headerName: 'Fabrikasi',
+      width: 80,
+      renderCell: (params) => (
+        <div className='py-4 flex flex-row justify-center items-center'>
+          <button
+            onClick={() => fabrikasiOpen(params.row)}
+            className={params.row?.fabrikasi_material?.status == 1 ? 'text-blue-500' : params.row?.fabrikasi_material?.status == 0 ? 'text-green-500' : 'text-slate-200'}
+          >
+            <Tooltip title={params.row?.fabrikasi_material ? 'Lihat Fabrikasi' : 'Tambah Fabrikasi'} placement="left" arrow>  
+              <IconPointFilled />
+            </Tooltip>
+          </button>
+        </div>
+      ),
+    },
+    {
+      field: 'delivery_material',
+      headerName: 'Delivery',
+      width: 80,
+      renderCell: (params) => (
+        <div className='py-4 flex flex-row justify-center items-center'>
+          <button
+            onClick={() => deliveryOpen(params.row)}
+            className={params.row?.delivery_material?.status == 1 ? 'text-blue-500' : params.row?.delivery_material?.status == 0 ? 'text-green-500' : 'text-slate-200'}
+          >
+            <Tooltip title={params.row?.delivery_material ? 'Lihat Delivery' : 'Tambah Delivery'} placement="left" arrow>  
               <IconPointFilled />
             </Tooltip>
           </button>
@@ -650,6 +1268,13 @@ const ReadinessMaterial = () => {
                             defaultValue={selectedReadiness ? selectedReadiness.material_name : ''}
                             required
                           />
+                          {validation.material_name && (
+                            validation.material_name.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
                         </div>
                         <div>
                           <label htmlFor="tanggal_ta">Tanggal TA <sup className='text-red-500'>*</sup></label>
@@ -661,6 +1286,13 @@ const ReadinessMaterial = () => {
                             defaultValue={selectedReadiness ? selectedReadiness.tanggal_ta : ''}
                             required
                           />
+                          {validation.tanggal_ta && (
+                            validation.tanggal_ta.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
                       <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
@@ -725,6 +1357,13 @@ const ReadinessMaterial = () => {
                   <option value="no">Tidak</option>
                   <option value="yes">Ada</option>
                 </select>
+                {validation.inspection_date && (
+                  validation.inspection_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
               {hasMemo ?
                 <div className="flex flex-col space-y-2">
@@ -778,6 +1417,13 @@ const ReadinessMaterial = () => {
                     ) : (
                       ''
                     )}
+                    {validation.rekomendasi_file && (
+                      validation.rekomendasi_file.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
+                    )}
                 </div>
               }
               <div>
@@ -788,6 +1434,13 @@ const ReadinessMaterial = () => {
                   className="border rounded-md p-2 w-full"
                   defaultValue={selectedReadiness?.rekomendasi_material?.target_date} 
                   required />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
@@ -830,6 +1483,13 @@ const ReadinessMaterial = () => {
                   defaultValue={selectedReadiness.notif_material ? selectedReadiness.notif_material.no_notif : ''}
                   required
                 />
+                {validation.no_notif && (
+                  validation.no_notif.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
               <div>
                 <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
@@ -841,6 +1501,13 @@ const ReadinessMaterial = () => {
                   defaultValue={selectedReadiness.notif_material ? selectedReadiness.notif_material.target_date : ''}
                   required
                 />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
@@ -885,6 +1552,13 @@ const ReadinessMaterial = () => {
                   defaultValue={selectedReadiness.job_plan_material ? selectedReadiness.job_plan_material.no_wo : ''}
                   required
                 />
+                {validation.no_wo && (
+                  validation.no_wo.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
               <div>
                 <label htmlFor="kak_file">KAK File</label>
@@ -904,6 +1578,13 @@ const ReadinessMaterial = () => {
                     </div>
                   ) : (
                     ''
+                  )}
+                  {validation.kak_file && (
+                    validation.kak_file.map((item, index) => (
+                      <div key={index}>
+                        <small className="text-red-600 text-sm">{item}</small>
+                      </div>
+                    ))
                   )}
               </div>
               <div>
@@ -925,6 +1606,13 @@ const ReadinessMaterial = () => {
                   ) : (
                     ''
                   )}
+                  {validation.boq_file && (
+                    validation.boq_file.map((item, index) => (
+                      <div key={index}>
+                        <small className="text-red-600 text-sm">{item}</small>
+                      </div>
+                    ))
+                  )}
               </div>
               <div>
                 <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
@@ -936,6 +1624,13 @@ const ReadinessMaterial = () => {
                   defaultValue={selectedReadiness.job_plan_material ? selectedReadiness.job_plan_material.target_date : ''}
                   required
                 />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
@@ -961,8 +1656,435 @@ const ReadinessMaterial = () => {
 
 
 
+      {/* modal PR material */}
+      <Modal
+        open={openPr}
+        onClose={prClose} 
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
+          <form onSubmit={(e) => {selectedReadiness.pr_material ? handleUpdatePr(e, selectedReadiness.pr_material.id) : handleAddPr(e)}} method="POST">
+            <h1 className="text-xl uppercase text-gray-900 mb-4">
+              {selectedReadiness.pr_material ? "Update" : "Tambah"} PR Material
+            </h1>
+            <div className="flex flex-col space-y-2">
+              <div>
+                <label htmlFor="no_pr">No PR <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="number"
+                  name="no_pr"
+                  id="no_pr"
+                  placeholder="Masukkan No PR Material"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.pr_material ? selectedReadiness.pr_material.no_pr : ''}
+                  required
+                />
+                {validation.no_pr && (
+                  validation.no_pr.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="date"
+                  name="target_date"
+                  id="target_date"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.pr_material ? selectedReadiness.pr_material.target_date : ''}
+                  required
+                />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
+              {selectedReadiness.pr_material?.target_date 
+                ? 
+                <>
+                  <button type="button" onClick={() => handleDeletePr(selectedReadiness?.pr_material)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 cursor-pointer gap-1 text-sm`}><IconTrash className="w-5" /> Hapus</button>
+                  <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Update</button> 
+                </>
+                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+              }
+              <button type="button" onClick={prClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600">Batal</button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
 
 
+
+
+      {/* modal Tender material */}
+      <Modal
+        open={openTender}
+        onClose={tenderClose} 
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
+          <form onSubmit={(e) => {selectedReadiness.tender_material ? handleUpdateTender(e, selectedReadiness.tender_material.id) : handleAddTender(e)}} method="POST">
+            <h1 className="text-xl uppercase text-gray-900 mb-4">
+              {selectedReadiness.tender_material ? "Update" : "Tambah"} Tender Material
+            </h1>
+            <div className="flex flex-col space-y-2">
+              <div>
+                <label htmlFor="description">Keterangan <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="text"
+                  name="description"
+                  id="description"
+                  placeholder="Masukkan Keterangan Tender Material"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.tender_material ? selectedReadiness.tender_material.description : ''}
+                  required
+                />
+                {validation.description && (
+                  validation.description.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="date"
+                  name="target_date"
+                  id="target_date"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.tender_material ? selectedReadiness.tender_material.target_date : ''}
+                  required
+                />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
+              {selectedReadiness.tender_material?.target_date 
+                ? 
+                <>
+                {selectedReadiness.tender_material?.status == 0 ?
+                    <button type="button" onClick={() => handleupdateStatusTender(1, selectedReadiness.tender_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs md:text-sm`} disabled={isSubmitting}>Selesai</button>
+                    : 
+                    <button type="button" onClick={() => handleupdateStatusTender(0, selectedReadiness?.tender_material.id)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs py-3`} disabled={isSubmitting}>Batalkan Selesai</button>
+                  }
+                  <button type="button" onClick={() => handleDeleteTender(selectedReadiness?.tender_material)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs`} disabled={isSubmitting} ><IconTrash className="w-5" /> Hapus</button>
+                  <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs md:text-sm`} disabled={isSubmitting}>Update</button> 
+                </>
+                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs md:text-sm`} disabled={isSubmitting}>Simpan</button>
+              }
+              <button type="button" onClick={tenderClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs md:text-sm">Batal</button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
+
+
+
+
+      {/* modal PO material */}
+      <Modal
+        open={openPo}
+        onClose={poClose} 
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
+          <form onSubmit={(e) => {selectedReadiness.po_material ? handleUpdatePo(e, selectedReadiness.po_material.id) : handleAddPo(e)}} method="POST">
+            <h1 className="text-xl uppercase text-gray-900 mb-4">
+              {selectedReadiness.po_material ? "Update" : "Tambah"} PO Material
+            </h1>
+            <div className="flex flex-col space-y-2">
+              <div>
+                <label htmlFor="no_po">No PO <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="number"
+                  name="no_po"
+                  id="no_po"
+                  placeholder="Masukkan No PO Material"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.po_material ? selectedReadiness.po_material.no_po : ''}
+                  required
+                />
+                {validation.no_po && (
+                  validation.no_po.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="po_file">PO File <sup className='text-red-500'>*</sup></label>
+                <input 
+                  type="file" 
+                  name="po_file"
+                  required
+                  className="border rounded-md p-2 w-full" />
+                  {selectedReadiness?.po_material?.po_file ? (
+                    <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                        <Link
+                          to={`${base_public_url}readiness_ta/material/po/${selectedReadiness?.po_material?.po_file}`}
+                          target='_blank'
+                          className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                        >
+                          {selectedReadiness?.po_material?.po_file}
+                        </Link>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                {validation.po_file && (
+                  validation.po_file.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="delivery_date">Delivery Date <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="date"
+                  name="delivery_date"
+                  id="delivery_date"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.po_material ? selectedReadiness.po_material.delivery_date : ''}
+                  required
+                />
+                {validation.delivery_date && (
+                  validation.delivery_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="date"
+                  name="target_date"
+                  id="target_date"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.po_material ? selectedReadiness.po_material.target_date : ''}
+                  required
+                />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
+              {selectedReadiness.po_material?.target_date 
+                ? 
+                <>
+                  <button type="button" onClick={() => handleDeletePo(selectedReadiness?.po_material)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 cursor-pointer gap-1 text-sm`}><IconTrash className="w-5" /> Hapus</button>
+                  <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Update</button> 
+                </>
+                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2 rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+              }
+              <button type="button" onClick={poClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600">Batal</button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
+
+
+
+
+      {/* modal Fabrikasi material */}
+      <Modal
+        open={openFabrikasi}
+        onClose={fabrikasiClose} 
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
+          <form onSubmit={(e) => {selectedReadiness.fabrikasi_material ? handleUpdateFabrikasi(e, selectedReadiness.fabrikasi_material.id) : handleAddFabrikasi(e)}} method="POST">
+            <h1 className="text-xl uppercase text-gray-900 mb-4">
+              {selectedReadiness.fabrikasi_material ? "Update" : "Tambah"} Fabrikasi Material
+            </h1>
+            <div className="flex flex-col space-y-2">
+              <div>
+                <label htmlFor="description">Keterangan <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="text"
+                  name="description"
+                  id="description"
+                  placeholder="Masukkan Keterangan Fabrikasi Material"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.fabrikasi_material ? selectedReadiness.fabrikasi_material.description : ''}
+                  required
+                />
+                {validation.description && (
+                  validation.description.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="date"
+                  name="target_date"
+                  id="target_date"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.fabrikasi_material ? selectedReadiness.fabrikasi_material.target_date : ''}
+                  required
+                />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
+              {selectedReadiness.fabrikasi_material?.target_date 
+                ? 
+                <>
+                {selectedReadiness.fabrikasi_material?.status == 0 ?
+                    <button type="button" onClick={() => handleupdateStatusFabrikasi(1, selectedReadiness.fabrikasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs md:text-sm`} disabled={isSubmitting}>Selesai</button>
+                    : 
+                    <button type="button" onClick={() => handleupdateStatusFabrikasi(0, selectedReadiness?.fabrikasi_material.id)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs py-3`} disabled={isSubmitting}>Batalkan Selesai</button>
+                  }
+                  <button type="button" onClick={() => handleDeleteFabrikasi(selectedReadiness?.fabrikasi_material)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs`} disabled={isSubmitting} ><IconTrash className="w-5" /> Hapus</button>
+                  <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs md:text-sm`} disabled={isSubmitting}>Update</button> 
+                </>
+                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs md:text-sm`} disabled={isSubmitting}>Simpan</button>
+              }
+              <button type="button" onClick={fabrikasiClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs md:text-sm">Batal</button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
+
+
+
+
+      {/* modal Delivery material */}
+      <Modal
+        open={openDelivery}
+        onClose={deliveryClose} 
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
+          <form onSubmit={(e) => {selectedReadiness.delivery_material ? handleUpdateDelivery(e, selectedReadiness.delivery_material.id) : handleAddDelivery(e)}} method="POST">
+            <h1 className="text-xl uppercase text-gray-900 mb-4">
+              {selectedReadiness.delivery_material ? "Update" : "Tambah"} Delivery Material
+            </h1>
+            <div className="flex flex-col space-y-2">
+              <div>
+                <label htmlFor="description">Keterangan <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="text"
+                  name="description"
+                  id="description"
+                  placeholder="Masukkan Keterangan Delivery Material"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.delivery_material ? selectedReadiness.delivery_material.description : ''}
+                  required
+                />
+                {validation.description && (
+                  validation.description.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="delivery_file">Delivery File</label>
+                <input 
+                  type="file" 
+                  name="delivery_file"
+                  className="border rounded-md p-2 w-full" />
+                  {selectedReadiness?.delivery_material?.delivery_file ? (
+                    <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                        <Link
+                          to={`${base_public_url}readiness_ta/material/delivery/${selectedReadiness?.delivery_material?.delivery_file}`}
+                          target='_blank'
+                          className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                        >
+                          {selectedReadiness?.delivery_material?.delivery_file}
+                        </Link>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                {validation.delivery_file && (
+                  validation.delivery_file.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div>
+                <label htmlFor="target_date">Target Date <sup className='text-red-500'>*</sup></label>
+                <input
+                  type="date"
+                  name="target_date"
+                  id="target_date"
+                  className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                  defaultValue={selectedReadiness.delivery_material ? selectedReadiness.delivery_material.target_date : ''}
+                  required
+                />
+                {validation.target_date && (
+                  validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
+              {selectedReadiness.delivery_material?.target_date 
+                ? 
+                <>
+                {selectedReadiness.delivery_material?.status == 0 ?
+                    <button type="button" onClick={() => handleupdateStatusDelivery(1, selectedReadiness.delivery_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs md:text-sm`} disabled={isSubmitting}>Selesai</button>
+                    : 
+                    <button type="button" onClick={() => handleupdateStatusDelivery(0, selectedReadiness?.delivery_material.id)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs py-3`} disabled={isSubmitting}>Batalkan Selesai</button>
+                  }
+                  <button type="button" onClick={() => handleDeleteDelivery(selectedReadiness?.delivery_material)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} gap-1 text-xs`} disabled={isSubmitting} ><IconTrash className="w-5" /> Hapus</button>
+                  <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs md:text-sm`} disabled={isSubmitting}>Update</button> 
+                </>
+                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs md:text-sm`} disabled={isSubmitting}>Simpan</button>
+              }
+              <button type="button" onClick={deliveryClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs md:text-sm">Batal</button>
+            </div>
+          </form>
+        </Box>
+      </Modal>
 
 
     </div>
