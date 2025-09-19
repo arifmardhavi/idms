@@ -52,6 +52,7 @@ import AddMoc from './components/moc/addMoc.jsx';
 import EditMoc from './components/moc/EditMoc.jsx';
 import ReadinessMaterial from './pages/ReadinessMaterial.jsx';
 import ReadinessJasa from './pages/ReadinessJasa.jsx';
+import Readiness from './pages/Readiness.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -110,8 +111,9 @@ const router = createBrowserRouter([
       { path: '/moc', element: <Moc /> },
       { path: '/moc/tambah', element: <AddMoc /> },
       { path: '/moc/edit/:id', element: <EditMoc /> },
-      { path: '/readiness_material', element: <ReadinessMaterial /> },
-      { path: '/readiness_jasa', element: <ReadinessJasa /> },
+      { path: '/readiness_material/:event_readiness_id', element: <ReadinessMaterial /> },
+      { path: '/readiness_jasa/:event_readiness_id', element: <ReadinessJasa /> },
+      { path: '/readiness', element: <Readiness /> },
 
 
     ],

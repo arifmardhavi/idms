@@ -382,7 +382,7 @@ const Contract = () => {
  
                 </div>
               : 
-                <button className='px-2 py-1 bg-lime-300 text-emerald-950 text-sm rounded' onClick={() => handleOpen(params.row)} >ADD</button>
+                <button className='px-2 py-1 bg-lime-300 text-emerald-950 text-sm rounded' onClick={() => handleOpen(params.row)} ><IconPlus stroke={2} /></button>
               }
             </div>
           )

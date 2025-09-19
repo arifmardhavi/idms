@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
 
@@ -38,11 +38,11 @@ const ProtectedRoute = () => {
 
     
     const masterDataPaths = ["/unit", "/category", "/type", "/tagnumber"];
-    const allPaths = [
-      "/unit", "/category", "/type", "/tagnumber",
-      "/user", "/features", "/plo", "/coi", "/skhp",
-      "/historical_memorandum", "/engineering_data", "/user", "/features"
-    ];
+    // const allPaths = [
+    //   "/unit", "/category", "/type", "/tagnumber",
+    //   "/user", "/features", "/plo", "/coi", "/skhp",
+    //   "/historical_memorandum", "/engineering_data", "/user", "/features"
+    // ];
     const allowedPathsVendor = [
       "/",
       "/dashboard", 
