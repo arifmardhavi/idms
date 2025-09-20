@@ -28,6 +28,7 @@ import { jwtDecode } from 'jwt-decode';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
+import { handleAddActivity } from '../utils/handleAddActivity';
 
 
 const Plo = () => {
@@ -272,6 +273,7 @@ const Plo = () => {
             to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.plo_certificate, "PLO")}
           >
             {params.value}
           </Link>
@@ -340,6 +342,7 @@ const Plo = () => {
             to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.plo_certificate, "PLO")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -357,6 +360,7 @@ const Plo = () => {
               to={`${base_public_url}plo/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "PLO")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -468,6 +472,7 @@ const Plo = () => {
               to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "PLO")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -488,6 +493,7 @@ const Plo = () => {
               to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "PLO")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
