@@ -112,9 +112,9 @@ const router = createBrowserRouter([
       { path: '/moc', element: <Moc /> },
       { path: '/moc/tambah', element: <AddMoc /> },
       { path: '/moc/edit/:id', element: <EditMoc /> },
-      { path: '/readiness_material/:event_readiness_id', element: <ReadinessMaterial /> },
-      { path: '/readiness_jasa/:event_readiness_id', element: <ReadinessJasa /> },
-      { path: '/readiness', element: <Readiness /> },
+      { path: '/readiness_ta_plantstop_material/:event_readiness_id', element: <ReadinessMaterial /> },
+      { path: '/readiness_ta_plantstop_jasa/:event_readiness_id', element: <ReadinessJasa /> },
+      { path: '/readiness_ta_plantstop', element: <Readiness /> },
 
 
     ],

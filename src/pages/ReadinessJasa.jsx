@@ -1168,14 +1168,14 @@ const ReadinessJasa = () => {
             <IconChevronRight className='text-emerald-950' stroke={2} />
             }
         >
-            <Link className='hover:underline text-emerald-950' to='/readiness'>
+            <Link className='hover:underline text-emerald-950' to='/readiness_ta_plantstop'>
             Event
             </Link>
-            <Typography className='text-lime-500'>Readiness Jasa</Typography>
+            <Typography className='text-lime-500'>Readiness Ta / Plant Stop Jasa</Typography>
         </Breadcrumbs>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-            <h1 className='text-xl font-bold uppercase'>Readiness Jasa</h1>
+            <h1 className='text-xl font-bold uppercase'>Readiness Ta / Plant Stop Jasa</h1>
             <div className='flex flex-row justify-end items-center space-x-2'>
                 <button
                     className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
@@ -1203,7 +1203,7 @@ const ReadinessJasa = () => {
                   <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
                     <form onSubmit={(e) => {selectedReadiness.id ? handleUpdateReadiness(e) : handleAddReadiness(e)}} method="POST">
                       <h1 className="text-xl uppercase text-gray-900 mb-4">
-                        {selectedReadiness ? "Update" : "Tambah"} Readiness Jasa
+                        {selectedReadiness ? "Update" : "Tambah"} Readiness Ta / Plant Stop Jasa
                       </h1>
                       <div className="flex flex-col space-y-2">
                         <div>

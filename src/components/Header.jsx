@@ -198,10 +198,10 @@ const Header = () => {
               '/laporan_inspection'
             )}
             {renderDirectLink(
-              'Readiness',
+              'Readiness Ta / Plant Stop',
               <IconHeartRateMonitor />,
-              'Readiness',
-              '/readiness'
+              'Readiness Ta / Plant Stop',
+              '/readiness_ta_plantstop'
             )}
           </>
         )}

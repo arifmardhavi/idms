@@ -129,12 +129,12 @@ const Readiness = () => {
       width: 150,
       renderCell: (params) => (
         <div className='py-2 flex flex-row justify-center items-center'>
-          <Link to={`/readiness_material/${params.row.id}`}
+          <Link to={`/readiness_ta_plantstop_material/${params.row.id}`}
             className='bg-green-500 text-white text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 mr-2 flex items-center space-x-1'
           >
             Material
           </Link>
-          <Link to={`/readiness_jasa/${params.row.id}`}
+          <Link to={`/readiness_ta_plantstop_jasa/${params.row.id}`}
             className='bg-blue-500 text-white text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 flex items-center space-x-1'
           >
             Jasa
@@ -193,7 +193,7 @@ const Readiness = () => {
           </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-            <h1 className='text-xl font-bold uppercase'>Event Readiness</h1>
+            <h1 className='text-xl font-bold uppercase'>Event Readiness Ta / Plant Stop</h1>
             <div className='flex flex-row justify-end items-center space-x-2'>
                 <button
                     className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
@@ -221,7 +221,7 @@ const Readiness = () => {
                   <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
                     <form onSubmit={(e) => {selectedEventReadiness.id ? handleUpdateEventReadiness(e) : handleAddEventReadiness(e)}} method="POST">
                       <h1 className="text-xl uppercase text-gray-900 mb-4">
-                        {selectedEventReadiness ? "Update" : "Tambah"} Event Readiness
+                        {selectedEventReadiness.id ? "Update" : "Tambah"} Event Readiness Ta / Plant Stop
                       </h1>
                       <div className="flex flex-col space-y-2">
                         <div>
