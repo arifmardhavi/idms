@@ -22,6 +22,7 @@ import { api_public } from '../../services/config';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
+import { handleAddActivity } from '../../utils/handleAddActivity';
 const EditCoi = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -421,6 +422,7 @@ const EditCoi = () => {
                               to={`${base_public_url}coi/certificates/${coi.coi_certificate}`}
                               target='_blank'
                               className='text-emerald-950 hover:underline cursor-pointer'
+                              onClick={() => handleAddActivity(coi.coi_certificate, "COI")}
                             >
                               {coi.coi_certificate}
                             </Link>
@@ -457,6 +459,7 @@ const EditCoi = () => {
                               to={`${base_public_url}coi/certificates/${coi.coi_old_certificate}`}
                               target='_blank'
                               className='text-emerald-950 hover:underline cursor-pointer'
+                              onClick={() => handleAddActivity(coi.coi_old_certificate, "COI")}
                             >
                               {coi.coi_old_certificate}
                             </Link>
@@ -591,6 +594,7 @@ const EditCoi = () => {
                                   to={`${base_public_url}coi/re_engineer/${coi.re_engineer_certificate}`}
                                   target='_blank'
                                   className='text-emerald-950 hover:underline cursor-pointer'
+                                  onClick={() => handleAddActivity(coi.re_engineer_certificate, "COI")}
                                 >
                                   {coi.re_engineer_certificate}
                                 </Link>
@@ -680,6 +684,7 @@ const EditCoi = () => {
                                   to={`${base_public_url}coi/rla/${coi.rla_certificate}`}
                                   target='_blank'
                                   className='text-emerald-950 hover:underline cursor-pointer'
+                                  onClick={() => handleAddActivity(coi.rla_certificate, "COI")}
                                 >
                                   {coi.rla_certificate}
                                 </Link>
@@ -716,6 +721,7 @@ const EditCoi = () => {
                                   to={`${base_public_url}coi/rla/${coi.rla_old_certificate}`}
                                   target='_blank'
                                   className='text-emerald-950 hover:underline cursor-pointer'
+                                  onClick={() => handleAddActivity(coi.rla_old_certificate, "COI")}
                                 >
                                   {coi.rla_old_certificate}
                                 </Link>

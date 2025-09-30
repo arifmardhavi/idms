@@ -17,6 +17,7 @@ import { addTenderMaterial, deleteTenderMaterial, updateTenderMaterial } from ".
 import { addPoMaterial, deletePoMaterial, updatePoMaterial } from "../services/po_material.service";
 import { addFabrikasiMaterial, deleteFabrikasiMaterial, updateFabrikasiMaterial } from "../services/fabrikasi_material.service";
 import { addDeliveryMaterial, deleteDeliveryMaterial, updateDeliveryMaterial } from "../services/delivery_material.service";
+import { handleAddActivity } from "../utils/handleAddActivity";
 
 const ReadinessMaterial = () => {
   const { event_readiness_id } = useParams();
@@ -1629,6 +1630,7 @@ const ReadinessMaterial = () => {
                             to={`${base_public_url}readiness_ta/material/rekomendasi/${selectedReadiness?.rekomendasi_material?.rekomendasi_file}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                            onClick={() => handleAddActivity(selectedReadiness?.rekomendasi_material?.rekomendasi_file, "READINESS MATERIAL")}
                           >
                             {selectedReadiness?.rekomendasi_material?.rekomendasi_file}
                           </Link>
@@ -1841,6 +1843,7 @@ const ReadinessMaterial = () => {
                           to={`${base_public_url}readiness_ta/material/job_plan/kak/${selectedReadiness?.job_plan_material?.kak_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.job_plan_material?.kak_file, "READINESS MATERIAL")}
                         >
                           {selectedReadiness?.job_plan_material?.kak_file}
                         </Link>
@@ -1868,6 +1871,7 @@ const ReadinessMaterial = () => {
                           to={`${base_public_url}readiness_ta/material/job_plan/boq/${selectedReadiness?.job_plan_material?.boq_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.job_plan_material?.boq_file, "READINESS MATERIAL")}
                         >
                           {selectedReadiness?.job_plan_material?.boq_file}
                         </Link>
@@ -2178,6 +2182,7 @@ const ReadinessMaterial = () => {
                           to={`${base_public_url}readiness_ta/material/po/${selectedReadiness?.po_material?.po_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.po_material?.po_file, "READINESS MATERIAL")}
                         >
                           {selectedReadiness?.po_material?.po_file}
                         </Link>
@@ -2411,6 +2416,7 @@ const ReadinessMaterial = () => {
                           to={`${base_public_url}readiness_ta/material/delivery/${selectedReadiness?.delivery_material?.delivery_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.delivery_material?.delivery_file, "READINESS MATERIAL")}
                         >
                           {selectedReadiness?.delivery_material?.delivery_file}
                         </Link>

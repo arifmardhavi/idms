@@ -17,6 +17,7 @@ import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
+import { handleAddActivity } from "../../utils/handleAddActivity"
 
 const ReportPlo = () => {
   const { id } = useParams();
@@ -107,6 +108,7 @@ const ReportPlo = () => {
         to={`${base_public_url}plo/reports/${params.row.report_plo}`}
         target='_blank'
         className='text-lime-500 underline'
+        onClick={() => handleAddActivity(params.row.report_plo, "PLO")}
       >
         {params.value}
       </Link>
@@ -116,6 +118,7 @@ const ReportPlo = () => {
         to={`${base_public_url}plo/reports/${params.row.report_plo}`}
         target='_blank'
         className='text-lime-500 underline'
+        onClick={() => handleAddActivity(params.row.report_plo, "PLO")}
       >
         <IconCloudDownload stroke={2} />
       </Link>

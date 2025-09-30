@@ -24,6 +24,7 @@ import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
 import { getExcelColor, getExcelTextColor } from "../utils/excelColor";
 import { limitWords } from "../utils/text";
+import { handleAddActivity } from "../utils/handleAddActivity";
 
 const Contract = () => {
     const [contract, setContract] = useState([]);
@@ -412,6 +413,7 @@ const Contract = () => {
                 to={`${base_public_url}contract/${params.row.contract_file}`}
                 target='_blank'
                 className='item-center text-lime-500'
+                onClick={() => handleAddActivity(params.value, "CONTRACT")}
               >
                 <IconCloudDownload stroke={2} />
               </Link>

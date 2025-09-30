@@ -20,6 +20,7 @@ import { jwtDecode } from "jwt-decode"
 import { IconCloudDownload } from "@tabler/icons-react"
 import { IconFiles } from "@tabler/icons-react"
 import { IconFile } from "@tabler/icons-react"
+import { handleAddActivity } from "../../utils/handleAddActivity"
 
 const Ga_Drawing = () => {
   const { id } = useParams();
@@ -235,6 +236,7 @@ const Ga_Drawing = () => {
             to={`${base_public_url}engineering_data/ga_drawing/${params.row.drawing_file}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.drawing_file, "GA DRAWING")}
           >
             {params.value}
           </Link> : '-'}
@@ -263,6 +265,7 @@ const Ga_Drawing = () => {
             to={`${base_public_url}engineering_data/ga_drawing/${params.row.drawing_file}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.drawing_file, "GA DRAWING")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -565,6 +568,7 @@ const Ga_Drawing = () => {
                         to={`${base_public_url}engineering_data/ga_drawing/${editDrawing.drawing_file}`} 
                         target='_blank'
                         className="hover:underline" 
+                        onClick={() => handleAddActivity(editDrawing.drawing_file, "GA DRAWING")}
                       >
                         {editDrawing.drawing_file}
                       </Link>

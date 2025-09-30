@@ -28,6 +28,7 @@ import { jwtDecode } from 'jwt-decode';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
+import { handleAddActivity } from '../utils/handleAddActivity';
 
 const Skhp = () => {
   const [skhp, setSkhp] = useState([]);
@@ -282,6 +283,7 @@ const Skhp = () => {
             to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.file_skhp, "SKHP")}
           >
             {params.value}
           </Link>
@@ -350,6 +352,7 @@ const Skhp = () => {
             to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.file_skhp, "SKHP")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -367,6 +370,7 @@ const Skhp = () => {
               to={`${base_public_url}skhp/${params.row.file_old_skhp}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.row.file_old_skhp, "SKHP")}
             >
               <IconCloudDownload stroke={2} />
             </Link>

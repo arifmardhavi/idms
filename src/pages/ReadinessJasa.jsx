@@ -15,6 +15,7 @@ import { addJobPlanJasa, deleteJobPlanJasa, updateJobPlanJasa } from "../service
 import { addPrJasa, deletePrJasa, updatePrJasa } from "../services/pr_jasa.service";
 import { addTenderJasa, deleteTenderJasa, updateTenderJasa } from "../services/tender_jasa.service";
 import { addContractJasa, deleteContractJasa, updateContractJasa } from "../services/contract_jasa.service";
+import { handleAddActivity } from "../utils/handleAddActivity";
 
 const ReadinessJasa = () => {
   const {event_readiness_id} = useParams();
@@ -1361,6 +1362,7 @@ const ReadinessJasa = () => {
                             to={`${base_public_url}readiness_ta/jasa/rekomendasi/${selectedReadiness?.rekomendasi_jasa?.rekomendasi_file}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                            onClick={() => handleAddActivity(selectedReadiness?.rekomendasi_jasa?.rekomendasi_file, "READINESS JASA")}
                           >
                             {selectedReadiness?.rekomendasi_jasa?.rekomendasi_file}
                           </Link>
@@ -1592,6 +1594,7 @@ const ReadinessJasa = () => {
                           to={`${base_public_url}readiness_ta/jasa/job_plan/kak/${selectedReadiness?.job_plan_jasa?.kak_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.job_plan_jasa?.kak_file, "READINESS JASA")}
                         >
                           {selectedReadiness?.job_plan_jasa?.kak_file}
                         </Link>
@@ -1619,6 +1622,7 @@ const ReadinessJasa = () => {
                           to={`${base_public_url}readiness_ta/jasa/job_plan/boq/${selectedReadiness?.job_plan_jasa?.boq_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.job_plan_jasa?.boq_file, "READINESS JASA")}
                         >
                           {selectedReadiness?.job_plan_jasa?.boq_file}
                         </Link>
@@ -1910,6 +1914,7 @@ const ReadinessJasa = () => {
                           to={`${base_public_url}readiness_ta/jasa/contract/${selectedReadiness?.contract_jasa?.contract_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                          onClick={() => handleAddActivity(selectedReadiness?.contract_jasa?.contract_file, "READINESS JASA")}
                         >
                           {selectedReadiness?.contract_jasa?.contract_file}
                         </Link>

@@ -9,6 +9,7 @@ import { IconCircleMinus, IconCloudDownload, IconPencil, IconPlus, IconRefresh }
 import { getHistoricalMemorandum } from "../../services/historical_memorandum.service";
 import { api_public } from '../../services/config';
 import Swal from "sweetalert2";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 const ExternalInspection = () => {
   const { id } = useParams();
@@ -139,6 +140,7 @@ const ExternalInspection = () => {
                   to={`${base_public_url}historical_memorandum/${params.row.historical_memorandum.memorandum_file}`}
                   target='_blank'
                   className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                  onClick={() => handleAddActivity(params.row.historical_memorandum.memorandum_file, "LAPORAN INSPEKSI") }
               >
                   <IconCloudDownload />
               </Link> 
@@ -165,6 +167,7 @@ const ExternalInspection = () => {
               to={`${base_public_url}laporan_inspection/external_inspection/${params.value}`}
               target='_blank'
               className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+              onClick={() => handleAddActivity(params.row.laporan_file, "LAPORAN INSPEKSI") }
             >
               <IconCloudDownload />
             </Link>
@@ -416,7 +419,7 @@ const ExternalInspection = () => {
                   name="laporan_file"
                   className="border rounded-md p-2 w-full" />
                   <div className="text-sm bg-lime-300 text-emerald-950 p-2 rounded-xl">
-                    <Link className="hover:underline" target="_blank" to={`${base_public_url}laporan_inspection/external_inspection/${SelectedEditData.laporan_file}`}>{SelectedEditData.laporan_file ? SelectedEditData.laporan_file : '-'}</Link>
+                    <Link className="hover:underline" target="_blank" onClick={() => handleAddActivity(SelectedEditData?.laporan_file, "LAPORAN INSPEKSI") } to={`${base_public_url}laporan_inspection/external_inspection/${SelectedEditData.laporan_file}`}>{SelectedEditData.laporan_file ? SelectedEditData.laporan_file : '-'}</Link>
                   </div>
               </div>
               }

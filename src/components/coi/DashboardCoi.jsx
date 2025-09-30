@@ -14,6 +14,7 @@ import { api_public } from "../../services/config";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconArrowRight } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 
 const DashboardCoi = () => {
@@ -119,6 +120,7 @@ const DashboardCoi = () => {
             to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.coi_certificate, "COI")}
           >
             {params.value}
           </Link>
@@ -187,6 +189,7 @@ const DashboardCoi = () => {
             to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.coi_certificate, "COI")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -204,6 +207,7 @@ const DashboardCoi = () => {
               to={`${base_public_url}coi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -301,6 +305,7 @@ const DashboardCoi = () => {
               to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -321,6 +326,7 @@ const DashboardCoi = () => {
               to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -341,6 +347,7 @@ const DashboardCoi = () => {
               to={`${base_public_url}coi/re_engineer/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>

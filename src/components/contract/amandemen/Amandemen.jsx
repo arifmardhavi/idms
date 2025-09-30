@@ -11,6 +11,7 @@ import { IconCircleMinus } from "@tabler/icons-react";
 import * as motion from 'motion/react-client';
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
+import { handleAddActivity } from "../../../utils/handleAddActivity";
 
 const Amandemen = () => {
     const { id } = useParams();
@@ -101,6 +102,7 @@ const Amandemen = () => {
                 to={`${base_public_url}contract/amandemen/principle_permit/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "AMANDEMEN")}
             >
                 <IconCloudDownload />
             </Link>}
@@ -110,6 +112,7 @@ const Amandemen = () => {
                 to={`${base_public_url}contract/amandemen/ba_agreement/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "AMANDEMEN")}
             >
                 <IconCloudDownload />
             </Link>}
@@ -119,6 +122,7 @@ const Amandemen = () => {
                 to={`${base_public_url}contract/amandemen/result_amandemen/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "AMANDEMEN")}
             >
                 <IconCloudDownload />
             </Link>}

@@ -15,6 +15,7 @@ import { IconArrowRight } from "@tabler/icons-react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 const DashboardContract = () => {
     const {id} = useParams();
     const [contract, setContract] = useState([]);
@@ -143,6 +144,7 @@ const DashboardContract = () => {
                                         to={`${base_public_url}contract/${contract.contract_file}`}
                                         target='_blank'
                                         className='bg-emerald-950 text-lime-400 underline px-2 rounded-md hover:underline cursor-pointer'
+                                        onClick={() => handleAddActivity(contract.contract_file, "CONTRACT")}
                                     >
                                         Preview
                                     </Link>
@@ -219,6 +221,7 @@ const DashboardContract = () => {
                                                 to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
                                                 target='_blank'
                                                 className='underline px-2 text-sm rounded-md hover:underline cursor-pointer'
+                                                onClick={() => handleAddActivity(contract.meeting_notes, "CONTRACT")}
                                             >
                                                 {contract.meeting_notes}
                                             </Link>
@@ -312,6 +315,7 @@ const DashboardContract = () => {
                                         to={`${base_public_url}contract/${contract.contract_file}`}
                                         target='_blank'
                                         className='bg-emerald-950 text-lime-400 underline px-2 rounded-md hover:underline cursor-pointer'
+                                        onClick={() => handleAddActivity(contract.contract_file, "CONTRACT")}
                                     >
                                         {contract.contract_file}
                                     </Link>

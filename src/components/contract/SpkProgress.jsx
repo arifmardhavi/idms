@@ -14,6 +14,7 @@ import { Box, Modal } from "@mui/material";
 import { getSpkByContract, getSpkById } from "../../services/spk.service";
 import { IconLoader2 } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 const SpkProgress = () => {
     
@@ -244,6 +245,7 @@ const SpkProgress = () => {
                 to={`${base_public_url}contract/spk/progress/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "SPK")}
             >
                 <IconCloudDownload />
             </Link>
@@ -603,6 +605,7 @@ const SpkProgress = () => {
                                         to={`${base_public_url}contract/spk/progress/${editspkProgress.progress_file}`}
                                         target='_blank'
                                         className='hover:underline'
+                                        onClick={() => handleAddActivity(editspkProgress.progress_file, "SPK")}
                                     >
                                             {editspkProgress.progress_file}
                                         </Link>

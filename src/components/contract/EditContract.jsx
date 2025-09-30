@@ -10,6 +10,7 @@ import { api_public } from "../../services/config";
 import { IconLoader2 } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
+import { handleAddActivity } from '../../utils/handleAddActivity';
 
 const EditContract = () => {
   const navigate = useNavigate();
@@ -386,6 +387,7 @@ const EditContract = () => {
                             to={`${base_public_url}contract/${contract.contract_file}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(contract.contract_file, "CONTRACT")}
                             >
                             {contract.contract_file}
                             </Link>
@@ -509,6 +511,7 @@ const EditContract = () => {
                               to={`${base_public_url}contract/meeting_notes/${contract.meeting_notes}`}
                               target='_blank'
                               className='text-emerald-950 hover:underline cursor-pointer'
+                              onClick={() => handleAddActivity(contract.meeting_notes, "CONTRACT")}
                               >
                               {contract.meeting_notes}
                               </Link>

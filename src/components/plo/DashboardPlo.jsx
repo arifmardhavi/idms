@@ -14,6 +14,7 @@ import { api_public } from "../../services/config";
 import { IconArrowRight } from "@tabler/icons-react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 const DashboardPlo = () => {
 
@@ -115,6 +116,7 @@ const DashboardPlo = () => {
             to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.plo_certificate, "PLO")}
           >
             {params.value}
           </Link>
@@ -183,6 +185,7 @@ const DashboardPlo = () => {
             to={`${base_public_url}plo/certificates/${params.row.plo_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.plo_certificate, "PLO")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -200,6 +203,7 @@ const DashboardPlo = () => {
               to={`${base_public_url}plo/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "PLO")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -297,6 +301,7 @@ const DashboardPlo = () => {
               to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "PLO")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -317,6 +322,7 @@ const DashboardPlo = () => {
               to={`${base_public_url}plo/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "PLO")}
             >
               <IconCloudDownload stroke={2} />
             </Link>

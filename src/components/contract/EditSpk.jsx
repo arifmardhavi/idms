@@ -11,6 +11,7 @@ import { api_public } from "../../services/config";
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
 import { IconLoader2 } from "@tabler/icons-react"
+import { handleAddActivity } from "../../utils/handleAddActivity"
 
 const EditSpk = () => {
     const { id, spk_id } = useParams();
@@ -273,6 +274,7 @@ const EditSpk = () => {
                                         to={`${base_public_url}contract/spk/${spk.spk_file}`}
                                         target='_blank'
                                         className='text-emerald-950 hover:underline cursor-pointer'
+                                        onClick={() => handleAddActivity(spk.spk_file, "SPK")}
                                         >
                                         {spk.spk_file}
                                         </Link>
@@ -378,6 +380,7 @@ const EditSpk = () => {
                                       to={`${base_public_url}contract/spk/invoice/${spk.invoice_file}`}
                                       target='_blank'
                                       className='text-emerald-950 hover:underline cursor-pointer'
+                                        onClick={() => handleAddActivity(spk.invoice_file, "SPK")}
                                       >
                                       {spk.invoice_file}
                                       </Link>

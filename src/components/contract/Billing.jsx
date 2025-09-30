@@ -14,6 +14,7 @@ import { IconCloudDownload } from "@tabler/icons-react";
 import { api_public } from '../../services/config';
 import { IconLoader2 } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 const Billing = ({onAddedBilling}) => {
     
@@ -187,6 +188,7 @@ const Billing = ({onAddedBilling}) => {
                   to={`${base_public_url}contract/payment/${params.row.payment_document}`}
                   target='_blank'
                   className='item-center text-lime-500'
+                    onClick={() => handleAddActivity(params.row.payment_document, "CONTRACT")}
                 >
                   <IconCloudDownload stroke={2} />
                 </Link>
@@ -386,6 +388,7 @@ const Billing = ({onAddedBilling}) => {
                                         to={`${base_public_url}contract/payment/${editTermBilling.payment_document}`}
                                         target='_blank'
                                         className='hover:underline'
+                                        onClick={() => handleAddActivity(editTermBilling.payment_document, "CONTRACT")}
                                     >
                                             {editTermBilling.payment_document}
                                         </Link>

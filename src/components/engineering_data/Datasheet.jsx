@@ -22,6 +22,7 @@ import { IconFiles } from "@tabler/icons-react"
 import { IconFile } from "@tabler/icons-react"
 import { getCoiByTagNumber } from "../../services/coi.service"
 import { getEngineeringDataById } from "../../services/engineering_data.service"
+import { handleAddActivity } from "../../utils/handleAddActivity"
 
 const Datasheet = () => {
   const { id } = useParams();
@@ -261,6 +262,7 @@ const Datasheet = () => {
         to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
         target='_blank'
         className='text-lime-500 underline'
+        onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
       >
         {params.value}
       </Link> : '-'}
@@ -289,6 +291,7 @@ const Datasheet = () => {
             to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -573,6 +576,7 @@ const Datasheet = () => {
                         to={`${base_public_url}engineering_data/datasheet/${editDatasheet.datasheet_file}`} 
                         target='_blank'
                         className="hover:underline" 
+                        onClick={() => handleAddActivity(editDatasheet.datasheet_file, "DATASHEET")}
                       >
                         {editDatasheet.datasheet_file}
                       </Link>
@@ -621,7 +625,7 @@ const Datasheet = () => {
             :
             <>
             {isReEng && <div className="mb-2 bg-lime-300 text-emerald-950 w-fit p-1 rounded">Re Engineering : &nbsp; 
-              <Link to={`${base_public_url}coi/re_engineer/${isReEng}`} target="_blank" className=" underline">
+              <Link to={`${base_public_url}coi/re_engineer/${isReEng}`} target="_blank" className=" underline" onClick={() => handleAddActivity(isReEng, "DATASHEET")}>
                 {isReEng}
               </Link>
             </div>}

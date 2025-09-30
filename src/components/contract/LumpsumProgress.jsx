@@ -14,6 +14,7 @@ import { Box, Modal } from "@mui/material";
 import { getContractById } from "../../services/contract.service";
 import { IconLoader2 } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 const LumpsumProgress = () => {
     
@@ -219,6 +220,7 @@ const LumpsumProgress = () => {
                 to={`${base_public_url}contract/lumpsum/progress/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "CONTRACT")}
             >
                 <IconCloudDownload />
             </Link>
@@ -514,6 +516,7 @@ const LumpsumProgress = () => {
                                     to={`${base_public_url}contract/lumpsum/progress/${editProgress.progress_file}`}
                                     target='_blank'
                                     className='hover:underline'
+                                    onClick={() => handleAddActivity(editProgress.progress_file, "CONTRACT")}
                                 >
                                         {editProgress.progress_file}
                                     </Link>

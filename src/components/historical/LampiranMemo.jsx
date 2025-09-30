@@ -15,6 +15,7 @@ import Swal from "sweetalert2"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
+import { handleAddActivity } from "../../utils/handleAddActivity"
 
 const LampiranMemo = () => {
   const { id } = useParams();
@@ -187,6 +188,7 @@ const LampiranMemo = () => {
         to={`${base_public_url}historical_memorandum/lampiran/${params.value}`}
         target='_blank'
         className='text-lime-500 underline'
+        onClick={() => handleAddActivity(params.value, "LAMPIRAN HISTORICAL MEMO")}
       >
         {params.value}
       </Link>

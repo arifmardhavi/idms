@@ -53,6 +53,7 @@ import EditMoc from './components/moc/EditMoc.jsx';
 import ReadinessMaterial from './pages/ReadinessMaterial.jsx';
 import ReadinessJasa from './pages/ReadinessJasa.jsx';
 import Readiness from './pages/Readiness.jsx';
+import { ActivityProvider } from './utils/ActivityContext.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -123,6 +124,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ActivityProvider>
+      <RouterProvider router={router} />
+    </ActivityProvider>
   </StrictMode>
 );

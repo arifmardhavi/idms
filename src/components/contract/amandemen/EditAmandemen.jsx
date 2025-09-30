@@ -12,6 +12,7 @@ import { getAmandemenById, updateAmandemen } from "../../../services/amandemen.s
 import { api_public } from '../../../services/config';
 import { IconArrowRight } from "@tabler/icons-react";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { handleAddActivity } from "../../../utils/handleAddActivity";
 
 const EditAmandemen = () => {
     const { id, amandemen_id } = useParams();
@@ -167,6 +168,7 @@ const EditAmandemen = () => {
                             to={`${base_public_url}contract/amandemen/ba_agreement/${amandemen.ba_agreement_file}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(amandemen.ba_agreement_file, "AMANDEMEN")}
                           >
                             {amandemen.ba_agreement_file}
                           </Link>
@@ -195,6 +197,7 @@ const EditAmandemen = () => {
                             to={`${base_public_url}contract/amandemen/result_amandemen/${amandemen.result_amandemen_file}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(amandemen.result_amandemen_file, "AMANDEMEN")}
                           >
                             {amandemen.result_amandemen_file}
                           </Link>
@@ -288,6 +291,7 @@ const EditAmandemen = () => {
                                 to={`${base_public_url}contract/amandemen/principle_permit/${amandemen.principle_permit_file}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
+                                onClick={() => handleAddActivity(amandemen.principle_permit_file, "AMANDEMEN")}
                               >
                                 {amandemen.principle_permit_file}
                               </Link>

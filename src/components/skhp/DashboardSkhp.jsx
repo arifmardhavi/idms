@@ -14,6 +14,7 @@ import { api_public } from "../../services/config";
 import { IconLoader2 } from "@tabler/icons-react";
 import { IconArrowRight } from "@tabler/icons-react";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 
 const DashboardSkhp = () => {
@@ -103,6 +104,7 @@ const DashboardSkhp = () => {
             to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.file_skhp, "SKHP")}
           >
             {params.value}
           </Link>
@@ -171,6 +173,7 @@ const DashboardSkhp = () => {
             to={`${base_public_url}skhp/${params.row.file_skhp}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.file_skhp, "SKHP")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -188,6 +191,7 @@ const DashboardSkhp = () => {
               to={`${base_public_url}skhp/${params.row.file_old_skhp}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.row.file_old_skhp, "SKHP")}
             >
               <IconCloudDownload stroke={2} />
             </Link>

@@ -28,6 +28,7 @@ import { jwtDecode } from 'jwt-decode';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
+import { handleAddActivity } from '../utils/handleAddActivity';
 
 const Coi = () => {
   const [coi, setCoi] = useState([]);
@@ -300,6 +301,7 @@ const Coi = () => {
             to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
+            onClick={() => handleAddActivity(params.row.coi_certificate, "COI")}
           >
             {params.value}
           </Link>
@@ -368,6 +370,7 @@ const Coi = () => {
             to={`${base_public_url}coi/certificates/${params.row.coi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
+            onClick={() => handleAddActivity(params.row.coi_certificate, "COI")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -385,6 +388,7 @@ const Coi = () => {
               to={`${base_public_url}coi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -482,6 +486,7 @@ const Coi = () => {
               to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -502,6 +507,7 @@ const Coi = () => {
               to={`${base_public_url}coi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -522,6 +528,7 @@ const Coi = () => {
               to={`${base_public_url}coi/re_engineer/${params.value}`}
               target='_blank'
               className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "COI")}
             >
               <IconCloudDownload stroke={2} />
             </Link>

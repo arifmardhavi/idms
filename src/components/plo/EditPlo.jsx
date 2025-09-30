@@ -15,6 +15,7 @@ import { IconX } from '@tabler/icons-react';
 import { api_public } from "../../services/config";
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
+import { handleAddActivity } from '../../utils/handleAddActivity';
 
 const EditPlo = () => {
   const navigate = useNavigate();
@@ -222,6 +223,7 @@ const EditPlo = () => {
                             to={`${base_public_url}plo/certificates/${plo.plo_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(plo.plo_certificate, "PLO")}
                           >
                             {plo.plo_certificate}
                           </Link>
@@ -258,6 +260,7 @@ const EditPlo = () => {
                             to={`${base_public_url}plo/certificates/${plo.plo_old_certificate}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(plo.plo_old_certificate, "PLO")}
                           >
                             {plo.plo_old_certificate}
                           </Link>
@@ -412,6 +415,7 @@ const EditPlo = () => {
                                 to={`${base_public_url}plo/rla/${plo.rla_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
+                                onClick={() => handleAddActivity(plo.rla_certificate, "PLO")}
                               >
                                 {plo.rla_certificate}
                               </Link>
@@ -448,6 +452,7 @@ const EditPlo = () => {
                                 to={`${base_public_url}plo/rla/${plo.rla_old_certificate}`}
                                 target='_blank'
                                 className='text-emerald-950 hover:underline cursor-pointer'
+                                onClick={() => handleAddActivity(plo.rla_old_certificate, "PLO")}
                               >
                                 {plo.rla_old_certificate}
                               </Link>

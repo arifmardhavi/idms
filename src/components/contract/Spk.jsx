@@ -12,6 +12,7 @@ import { IconCloudDownload } from "@tabler/icons-react";
 import { api_public } from '../../services/config';
 import { IconLoader2 } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
+import { handleAddActivity } from "../../utils/handleAddActivity";
 
 const Spk = () => {
     
@@ -100,6 +101,7 @@ const Spk = () => {
                 to={`${base_public_url}contract/spk/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "SPK")}
             >
                 <IconCloudDownload />
             </Link>
@@ -140,6 +142,7 @@ const Spk = () => {
                 to={`${base_public_url}contract/spk/invoice/${params.value}`}
                 target='_blank'
                 className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+                onClick={() => handleAddActivity(params.value, "SPK")}
             >
                 <IconCloudDownload />
             </Link>

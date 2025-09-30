@@ -22,6 +22,7 @@ import { api_public } from "../../services/config";
 import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
+import { handleAddActivity } from '../../utils/handleAddActivity';
 
 const EditSkhp = () => {
   const navigate = useNavigate();
@@ -417,6 +418,7 @@ const handledeleteFile = async (file) => {
                             to={`${base_public_url}skhp/${skhp.file_skhp}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(skhp.file_skhp, "SKHP")}
                           >
                             {skhp.file_skhp}
                           </Link>
@@ -453,6 +455,7 @@ const handledeleteFile = async (file) => {
                             to={`${base_public_url}skhp/${skhp.file_old_skhp}`}
                             target='_blank'
                             className='text-emerald-950 hover:underline cursor-pointer'
+                            onClick={() => handleAddActivity(skhp.file_old_skhp, "SKHP")}
                           >
                             {skhp.file_old_skhp}
                           </Link>

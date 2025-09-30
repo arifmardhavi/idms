@@ -15,6 +15,7 @@ import { IconEye } from "@tabler/icons-react"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
+import { handleAddActivity } from "../utils/handleAddActivity"
 
 const HistoricalMemorandum = () => {
     const [historicalMemorandum, setHistoricalMemorandum] = useState([])
@@ -101,7 +102,7 @@ const HistoricalMemorandum = () => {
                     return <div className="py-4">-</div>;
                 }
             } },
-        { field: 'no_dokumen', headerName: 'No Dokumen', width: 200,  renderCell: (params) => <div className="py-4"><Link className="underline font-semibold text-lime-800" to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`} target="_blank">{params.value}</Link></div> },
+        { field: 'no_dokumen', headerName: 'No Dokumen', width: 200,  renderCell: (params) => <div className="py-4"><Link className="underline font-semibold text-lime-800" to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`} onClick={() => handleAddActivity(params.row.memorandum_file, "HISTORICAL MEMORANDUM")} target="_blank">{params.value}</Link></div> },
         { field: 'perihal', headerName: 'Perihal', width: 200,  renderCell: (params) => <div className="py-4">{params.value}</div> },
         { 
             field: 'tipe_memorandum', 
@@ -138,6 +139,7 @@ const HistoricalMemorandum = () => {
                 to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`}
                 target='_blank'
                 className='item-center text-lime-500'
+                onClick={() => handleAddActivity(params.row.memorandum_file, "HISTORICAL MEMORANDUM")}
               >
                 <IconCloudDownload stroke={2} />
               </Link>

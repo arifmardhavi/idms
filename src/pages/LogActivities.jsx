@@ -65,7 +65,7 @@ const LogActivities = () => {
     try {
       setLoading(true);
       const data = await getUser();
-      setUsers(data.data.filter((item) => item.level_user != 99));
+      setUsers(data.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -74,30 +74,30 @@ const LogActivities = () => {
   };
 
   const columnsUsers = [
-    { field: 'fullname', headerName: 'Nama', width: 300, renderCell: (params) => <div className="py-4">{params.value}</div> },
-    {field: 'total_activities', headerName: 'contribution', renderCell: (params) => <div className="py-4">{params.value}</div>},
-    {field: 'total_file_open', headerName: 'active', renderCell: (params) => <div className="py-4">{params.value}</div>},
-    { 
-      field: 'level_user', 
-      headerName: 'Level User',
-      width: 120,
-      valueGetter: (params) => params == 1 ? 'Admin' : params == 2 ? 'Inputer' : params == 3 ? 'Vendor' : params == 4 ? 'Viewer All' : params == 5 ? 'Viewer' : 'Super Admin',
-      renderCell: (params) => (
-        <div className={`${params.row.level_user == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} flex flex-col justify-center items-center`}>
-          {params.row.level_user == '1' ? 'Admin' : params.row.level_user == '2' ? 'Inputer' : params.row.level_user == '3' ? 'Vendor' : params.row.level_user == '4' ? 'Viewer All' : params.row.level_user == '5' ? 'Viewer' : 'Super Admin'}
-        </div>
-      )
-    },
-    { 
-      field: 'status', 
-      headerName: 'Status',
-      valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
-      renderCell: (params) => (
-        <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} flex flex-col justify-center items-center`}>
-          {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
-        </div>
-      )
-    },
+    { field: 'fullname', headerName: 'Nama', width: 300, renderCell: (params) => <div className="">{params.value}</div> },
+    {field: 'total_activities', headerName: 'contribution', renderCell: (params) => <div className="">{params.value}</div>},
+    {field: 'total_file_open', headerName: 'active', renderCell: (params) => <div className="">{params.value}</div>},
+    // { 
+    //   field: 'level_user', 
+    //   headerName: 'Level User',
+    //   width: 120,
+    //   valueGetter: (params) => params == 1 ? 'Admin' : params == 2 ? 'Inputer' : params == 3 ? 'Vendor' : params == 4 ? 'Viewer All' : params == 5 ? 'Viewer' : 'Super Admin',
+    //   renderCell: (params) => (
+    //     <div className={`${params.row.level_user == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} flex flex-col justify-center items-center`}>
+    //       {params.row.level_user == '1' ? 'Admin' : params.row.level_user == '2' ? 'Inputer' : params.row.level_user == '3' ? 'Vendor' : params.row.level_user == '4' ? 'Viewer All' : params.row.level_user == '5' ? 'Viewer' : 'Super Admin'}
+    //     </div>
+    //   )
+    // },
+    // { 
+    //   field: 'status', 
+    //   headerName: 'Status',
+    //   valueGetter: (params) => params == 1 ? 'Aktif' : 'Nonaktif',
+    //   renderCell: (params) => (
+    //     <div className={`${params.row.status == '1' ? 'bg-lime-300 text-emerald-950' : 'text-lime-300 bg-emerald-950'} flex flex-col justify-center items-center`}>
+    //       {params.row.status == '1' ? 'Aktif' : 'Nonaktif'}
+    //     </div>
+    //   )
+    // },
   ];
 
   const columnsOpenFile = [
@@ -241,7 +241,7 @@ const LogActivities = () => {
 
               </div>
               {/* active users */}
-              <div className="flex flex-col space-y-4 bg-white p-2 rounded-md shadow-md">
+              { 1 == 0 && <div className="flex flex-col space-y-4 bg-white p-2 rounded-md shadow-md">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-2xl text-gray-900">Log Active Users</p>
     
@@ -265,7 +265,7 @@ const LogActivities = () => {
                   // checkboxSelection
                 />}
 
-              </div>
+              </div>}
               {/* log activity */}
               <div className="flex flex-col space-y-4 bg-white p-2 rounded-md shadow-md">
                 <div className="flex justify-between items-center mb-4">

@@ -13,6 +13,7 @@ import { ActiveUnit } from "../../services/unit.service"
 import { ActiveCategory } from "../../services/category.service"
 import { IconArrowLeft } from "@tabler/icons-react"
 import { IconArrowRight } from "@tabler/icons-react"
+import { handleAddActivity } from "../../utils/handleAddActivity"
 
 const EditHistoricalMemorandum = () => {
     const {id} = useParams();
@@ -368,6 +369,7 @@ const EditHistoricalMemorandum = () => {
                                     to={`${base_public_url}historical_memorandum/${historicalMemorandum.memorandum_file}`}
                                     target='_blank'
                                     className='text-emerald-950 hover:underline cursor-pointer'
+                                    onClick={() => handleAddActivity(historicalMemorandum.memorandum_file, "HISTORICAL MEMORANDUM")}
                                     >
                                     {historicalMemorandum.memorandum_file}
                                     </Link>
