@@ -65,7 +65,7 @@ const LogActivities = () => {
     try {
       setLoading(true);
       const data = await getUser();
-      setUsers(data.data);
+      setUsers(data.data.filter(user => user.level_user != 99));
     } catch (err) {
       console.error(err);
     } finally {
