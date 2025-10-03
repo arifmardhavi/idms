@@ -227,7 +227,7 @@ const Header = () => {
           className="cursor-pointer"
           onClick={() => handleMenuClick('User Guides')}
         >
-          {renderDirectLink('User Guides', <IconHelpSquareRounded />, 'User Guides')}
+          {renderDirectLink('User Guides', <IconHelpSquareRounded />, 'User Guides', `${base_public_url}user_guides/USER GUIDE IDMS.pdf`)}
         </Link>
         <div onClick={handleLogout} className="cursor-pointer">
           {renderDirectLink('logout', <IconLogout />, 'Logout', '#')}

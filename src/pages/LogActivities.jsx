@@ -65,13 +65,20 @@ const LogActivities = () => {
     try {
       setLoading(true);
       const data = await getUser();
-      setUsers(data.data.filter(user => user.level_user != 99));
+
+      // filter + sort descending by total_activities
+      const filtered = data.data
+        .filter(user => user.level_user != 99)
+        .sort((a, b) => b.total_activities - a.total_activities);
+
+      setUsers(filtered);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
 
   const columnsUsers = [
     { field: 'fullname', headerName: 'Nama', width: 300, renderCell: (params) => <div className="">{params.value}</div> },

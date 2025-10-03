@@ -1,8 +1,8 @@
 // services/api.js
 import axios from "axios";
 
-const mode = 'local'; // 'local' or 'server'
-// const mode = 'server'; // 'local' or 'server'
+// const mode = 'local'; // 'local' or 'server'
+const mode = 'server'; // 'local' or 'server'
 const base_server = import.meta.env.VITE_BASE_BACKEND_SERVER_URL;
 const public_server = import.meta.env.VITE_PUBLIC_BACKEND_SERVER_URL;
 const base_local = import.meta.env.VITE_BASE_BACKEND_LOCAL_URL;

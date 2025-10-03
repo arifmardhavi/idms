@@ -1,10 +1,10 @@
 import Header from '../components/Header'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import { addUser, getUser, nonactiveUser, updateUser } from '../services/user.service'
+import { addUser, deleteUser, getUser, nonactiveUser, updateUser } from '../services/user.service'
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { IconColumnInsertLeft, IconColumnRemove, IconPencil } from '@tabler/icons-react';
+import { IconColumnInsertLeft, IconColumnRemove, IconPencil, IconTrash } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
@@ -172,6 +172,29 @@ const User = () => {
 
     
     // Nonaktifkan User
+    const handleDelete = async (user) => {
+      const confirm = await Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: 'Data user akan dihapus permanent!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+      });
+    
+      if (confirm.isConfirmed) {
+        try {
+          await deleteUser(user.id);
+          Swal.fire('Berhasil!', 'User berhasil dihapus!', 'success');
+          fetchUsers();
+        } catch (error) {
+          console.error(error);
+          Swal.fire('Gagal!', 'Terjadi kesalahan saat hapus user!', 'error');
+        }
+      }
+    };
+
+    // Nonaktifkan User
     const handleNonactive = async (user) => {
       const confirm = await Swal.fire({
         title: 'Apakah Anda yakin?',
@@ -235,6 +258,16 @@ const User = () => {
                 <IconPencil stroke={2} />
               </motion.button>
               </Tooltip>
+              {userLevel == 99 && <Tooltip title="Hapus" placement="right">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded"
+                  onClick={() => handleDelete(params.row)}
+                >
+                  <IconTrash stroke={2} />
+                </motion.button>
+              </Tooltip>}
               <Tooltip title="Nonaktifkan" placement="right">
               <motion.button
                 whileHover={{ scale: 1.1 }}
