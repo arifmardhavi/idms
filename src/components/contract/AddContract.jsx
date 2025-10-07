@@ -9,6 +9,7 @@ import { addContract } from '../../services/contract.service';
 import { useEffect } from 'react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconArrowLeft } from '@tabler/icons-react';
+import { useLocation } from "react-router-dom";
 
 const AddContract = () => {
   const navigate = useNavigate();
@@ -18,6 +19,16 @@ const AddContract = () => {
   const [IsKOM, setIsKOM] = useState(false);
   const [kom, setKom] = useState(true);
   const [hide, setHide] = useState(false);
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const typeParams = searchParams.get('type');
+  console.log('params :',typeParams);
+
+  useEffect(() => {
+    typeParams === '3' ? setKom(false) : setKom(true);
+  }, []);
+  
 
   useEffect(() => {
     console.log("kom berubah jadi:", kom);
@@ -232,9 +243,9 @@ const AddContract = () => {
                             setIsKOM(false);
                           }}
                       >
-                          <option value="1">Lumpsum</option>
-                          <option value="2">Unit Price</option>
-                          <option value="3">PO Material</option>
+                          <option value="1" selected={typeParams === '1'}>Lumpsum</option>
+                          <option value="2" selected={typeParams === '2'}>Unit Price</option>
+                          <option value="3" selected={typeParams === '3'}>PO Material</option>
 
                       </select>
                       {validation.contract_type && (
