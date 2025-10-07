@@ -45,10 +45,15 @@ const Contract = () => {
       setOpen(true);
     }
 
-    const handleCurrentStatusContract = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        formData.append('current_status', currentStatus);
+    const handleCurrentStatusContract = async (e, value = null) => {
+         // kalau dipanggil dari form submit, cegah reload
+        if (e && e.preventDefault) e.preventDefault();
+
+        // tentukan nilai yang mau dikirim
+        const statusValue = value !== null ? value : currentStatus;
+
+        const formData = new FormData();
+        formData.append("current_status", statusValue);
         try {
           setIsSubmitting(true);
           const res = await updateCurrentStatusContract(contractId, formData);
@@ -152,6 +157,7 @@ const Contract = () => {
         { header: 'Sisa MPP', key: 'durasi_mpp', width: 9 },
         // { header: 'Progress Aktual', key: 'actual_progress', width: 15 },
         { header: 'Deviasi Progress', key: 'monitoring_progress', width: 14 },
+        { header: 'Current Status', key: 'current_status', width: 32 },
         { header: 'Sisa Nilai Kontrak', key: 'sisa_nilai', width: 16, style: { numFmt: '#,##0' } },
         { header: 'Status', key: 'contract_status', width: 7 },
       ];
@@ -168,6 +174,7 @@ const Contract = () => {
           contract_date: item.contract_date,
           durasi_mpp: item.durasi_mpp?.sisa,
           // actual_progress: `${item.actual_progress}%`,
+          current_status: item.current_status,
           monitoring_progress: item.monitoring_progress?.deviation,
           sisa_nilai: item.sisa_nilai?.sisa,
           contract_status: item.contract_status == 1 ? 'Aktif' : 'Selesai',
@@ -609,7 +616,17 @@ const Contract = () => {
 
                   </div>
                   <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-                    <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                    <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`} disabled={isSubmitting}>Simpan</button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleCurrentStatusContract(e, '')} // ⬅️ kirim string kosong
+                      className={`bg-red-500 text-white p-2 rounded-xl flex ${
+                        isSubmitting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+                      }`}
+                      disabled={isSubmitting}
+                    >
+                      Hapus
+                    </button>
                     <button type="button" onClick={handleClose} className="bg-slate-700 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600">Batal</button>
                   </div>
                 </form>
