@@ -18,6 +18,8 @@ import { addPoMaterial, deletePoMaterial, updatePoMaterial } from "../services/p
 import { addFabrikasiMaterial, deleteFabrikasiMaterial, updateFabrikasiMaterial } from "../services/fabrikasi_material.service";
 import { addDeliveryMaterial, deleteDeliveryMaterial, updateDeliveryMaterial } from "../services/delivery_material.service";
 import { handleAddActivity } from "../utils/handleAddActivity";
+import { getEventReadinessById } from "../services/event_readiness.service";
+import { getContractByPoMaterial } from "../services/contract.service";
 
 const ReadinessMaterial = () => {
   const { event_readiness_id } = useParams();
@@ -41,15 +43,32 @@ const ReadinessMaterial = () => {
   const [openPo, setOpenPo] = useState(false);
   const [openFabrikasi, setOpenFabrikasi] = useState(false);
   const [openDelivery, setOpenDelivery] = useState(false);
+  const [eventReadiness, setEventReadiness] = useState([]);
+  const [contract, setContract] = useState([]);
+  const [selectedContract, setSelectedContract] = useState(null);
 
   
 
   useEffect(() => {
     fetchReadinessMaterial();
     fetchHistoricalMemorandum();
+    fetchEventReadiness();
+    fetchPoContract();
   }, [event_readiness_id]);
 
   // fetch area
+
+  const fetchEventReadiness = async () => {
+    setLoading(true);
+    try {
+      const data = await getEventReadinessById(event_readiness_id);
+      setEventReadiness(data.data);
+    } catch (error) {
+      console.error("Error fetching Event Readiness:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchReadinessMaterial = async () => {
     setLoading(true);
@@ -72,6 +91,18 @@ const ReadinessMaterial = () => {
           console.log(data.data);
       } catch (error) {
           console.error("Error fetching historical memorandum:", error);
+      } finally {
+          setLoading(false);
+      }
+  }
+  const fetchPoContract = async () => {
+      try {
+          setLoading(true);
+          const data = await getContractByPoMaterial();
+          setContract(data.data);
+          console.log(data.data);
+      } catch (error) {
+          console.error("Error fetching contracts PO:", error);
       } finally {
           setLoading(false);
       }
@@ -277,6 +308,28 @@ const ReadinessMaterial = () => {
     }
   }
 
+  const handleaddStatusRekomendasi = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addRekomendasiMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Rekomendasi Material berhasil ditambahkan!", "success");
+        rekomendasiClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Rekomendasi Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const handleupdateStatusRekomendasi = async (status, id) => {
     const formData = new FormData();
     formData.append('status', status);
@@ -394,6 +447,29 @@ const ReadinessMaterial = () => {
     }
   }
 
+  const handleaddStatusNotif = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+
+    try {
+      setIsSubmitting(true);
+      const res = await addNotifMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Notif Material berhasil ditambahkan!", "success");
+        notifClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Notif Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const handleupdateStatusNotif = async (status, id) => {
     const formData = new FormData();
     formData.append('status', status);
@@ -503,6 +579,28 @@ const ReadinessMaterial = () => {
       }
     } catch (error) {
       console.error("Error updating Job Plan Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleaddStatusJobPlan = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addJobPlanMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Job Plan Material berhasil ditambahkan!", "success");
+        jobPlanClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Job Plan Material:", error);
       setValidation(error.response?.data.errors || []);
     } finally {
       setIsSubmitting(false);
@@ -622,6 +720,29 @@ const ReadinessMaterial = () => {
     }
   }
 
+  const handleaddStatusPr = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    console.log(formData);
+    try {
+      setIsSubmitting(true);
+      const res = await addPrMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status PR Material berhasil ditambahkan!", "success");
+        prClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status PR Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const handleupdateStatusPr = async (status, id) => {
     const formData = new FormData();
     formData.append('status', status);
@@ -736,6 +857,28 @@ const ReadinessMaterial = () => {
       setIsSubmitting(false);
     }
   }
+  const handleaddStatusTender = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addTenderMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Tender Material berhasil ditambahkan!", "success");
+        tenderClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Tender Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const handleupdateStatusTender = async (status, id) => {
     const formData = new FormData();
     formData.append('status', status);
@@ -795,6 +938,7 @@ const ReadinessMaterial = () => {
     setOpenPo(true);
     setSelectedReadiness(row);
     setSelectedId(row.id);
+    setSelectedContract(row.po_material?.contract_id ? row.po_material?.contract_id : null);
   };
 
   const poClose = () => {
@@ -802,6 +946,7 @@ const ReadinessMaterial = () => {
     setSelectedReadiness([]);
     setSelectedId(null);
     setValidation({});
+    setSelectedContract(null);
     setIsSubmitting(false);
   }
 
@@ -810,6 +955,7 @@ const ReadinessMaterial = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     formData.append('readiness_material_id', selectedId);
+    selectedContract && formData.append('contract_id', selectedContract);
     try {
       setIsSubmitting(true);
       const res = await addPoMaterial(formData);
@@ -831,6 +977,7 @@ const ReadinessMaterial = () => {
   const handleUpdatePo = async (e, id) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    selectedContract && formData.append('contract_id', selectedContract);
     try {
       setIsSubmitting(true);
       const res = await updatePoMaterial( id, formData);
@@ -850,6 +997,28 @@ const ReadinessMaterial = () => {
     }
   }
 
+  const handleaddStatusPo = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addPoMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status PO Material berhasil ditambahkan!", "success");
+        poClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status PO Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const handleupdateStatusPo = async (status, id) => {
     const formData = new FormData();
     formData.append('status', status);
@@ -959,6 +1128,28 @@ const ReadinessMaterial = () => {
       }
     } catch (error) {
       console.error("Error updating Fabrikasi Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+  const handleaddStatusFabrikasi = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addFabrikasiMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Fabrikasi Material berhasil ditambahkan!", "success");
+        fabrikasiClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Fabrikasi Material:", error);
       setValidation(error.response?.data.errors || []);
     } finally {
       setIsSubmitting(false);
@@ -1078,6 +1269,28 @@ const ReadinessMaterial = () => {
       setIsSubmitting(false);
     }
   }
+  const handleaddStatusDelivery = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_material_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addDeliveryMaterial(formData);
+      if (res.success) {
+        fetchReadinessMaterial();
+        Swal.fire("Berhasil!", "Status Delivery Material berhasil ditambahkan!", "success");
+        deliveryClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Delivery Material:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const handleupdateStatusDelivery = async (status, id) => {
     const formData = new FormData();
     formData.append('status', status);
@@ -1138,6 +1351,19 @@ const ReadinessMaterial = () => {
 
   const columns = [
     { field: 'material_name', headerName: 'Nama Material', width: 250 },
+    { 
+      field: 'type', 
+      headerName: 'Type',
+      valueGetter: (params) => params == 1 ? 'Non LLDI' : 'LLDI',
+      renderCell: (params) => (
+        <div className="flex flex-col justify-center items-center p-2" >
+          <Stack direction="row" spacing={1}>
+            <Chip label={params.row.type == 1 ? 'Non LLDI' : 'LLDI'} />
+          </Stack>
+          
+        </div>
+      )
+    },
     { field: 'last_number_status', headerName: 'Notif/WO/PR/PO', width: 200 },
     {
       field: 'rekomendasi_material',
@@ -1276,37 +1502,24 @@ const ReadinessMaterial = () => {
       ),
     },
     {
-      field: 'tanggal_ta',
+      field: 'event_readiness',
       headerName: 'Tanggal TA',
+      valueGetter: (params) => {params != null ? (params.event_readiness?.tanggal_ta ?? '-') : '-'},
       width: 140,
       renderCell: (params) => (
         <div className=''>
-          {params.value ? new Intl.DateTimeFormat('id-ID', {
+          {params.row.event_readiness?.tanggal_ta ? new Intl.DateTimeFormat('id-ID', {
             day: '2-digit',
             month: 'long',
             year: 'numeric',
-          }).format(new Date(params.value)) : '-'}
+          }).format(new Date(params.row.event_readiness?.tanggal_ta)) : '-'}
         </div>
       ),
     },
     {
-      field: 'last_target_status',
-      headerName: 'Target Status',
-      valueGetter: (params) => {params != null ? (params.days_remaining ? params.days_remaining : '-') : null},
+      field: 'total_progress',
+      headerName: 'Total Progress',
       width: 120,
-      renderCell: (params) => {
-        const color = params.row.last_target_status != null ? (params.row.last_target_status?.color == 'red' ? 'error' : params.row.last_target_status?.color == 'yellow' ? 'warning' : 'success') : 'default';
-        const title = params.row.last_target_status != null ? `remaining: ${params.row.last_target_status?.days_remaining ?? '-'}\n|\nDate: ${params.row.last_target_status?.date_used ?? '-'}\n|\nStep: ${params.row.last_target_status?.step_used ?? '-'}\n `: '-';
-        return (
-          <div className="flex flex-col justify-center items-center p-2" >
-            <Tooltip title={title} placement="top" arrow>
-              <Stack direction="row" spacing={1}>
-                <Chip label={params.row.last_target_status?.days_remaining ?? '-'} color={color} />
-              </Stack>
-            </Tooltip>
-          </div>
-        );
-      },
     },
     {
       field: 'prognosa',
@@ -1329,7 +1542,7 @@ const ReadinessMaterial = () => {
     },
     {
       field: 'ta_status',
-      headerName: 'TA Status',
+      headerName: 'Days to TA',
       valueGetter: (params) => {params != null ? (params.days_remaining ? params.days_remaining : '-') : null},
       width: 100,
       renderCell: (params) => {
@@ -1441,9 +1654,23 @@ const ReadinessMaterial = () => {
               </Link>
               <Typography className='text-lime-500'>Readiness Ta / Plant Stop Material</Typography>
           </Breadcrumbs>
+          {/* card area */}
           <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
             <div className='flex flex-row justify-between'>
-              <h1 className='text-xl font-bold uppercase'>Readiness Ta / Plant Stop Material</h1>
+              <h1 className="text-xl font-bold uppercase ">
+                {eventReadiness?.event_name ?? 'Readiness TA / Plant Stop Jasa'}
+                <small className='text-xs font-normal'>
+                  {' ('}
+                  {eventReadiness?.tanggal_ta
+                    ? new Date(eventReadiness.tanggal_ta).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })
+                    : ''}
+                  {')'}
+                </small>
+              </h1>
               <div className='flex flex-row justify-end items-center space-x-2'>
                   <button
                       className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
@@ -1494,17 +1721,14 @@ const ReadinessMaterial = () => {
                             )}
                           </div>
                           <div>
-                            <label htmlFor="tanggal_ta">Tanggal TA <sup className='text-red-500'>*</sup></label>
-                            <input
-                              type="date"
-                              name="tanggal_ta"
-                              id="tanggal_ta"
-                              className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
-                              defaultValue={selectedReadiness ? selectedReadiness.tanggal_ta : ''}
-                              required
-                            />
-                            {validation.tanggal_ta && (
-                              validation.tanggal_ta.map((item, index) => (
+                            <label htmlFor="type">Type <sup className='text-red-500'>*</sup></label>
+                            <select name="type" id="type" className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none" defaultValue={selectedReadiness ? selectedReadiness.type : ''} required>
+                              <option value="">Pilih Type</option>
+                              <option value="1" selected={selectedReadiness?.type == 1 ? true : false}>Non LLDI</option>
+                              <option value="0" selected={selectedReadiness?.type == 0 ? true : false}>LLDI</option>
+                            </select>
+                            {validation.type && (
+                              validation.type.map((item, index) => (
                                 <div key={index}>
                                   <small className="text-red-600 text-sm">{item}</small>
                                 </div>
@@ -1513,7 +1737,7 @@ const ReadinessMaterial = () => {
                           </div>
                         </div>
                         <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-                          {selectedReadiness.tanggal_ta 
+                          {selectedReadiness.material_name 
                             ? 
                             <>
                               <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Update</button> 
@@ -1554,6 +1778,16 @@ const ReadinessMaterial = () => {
                 // checkboxSelection
               />}
             </div>
+          </div>
+          {/* Keterangan dan status area */}
+          <div>
+            <ul>
+              <li className='text-sm'><span className='font-bold'>Keterangan Icon Status :</span></li>
+              <li className='text-sm flex'> <span className='text-blue-500'><IconPointFilled /></span> : Selesai</li>
+              <li className='text-sm flex'> <span className='text-green-500'><IconPointFilled /></span> : On Going</li>
+              <li className='text-sm flex'> <span className='text-yellow-500'><IconPointFilled /></span> : {'Telat < 1bln'} </li>
+              <li className='text-sm flex'> <span className='text-red-500'><IconPointFilled /></span> : {'Telat > 1bln'} </li>
+            </ul>
           </div>
       </div>
 
@@ -1616,6 +1850,20 @@ const ReadinessMaterial = () => {
                     />
                     )}
                   />
+                  {selectedReadiness?.rekomendasi_material?.historical_memorandum?.memorandum_file ? (
+                      <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                          <Link
+                            to={`${base_public_url}historical_memorandum/${selectedReadiness?.rekomendasi_material?.historical_memorandum?.memorandum_file}`}
+                            target='_blank'
+                            className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                            onClick={() => handleAddActivity(selectedReadiness?.rekomendasi_material?.historical_memorandum?.memorandum_file, "READINESS MATERIAL")}
+                          >
+                            {selectedReadiness?.rekomendasi_material?.historical_memorandum?.memorandum_file}
+                          </Link>
+                      </div>
+                    ) : (
+                      ''
+                  )}
                 </div>
                 :
                 <div>
@@ -1654,9 +1902,16 @@ const ReadinessMaterial = () => {
                   name="target_date"
                   className="border rounded-md p-2 w-full"
                   defaultValue={selectedReadiness?.rekomendasi_material?.target_date} 
-                  required />
+                   />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
                     <div key={index}>
                       <small className="text-red-600 text-sm">{item}</small>
                     </div>
@@ -1665,37 +1920,48 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness?.rekomendasi_material ? (
+              {selectedReadiness?.rekomendasi_material ? 
+                (
+                  <>
+                  {selectedReadiness.rekomendasi_material?.status == 1 ?
+                    <>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(0, selectedReadiness.rekomendasi_material.id)} className={`bg-blue-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-blue-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>Selesai</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(2, selectedReadiness.rekomendasi_material.id)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(3, selectedReadiness.rekomendasi_material.id)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                    </>
+                    : selectedReadiness.rekomendasi_material?.status == 2 ?
+                    <>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(0, selectedReadiness.rekomendasi_material.id)} className={`bg-blue-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-blue-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>Selesai</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(1, selectedReadiness.rekomendasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(3, selectedReadiness.rekomendasi_material.id)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                    </>
+                    : selectedReadiness.rekomendasi_material?.status == 3 ?
+                    <>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(0, selectedReadiness.rekomendasi_material.id)} className={`bg-blue-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-blue-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>Selesai</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(1, selectedReadiness.rekomendasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(2, selectedReadiness.rekomendasi_material.id)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                    </>
+                    : 
+                    <>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(1, selectedReadiness.rekomendasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(2, selectedReadiness.rekomendasi_material.id)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                      <button type="button" onClick={() => handleupdateStatusRekomendasi(3, selectedReadiness.rekomendasi_material.id)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                    </>
+                  }
+                  
+                    <button type="button" onClick={() => handleDeleteRekomendasi(selectedReadiness?.rekomendasi_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
+                    <button type="submit" className={`bg-slate-500 text-white p-2 text-xs rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button>
+                  </>
+                ) 
+                :
                 <>
-                {selectedReadiness.rekomendasi_material?.status == 1 ?
-                  <>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(0, selectedReadiness.rekomendasi_material.id)} className={`bg-blue-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-blue-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>Selesai</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(2, selectedReadiness.rekomendasi_material.id)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(3, selectedReadiness.rekomendasi_material.id)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
-                  </>
-                  : selectedReadiness.rekomendasi_material?.status == 2 ?
-                  <>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(0, selectedReadiness.rekomendasi_material.id)} className={`bg-blue-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-blue-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>Selesai</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(1, selectedReadiness.rekomendasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(3, selectedReadiness.rekomendasi_material.id)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
-                  </>
-                  : selectedReadiness.rekomendasi_material?.status == 3 ?
-                  <>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(0, selectedReadiness.rekomendasi_material.id)} className={`bg-blue-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-blue-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>Selesai</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(1, selectedReadiness.rekomendasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(2, selectedReadiness.rekomendasi_material.id)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
-                  </>
-                  : 
-                  <>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(1, selectedReadiness.rekomendasi_material.id)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(2, selectedReadiness.rekomendasi_material.id)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
-                    <button type="button" onClick={() => handleupdateStatusRekomendasi(3, selectedReadiness.rekomendasi_material.id)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
-                  </>
-                }
-                  <button type="button" onClick={() => handleDeleteRekomendasi(selectedReadiness?.rekomendasi_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
-                  <button type="submit" className={`bg-slate-500 text-white p-2 text-xs rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button>
-                </>
-              ) : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>}
+                  <button type="button" onClick={() => handleaddStatusRekomendasi(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusRekomendasi(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusRekomendasi(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
+              }
               <button type="button" onClick={rekomendasiClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
           </form>
@@ -1745,7 +2011,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.notif_material ? selectedReadiness.notif_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1754,10 +2020,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.notif_material?.target_date 
+              {selectedReadiness.notif_material?.status 
                 ? 
                 <>
                   {selectedReadiness.notif_material?.status == 1 ?
@@ -1788,7 +2061,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeleteNotif(selectedReadiness?.notif_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusNotif(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusNotif(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusNotif(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={notifClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -1895,7 +2175,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.job_plan_material ? selectedReadiness.job_plan_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1904,10 +2184,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.job_plan_material?.target_date 
+              {selectedReadiness.job_plan_material?.status 
                 ? 
                 <>
                   {selectedReadiness.job_plan_material?.status == 1 ?
@@ -1938,7 +2225,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeleteJobPlan(selectedReadiness?.job_plan_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusJobPlan(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusJobPlan(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusJobPlan(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={jobPlanClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -1989,7 +2283,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.pr_material ? selectedReadiness.pr_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1998,10 +2292,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.pr_material?.target_date 
+              {selectedReadiness.pr_material?.status
                 ? 
                 <>
                   {selectedReadiness.pr_material?.status == 1 ?
@@ -2032,7 +2333,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeletePr(selectedReadiness?.pr_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusPr(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusPr(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusPr(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={prClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -2083,7 +2391,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.tender_material ? selectedReadiness.tender_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -2092,10 +2400,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.tender_material?.target_date 
+              {selectedReadiness.tender_material?.status 
                 ? 
                 <>
                   {selectedReadiness.tender_material?.status == 1 ?
@@ -2126,7 +2441,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeleteTender(selectedReadiness?.tender_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusTender(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusTender(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusTender(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={tenderClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -2169,34 +2491,57 @@ const ReadinessMaterial = () => {
                   ))
                 )}
               </div>
-              <div>
-                <label htmlFor="po_file">PO File {selectedReadiness?.po_material?.po_file ? '' : <sup className='text-red-500'>*</sup> }</label>
-                <input 
-                  type="file" 
-                  name="po_file"
-                  required={selectedReadiness?.po_material?.po_file ? false : true}
-                  className="border rounded-md p-2 w-full" />
-                  {selectedReadiness?.po_material?.po_file ? (
-                    <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
-                        <Link
-                          to={`${base_public_url}readiness_ta/material/po/${selectedReadiness?.po_material?.po_file}`}
-                          target='_blank'
-                          className='text-emerald-950 hover:underline cursor-pointer text-xs'
-                          onClick={() => handleAddActivity(selectedReadiness?.po_material?.po_file, "READINESS MATERIAL")}
-                        >
-                          {selectedReadiness?.po_material?.po_file}
-                        </Link>
-                    </div>
-                  ) : (
-                    ''
+              <div className="flex flex-row space-x-1">
+                <div className="flex flex-col w-full space-y-2">
+                  <label htmlFor="contract">Contract PO Material<sup className='text-red-500'>*</sup></label>
+                  <Autocomplete
+                    id="contract"
+                    options={Array.isArray(contract) ? contract : []}
+                    getOptionLabel={(option) => `${option?.contract_name ?? ''}`}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    value={contract.find((item) => item.id === selectedContract) || null}
+                    onChange={(e, value) => {
+                        setSelectedContract(value?.id || null);
+                    }}
+                    required
+                    renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        name="contract_id" // Tambahkan name di sini
+                        placeholder={'N/A'}
+                        variant="outlined"
+                        error={!!validation.contract_id}
+                        helperText={
+                        validation.contract_id &&
+                        validation.contract_id.map((item, index) => (
+                            <span key={index} className="text-red-600 text-sm">
+                            {item}
+                            </span>
+                        ))
+                        }
+                    />
+                    )}
+                  />
+                  {selectedReadiness?.po_material?.contract?.contract_file ? (
+                      <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                          <Link
+                            to={`${base_public_url}contract/${selectedReadiness?.po_material?.contract?.contract_file}`}
+                            target='_blank'
+                            className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                            onClick={() => handleAddActivity(selectedReadiness?.po_material?.contract?.contract_file, "READINESS MATERIAL")}
+                          >
+                            {selectedReadiness?.po_material?.contract?.contract_file}
+                          </Link>
+                      </div>
+                    ) : (
+                      ''
                   )}
-                {validation.po_file && (
-                  validation.po_file.map((item, index) => (
-                    <div key={index}>
-                      <small className="text-red-600 text-sm">{item}</small>
-                    </div>
-                  ))
-                )}
+                </div>
+                <Tooltip title="Tambah Contract" placement="left">
+                  <Link to={`/contract/tambah?type=3`} className="self-end mb-2 text-xs bg-blue-500 p-2 rounded-xl text-white hover:bg-blue-600 flex justify-center items-center">
+                    <IconPlus className="w-6" />
+                  </Link>
+                </Tooltip>
               </div>
               <div>
                 <label htmlFor="delivery_date">Delivery Date <sup className='text-red-500'>*</sup></label>
@@ -2224,7 +2569,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.po_material ? selectedReadiness.po_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -2233,10 +2578,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.po_material?.target_date 
+              {selectedReadiness.po_material 
                 ? 
                 <>
                   {selectedReadiness.po_material?.status == 1 ?
@@ -2267,7 +2619,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeletePo(selectedReadiness?.po_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusPo(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusPo(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusPo(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={poClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -2318,7 +2677,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.fabrikasi_material ? selectedReadiness.fabrikasi_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -2327,10 +2686,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.fabrikasi_material?.target_date 
+              {selectedReadiness.fabrikasi_material?.status 
                 ? 
                 <>
                   {selectedReadiness.fabrikasi_material?.status == 1 ?
@@ -2361,7 +2727,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeleteFabrikasi(selectedReadiness?.fabrikasi_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                : 
+                <>
+                  <button type="button" onClick={() => handleaddStatusFabrikasi(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusFabrikasi(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusFabrikasi(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={fabrikasiClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -2440,7 +2813,7 @@ const ReadinessMaterial = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.delivery_material ? selectedReadiness.delivery_material.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -2449,10 +2822,17 @@ const ReadinessMaterial = () => {
                     </div>
                   ))
                 )}
+                {validation.readiness_material_id && (
+                  validation.readiness_material_id.map((item, index) => (
+                    <div key={index}>
+                      <small className="text-red-600 text-sm">{item}</small>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.delivery_material?.target_date 
+              {selectedReadiness.delivery_material?.status 
                 ? 
                 <>
                   {selectedReadiness.delivery_material?.status == 1 ?
@@ -2483,7 +2863,14 @@ const ReadinessMaterial = () => {
                   <button type="button" onClick={() => handleDeleteDelivery(selectedReadiness?.delivery_material)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                : 
+                <>
+                  <button type="button" onClick={() => handleaddStatusDelivery(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusDelivery(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusDelivery(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </>
               }
               <button type="button" onClick={deliveryClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>

@@ -16,6 +16,8 @@ import { addPrJasa, deletePrJasa, updatePrJasa } from "../services/pr_jasa.servi
 import { addTenderJasa, deleteTenderJasa, updateTenderJasa } from "../services/tender_jasa.service";
 import { addContractJasa, deleteContractJasa, updateContractJasa } from "../services/contract_jasa.service";
 import { handleAddActivity } from "../utils/handleAddActivity";
+import { getContractByUnPoMaterial } from "../services/contract.service";
+import { getEventReadinessById } from "../services/event_readiness.service";
 
 const ReadinessJasa = () => {
   const {event_readiness_id} = useParams();
@@ -37,11 +39,16 @@ const ReadinessJasa = () => {
     const [openPr, setOpenPr] = useState(false);
     const [openTender, setOpenTender] = useState(false);
     const [openContract, setOpenContract] = useState(false);
+    const [contract, setContract] = useState([]);
+    const [selectedContract, setSelectedContract] = useState(null);
+    const [eventReadiness, setEventReadiness] = useState({});
 
 
   useEffect(() => {
+    fetchEventReadiness();
     fetchReadinessJasa();
     fetchHistoricalMemorandum();
+    fetchContract();
   }, [event_readiness_id]);
 
   // fetch area
@@ -71,6 +78,31 @@ const ReadinessJasa = () => {
           setLoading(false);
       }
   }
+
+  const fetchContract = async () => {
+      try {
+          setLoading(true);
+          const data = await getContractByUnPoMaterial();
+          setContract(data.data);
+          console.log(data.data);
+      } catch (error) {
+          console.error("Error fetching contracts PO:", error);
+      } finally {
+          setLoading(false);
+      }
+  }
+
+  const fetchEventReadiness = async () => {
+      setLoading(true);
+      try {
+        const data = await getEventReadinessById(event_readiness_id);
+        setEventReadiness(data.data);
+      } catch (error) {
+        console.error("Error fetching Event Readiness:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
 
 
@@ -293,6 +325,28 @@ const ReadinessJasa = () => {
       setIsSubmitting(false);
     }
   }
+  const handleaddStatusRekomendasi = async (status) => {
+    const formData = new FormData();
+    formData.append('readiness_jasa_id', selectedId);
+    formData.append('status', status);
+    try {
+      setIsSubmitting(true);
+      const res = await addRekomendasiJasa(formData);
+      if (res.success) {
+        fetchReadinessJasa();
+        Swal.fire("Berhasil!", "Status Rekomendasi Jasa Berhasil ditambahkan!", "success");
+        rekomendasiClose();
+      } else {
+        console.log(res.response.data.errors);
+        setValidation(res.response?.data.errors || []);
+      }
+    } catch (error) {
+      console.error("Error adding status Rekomendasi Jasa:", error);
+      setValidation(error.response?.data.errors || []);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   const handleDeleteRekomendasi = async (row) => {
     setOpenRekomendasi(false);
@@ -389,6 +443,28 @@ const ReadinessJasa = () => {
       }
     }
   
+    const handleaddStatusNotif = async (status) => {
+      const formData = new FormData();
+      formData.append('readiness_jasa_id', selectedId);
+      formData.append('status', status);
+      try {
+        setIsSubmitting(true);
+        const res = await addNotifJasa(formData);
+        if (res.success) {
+          fetchReadinessJasa();
+          Swal.fire("Berhasil!", "Status Notif Jasa Berhasil ditambahkan!", "success");
+          notifClose();
+        } else {
+          console.log(res.response.data.errors);
+          setValidation(res.response?.data.errors || []);
+        }
+      } catch (error) {
+        console.error("Error adding status Notif Jasa:", error);
+        setValidation(error.response?.data.errors || []);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
     const handleupdateStatusNotif = async (status, id) => {
       const formData = new FormData();
       formData.append('status', status);
@@ -498,6 +574,28 @@ const ReadinessJasa = () => {
         }
       } catch (error) {
         console.error("Error updating Job Plan Jasa:", error);
+        setValidation(error.response?.data.errors || []);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+    const handleaddStatusJobPlan = async (status) => {
+      const formData = new FormData();
+      formData.append('readiness_jasa_id', selectedId);
+      formData.append('status', status);
+      try {
+        setIsSubmitting(true);
+        const res = await addJobPlanJasa(formData);
+        if (res.success) {
+          fetchReadinessJasa();
+          Swal.fire("Berhasil!", "Status Job Plan Jasa Berhasil ditambahkan!", "success");
+          jobPlanClose();
+        } else {
+          console.log(res.response.data.errors);
+          setValidation(res.response?.data.errors || []);
+        }
+      } catch (error) {
+        console.error("Error adding status Job Plan Jasa:", error);
         setValidation(error.response?.data.errors || []);
       } finally {
         setIsSubmitting(false);
@@ -618,6 +716,28 @@ const ReadinessJasa = () => {
       }
     }
   
+    const handleaddStatusPr = async (status) => {
+      const formData = new FormData();
+      formData.append('readiness_jasa_id', selectedId);
+      formData.append('status', status);
+      try {
+        setIsSubmitting(true);
+        const res = await addPrJasa(formData);
+        if (res.success) {
+          fetchReadinessJasa();
+          Swal.fire("Berhasil!", "Status PR Jasa Berhasil ditambahkan!", "success");
+          prClose();
+        } else {
+          console.log(res.response.data.errors);
+          setValidation(res.response?.data.errors || []);
+        }
+      } catch (error) {
+        console.error("Error adding status PR Jasa:", error);
+        setValidation(error.response?.data.errors || []);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
     const handleupdateStatusPr = async (status, id) => {
       const formData = new FormData();
       formData.append('status', status);
@@ -733,6 +853,28 @@ const ReadinessJasa = () => {
           setIsSubmitting(false);
         }
       }
+      const handleaddStatusTender = async (status) => {
+        const formData = new FormData();
+        formData.append('readiness_jasa_id', selectedId);
+        formData.append('status', status);
+        try {
+          setIsSubmitting(true);
+          const res = await addTenderJasa(formData);
+          if (res.success) {
+            fetchReadinessJasa();
+            Swal.fire("Berhasil!", "Status Tender Jasa Berhasil ditambahkan!", "success");
+            tenderClose();
+          } else {
+            console.log(res.response.data.errors);
+            setValidation(res.response?.data.errors || []);
+          }
+        } catch (error) {
+          console.error("Error adding status Tender Jasa:", error);
+          setValidation(error.response?.data.errors || []);
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
       const handleupdateStatusTender = async (status, id) => {
         const formData = new FormData();
         formData.append('status', status);
@@ -793,6 +935,7 @@ const ReadinessJasa = () => {
         setOpenContract(true);
         setSelectedReadiness(row);
         setSelectedId(row.id);
+        setSelectedContract(row.contract_jasa?.contract_id ?? null);
       };
     
       const contractClose = () => {
@@ -801,6 +944,7 @@ const ReadinessJasa = () => {
         setSelectedId(null);
         setValidation({});
         setIsSubmitting(false);
+        setSelectedContract(null);
       }
     
     
@@ -808,6 +952,7 @@ const ReadinessJasa = () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         formData.append('readiness_jasa_id', selectedId);
+        selectedContract && formData.append('contract_id', selectedContract);
         formData.append('status', 1);
         // console.log(formData);
         try {
@@ -831,6 +976,7 @@ const ReadinessJasa = () => {
       const handleUpdateContract = async (e, id) => {
         e.preventDefault();
         const formData = new FormData(e.target);
+        selectedContract && formData.append('contract_id', selectedContract);
         try {
           setIsSubmitting(true);
           const res = await updateContractJasa( id, formData);
@@ -844,6 +990,28 @@ const ReadinessJasa = () => {
           }
         } catch (error) {
           console.error("Error updating Contract Jasa:", error);
+          setValidation(error.response?.data.errors || []);
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+      const handleaddStatusContract = async (status) => {
+        const formData = new FormData();
+        formData.append('readiness_jasa_id', selectedId);
+        formData.append('status', status);
+        try {
+          setIsSubmitting(true);
+          const res = await addContractJasa(formData);
+          if (res.success) {
+            fetchReadinessJasa();
+            Swal.fire("Berhasil!", "Status Contract Jasa Berhasil ditambahkan!", "success");
+            contractClose();
+          } else {
+            console.log(res.response.data.errors);
+            setValidation(res.response?.data.errors || []);
+          }
+        } catch (error) {
+          console.error("Error adding status Contract Jasa:", error);
           setValidation(error.response?.data.errors || []);
         } finally {
           setIsSubmitting(false);
@@ -1012,37 +1180,24 @@ const ReadinessJasa = () => {
         ),
       },
       {
-        field: 'tanggal_ta',
+        field: 'event_readiness',
         headerName: 'Tanggal TA',
+        valueGetter: (params) => {params != null ? (params.event_readiness?.tanggal_ta ?? '-') : '-'},
         width: 140,
         renderCell: (params) => (
           <div className=''>
-            {params.value ? new Intl.DateTimeFormat('id-ID', {
+            {params.row.event_readiness?.tanggal_ta ? new Intl.DateTimeFormat('id-ID', {
               day: '2-digit',
               month: 'long',
               year: 'numeric',
-            }).format(new Date(params.value)) : '-'}
+            }).format(new Date(params.row.event_readiness?.tanggal_ta)) : '-'}
           </div>
         ),
       },
       {
-        field: 'last_target_status',
-        headerName: 'Target Status',
-        valueGetter: (params) => {params != null ? (params.days_remaining ? params.days_remaining : '-') : null},
+        field: 'total_progress',
+        headerName: 'Total Progress',
         width: 120,
-        renderCell: (params) => {
-          const color = params.row.last_target_status != null ? (params.row.last_target_status?.color == 'red' ? 'error' : params.row.last_target_status?.color == 'yellow' ? 'warning' : 'success') : 'default';
-          const title = params.row.last_target_status != null ? `remaining: ${params.row.last_target_status?.days_remaining ?? '-'}\n|\nDate: ${params.row.last_target_status?.date_used ?? '-'}\n|\nStep: ${params.row.last_target_status?.step_used ?? '-'}\n `: '-';
-          return (
-            <div className="flex flex-col justify-center items-center p-2" >
-              <Tooltip title={title} placement="top" arrow>
-                <Stack direction="row" spacing={1}>
-                  <Chip label={params.row.last_target_status?.days_remaining ?? '-'} color={color} />
-                </Stack>
-              </Tooltip>
-            </div>
-          );
-        },
       },
       {
         field: 'prognosa',
@@ -1065,7 +1220,7 @@ const ReadinessJasa = () => {
       },
       {
         field: 'ta_status',
-        headerName: 'TA Status',
+        headerName: 'Days to TA',
         valueGetter: (params) => {params != null ? (params.days_remaining ? params.days_remaining : '-') : null},
         width: 100,
         renderCell: (params) => {
@@ -1175,7 +1330,21 @@ const ReadinessJasa = () => {
         </Breadcrumbs>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-between'>
-            <h1 className='text-xl font-bold uppercase'>Readiness Ta / Plant Stop Jasa</h1>
+            <h1 className="text-xl font-bold uppercase ">
+              {eventReadiness?.event_name ?? 'Readiness TA / Plant Stop Jasa'}
+              <small className='text-xs font-normal'>
+                {' ('}
+                {eventReadiness?.tanggal_ta
+                  ? new Date(eventReadiness.tanggal_ta).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : ''}
+                {')'}
+              </small>
+            </h1>
+
             <div className='flex flex-row justify-end items-center space-x-2'>
                 <button
                     className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
@@ -1225,27 +1394,9 @@ const ReadinessJasa = () => {
                             ))
                           )}
                         </div>
-                        <div>
-                          <label htmlFor="tanggal_ta">Tanggal TA <sup className='text-red-500'>*</sup></label>
-                          <input
-                            type="date"
-                            name="tanggal_ta"
-                            id="tanggal_ta"
-                            className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
-                            defaultValue={selectedReadiness ? selectedReadiness.tanggal_ta : ''}
-                            required
-                          />
-                          {validation.tanggal_ta && (
-                            validation.tanggal_ta.map((item, index) => (
-                              <div key={index}>
-                                <small className="text-red-600 text-sm">{item}</small>
-                              </div>
-                            ))
-                          )}
-                        </div>
                       </div>
                       <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-                        {selectedReadiness.tanggal_ta 
+                        {selectedReadiness.status 
                           ? 
                           <>
                             <button type="submit" className={`bg-yellow-400 text-black p-2  rounded-xl flex hover:bg-yellow-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Update</button> 
@@ -1286,6 +1437,16 @@ const ReadinessJasa = () => {
               // checkboxSelection
             />}
           </div>
+        </div>
+        {/* Keterangan dan status area */}
+        <div>
+          <ul>
+            <li className='text-sm'><span className='font-bold'>Keterangan Icon Status :</span></li>
+            <li className='text-sm flex'> <span className='text-blue-500'><IconPointFilled /></span> : Selesai</li>
+            <li className='text-sm flex'> <span className='text-green-500'><IconPointFilled /></span> : On Going</li>
+            <li className='text-sm flex'> <span className='text-yellow-500'><IconPointFilled /></span> : {'Telat < 1bln'} </li>
+            <li className='text-sm flex'> <span className='text-red-500'><IconPointFilled /></span> : {'Telat > 1bln'} </li>
+          </ul>
         </div>
       </div>
       
@@ -1348,6 +1509,20 @@ const ReadinessJasa = () => {
                     />
                     )}
                   />
+                  {selectedReadiness?.rekomendasi_jasa?.historical_memorandum?.memorandum_file ? (
+                      <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
+                          <Link
+                            to={`${base_public_url}historical_memorandum/${selectedReadiness?.rekomendasi_jasa?.historical_memorandum?.memorandum_file}`}
+                            target='_blank'
+                            className='text-emerald-950 hover:underline cursor-pointer text-xs'
+                            onClick={() => handleAddActivity(selectedReadiness?.rekomendasi_jasa?.historical_memorandum?.memorandum_file, "READINESS MATERIAL")}
+                          >
+                            {selectedReadiness?.rekomendasi_jasa?.historical_memorandum?.memorandum_file}
+                          </Link>
+                      </div>
+                    ) : (
+                      ''
+                  )}
                 </div>
                 :
                 <div>
@@ -1386,7 +1561,7 @@ const ReadinessJasa = () => {
                   name="target_date"
                   className="border rounded-md p-2 w-full"
                   defaultValue={selectedReadiness?.rekomendasi_jasa?.target_date} 
-                  required />
+                   />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
                     <div key={index}>
@@ -1427,7 +1602,15 @@ const ReadinessJasa = () => {
                   <button type="button" onClick={() => handleDeleteRekomendasi(selectedReadiness?.rekomendasi_jasa)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-white p-2 text-xs rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button>
                 </>
-              ) : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>}
+              ) :
+                <>
+                  <button type="button" onClick={() => handleaddStatusRekomendasi(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusRekomendasi(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusRekomendasi(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
+              }
               <button type="button" onClick={rekomendasiClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
           </form>
@@ -1477,7 +1660,7 @@ const ReadinessJasa = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.notif_jasa ? selectedReadiness.notif_jasa.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1489,7 +1672,7 @@ const ReadinessJasa = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.notif_jasa?.target_date 
+              {selectedReadiness.notif_jasa 
                 ? 
                 <>
                   {selectedReadiness.notif_jasa?.status == 1 ?
@@ -1520,7 +1703,14 @@ const ReadinessJasa = () => {
                   <button type="button" onClick={() => handleDeleteNotif(selectedReadiness?.notif_jasa)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusNotif(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusNotif(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusNotif(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </>
               }
               <button type="button" onClick={notifClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -1646,7 +1836,7 @@ const ReadinessJasa = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.job_plan_jasa ? selectedReadiness.job_plan_jasa.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1658,7 +1848,7 @@ const ReadinessJasa = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.job_plan_jasa?.target_date 
+              {selectedReadiness.job_plan_jasa 
                 ? 
                 <>
                   {selectedReadiness.job_plan_jasa?.status == 1 ?
@@ -1689,7 +1879,14 @@ const ReadinessJasa = () => {
                   <button type="button" onClick={() => handleDeleteJobPlan(selectedReadiness?.job_plan_jasa)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusJobPlan(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusJobPlan(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusJobPlan(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={jobPlanClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -1740,7 +1937,7 @@ const ReadinessJasa = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.pr_jasa ? selectedReadiness.pr_jasa.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1752,7 +1949,7 @@ const ReadinessJasa = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.pr_jasa?.target_date 
+              {selectedReadiness.pr_jasa 
                 ? 
                 <>
                   {selectedReadiness.pr_jasa?.status == 1 ?
@@ -1783,7 +1980,14 @@ const ReadinessJasa = () => {
                   <button type="button" onClick={() => handleDeletePr(selectedReadiness?.pr_jasa)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusPr(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusPr(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusPr(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={prClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -1834,7 +2038,7 @@ const ReadinessJasa = () => {
                   id="target_date"
                   className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
                   defaultValue={selectedReadiness.tender_jasa ? selectedReadiness.tender_jasa.target_date : ''}
-                  required
+                  
                 />
                 {validation.target_date && (
                   validation.target_date.map((item, index) => (
@@ -1846,7 +2050,7 @@ const ReadinessJasa = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.tender_jasa?.target_date 
+              {selectedReadiness.tender_jasa 
                 ? 
                 <>
                   {selectedReadiness.tender_jasa?.status == 1 ?
@@ -1877,7 +2081,14 @@ const ReadinessJasa = () => {
                   <button type="button" onClick={() => handleDeleteTender(selectedReadiness?.tender_jasa)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusTender(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusTender(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusTender(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={tenderClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>
@@ -1900,39 +2111,60 @@ const ReadinessJasa = () => {
             <h1 className="text-xl uppercase text-gray-900 mb-4">
               {selectedReadiness.contract_jasa ? "Update" : "Tambah"} Contract Jasa
             </h1>
-            <div className="flex flex-col space-y-2">
-              <div>
-                <label htmlFor="contract_file">Contract File {!selectedReadiness.contract_jasa?.contract_file && <span className="text-red-600">*</span>}</label>
-                <input 
-                  type="file" 
-                  name="contract_file"
-                  required={!selectedReadiness.contract_jasa?.contract_file}
-                  className="border rounded-md p-2 w-full" />
-                  {selectedReadiness?.contract_jasa?.contract_file ? (
+            <div className="flex flex-row space-x-1">
+              <div className="flex flex-col w-full space-y-2">
+                <label htmlFor="contract">Pilih Contract<sup className='text-red-500'>*</sup></label>
+                <Autocomplete
+                  id="contract"
+                  options={Array.isArray(contract) ? contract : []}
+                  getOptionLabel={(option) => `${option?.contract_name ?? ''}`}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={contract.find((item) => item.id === selectedContract) || null}
+                  onChange={(e, value) => {
+                      setSelectedContract(value?.id || null);
+                  }}
+                  required
+                  renderInput={(params) => (
+                  <TextField
+                      {...params}
+                      name="contract_id" // Tambahkan name di sini
+                      placeholder={'N/A'}
+                      variant="outlined"
+                      error={!!validation.contract_id}
+                      helperText={
+                      validation.contract_id &&
+                      validation.contract_id.map((item, index) => (
+                          <span key={index} className="text-red-600 text-sm">
+                          {item}
+                          </span>
+                      ))
+                      }
+                  />
+                  )}
+                />
+                {selectedReadiness?.contract_jasa?.contract?.contract_file ? (
                     <div className='flex flex-row justify-between items-center w-full border bg-lime-400 rounded p-1'>
                         <Link
-                          to={`${base_public_url}readiness_ta/jasa/contract/${selectedReadiness?.contract_jasa?.contract_file}`}
+                          to={`${base_public_url}contract/${selectedReadiness?.contract_jasa?.contract?.contract_file}`}
                           target='_blank'
                           className='text-emerald-950 hover:underline cursor-pointer text-xs'
-                          onClick={() => handleAddActivity(selectedReadiness?.contract_jasa?.contract_file, "READINESS JASA")}
+                          onClick={() => handleAddActivity(selectedReadiness?.contract_jasa?.contract?.contract_file, "READINESS MATERIAL")}
                         >
-                          {selectedReadiness?.contract_jasa?.contract_file}
+                          {selectedReadiness?.contract_jasa?.contract?.contract_file}
                         </Link>
                     </div>
                   ) : (
                     ''
-                  )}
-                  {validation.contract_file && (
-                    validation.contract_file.map((item, index) => (
-                      <div key={index}>
-                        <small className="text-red-600 text-sm">{item}</small>
-                      </div>
-                    ))
-                  )}
+                )}
               </div>
+              <Tooltip title="Tambah Contract" placement="left">
+                <Link to={`/contract/tambah`} className="self-end mb-2 text-xs bg-blue-500 p-2 rounded-xl text-white hover:bg-blue-600 flex justify-center items-center">
+                  <IconPlus className="w-6" />
+                </Link>
+              </Tooltip>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.contract_jasa?.contract_file 
+              {selectedReadiness.contract_jasa 
                 ? 
                 <>
                   {selectedReadiness.contract_jasa?.status == 1 ?
@@ -1963,7 +2195,14 @@ const ReadinessJasa = () => {
                   <button type="button" onClick={() => handleDeleteContract(selectedReadiness?.contract_jasa)} className={`bg-slate-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-slate-600 cursor-pointer text-xs`}><IconTrash className="w-4" /> Hapus</button>
                   <button type="submit" className={`bg-slate-500 text-xs text-white p-2  rounded-xl flex hover:bg-slate-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} items-center`}> <IconPencil className="w-4" /> Update</button> 
                 </>
-                : <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                :
+                <>
+                  <button type="button" onClick={() => handleaddStatusContract(1)} className={`bg-green-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-green-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'On Going'}</button>
+                  <button type="button" onClick={() => handleaddStatusContract(2)} className={`bg-yellow-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-yellow-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat < 1bln'}</button>
+                  <button type="button" onClick={() => handleaddStatusContract(3)} className={`bg-red-500 text-white p-2 rounded-xl flex justify-center items-center hover:bg-red-600 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} text-xs`} disabled={isSubmitting}>{'Telat > 1bln'}</button>
+                  {/* submit button  */}
+                  <button type="submit" className={`bg-emerald-950 text-lime-300 p-2  rounded-xl flex hover:bg-emerald-900 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>Simpan</button>
+                </> 
               }
               <button type="button" onClick={contractClose} className="bg-slate-500 p-2 cursor-pointer rounded-xl flex text-white hover:bg-slate-600 text-xs items-center"> <IconX className="w-4" /> Batal</button>
             </div>

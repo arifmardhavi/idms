@@ -124,6 +124,20 @@ const Readiness = () => {
   const columns = [
     { field: 'event_name', headerName: 'Nama Event', width: 200 },
     {
+      field: 'tanggal_ta',
+      headerName: 'Tanggal TA',
+      width: 140,
+      renderCell: (params) => (
+        <div className=''>
+          {params.value ? new Intl.DateTimeFormat('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          }).format(new Date(params.value)) : '-'}
+        </div>
+      ),
+    },
+    {
       field: 'dashboard',
       headerName: 'Dashboard',
       width: 150,
@@ -237,6 +251,24 @@ const Readiness = () => {
                           />
                           {validation.event_name && (
                             validation.event_name.map((item, index) => (
+                              <div key={index}>
+                                <small className="text-red-600 text-sm">{item}</small>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                        <div>
+                          <label htmlFor="tanggal_ta">Tanggal Ta / Plant Stop <sup className='text-red-500'>*</sup></label>
+                          <input
+                            type="date"
+                            name="tanggal_ta"
+                            id="tanggal_ta"
+                            className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
+                            defaultValue={selectedEventReadiness ? selectedEventReadiness.tanggal_ta : ''}
+                            required
+                          />
+                          {validation.tanggal_ta && (
+                            validation.tanggal_ta.map((item, index) => (
                               <div key={index}>
                                 <small className="text-red-600 text-sm">{item}</small>
                               </div>
