@@ -9,3 +9,4 @@ export const addReadinessJasa = async (data) => await apiPost(endpoint, data);
 export const updateReadinessJasa = async (id, data) => await apiPost(`${endpoint}/${id}?_method=PUT`, data);
 export const deleteReadinessJasa = async (id) => await apiDelete(`${endpoint}/${id}`);
 export const nonactiveReadinessJasa = async (id) => await apiPut(`${endpoint}/nonactive/${id}`, {});
+export const getDashboardReadinessJasaByEvent = async (id) => await apiGet(`${endpoint}/dashboard/${id}`);

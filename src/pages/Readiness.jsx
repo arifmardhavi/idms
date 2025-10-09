@@ -139,12 +139,12 @@ const Readiness = () => {
     },
     {
       field: 'dashboard',
-      headerName: 'Dashboard',
-      width: 150,
+      headerName: 'Menu',
+      width: 250,
       renderCell: (params) => (
-        <div className='py-2 flex flex-row justify-center items-center'>
+        <div className='py-2 flex flex-row justify-center items-center space-x-1'>
           <Link to={`/readiness_ta_plantstop_material/${params.row.id}`}
-            className='bg-green-500 text-white text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 mr-2 flex items-center space-x-1'
+            className='bg-green-500 text-white text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 flex items-center space-x-1'
           >
             Material
           </Link>
@@ -152,6 +152,11 @@ const Readiness = () => {
             className='bg-blue-500 text-white text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 flex items-center space-x-1'
           >
             Jasa
+          </Link>
+          <Link to={`/dashboard_readiness_ta_plantstop/${params.row.id}`}
+            className='bg-emerald-950 text-lime-400 text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 flex items-center space-x-1'
+          >
+            Dashboard
           </Link>
         </div>
       ),

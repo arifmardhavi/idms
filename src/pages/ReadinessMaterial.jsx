@@ -2030,7 +2030,7 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.notif_material?.status 
+              {selectedReadiness.notif_material 
                 ? 
                 <>
                   {selectedReadiness.notif_material?.status == 1 ?
@@ -2194,7 +2194,7 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.job_plan_material?.status 
+              {selectedReadiness.job_plan_material 
                 ? 
                 <>
                   {selectedReadiness.job_plan_material?.status == 1 ?
@@ -2302,7 +2302,7 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.pr_material?.status
+              {selectedReadiness.pr_material
                 ? 
                 <>
                   {selectedReadiness.pr_material?.status == 1 ?
@@ -2410,7 +2410,7 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.tender_material?.status 
+              {selectedReadiness.tender_material 
                 ? 
                 <>
                   {selectedReadiness.tender_material?.status == 1 ?
@@ -2696,7 +2696,7 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.fabrikasi_material?.status 
+              {selectedReadiness.fabrikasi_material 
                 ? 
                 <>
                   {selectedReadiness.fabrikasi_material?.status == 1 ?
@@ -2832,7 +2832,7 @@ const ReadinessMaterial = () => {
               </div>
             </div>
             <div className="flex flex-row space-x-2 justify-end text-center items-center mt-4">
-              {selectedReadiness.delivery_material?.status 
+              {selectedReadiness.delivery_material 
                 ? 
                 <>
                   {selectedReadiness.delivery_material?.status == 1 ?
