@@ -6,7 +6,7 @@ import { getTagnumber, addTagnumber, updateTagnumber, nonactiveTagnumber, delete
 import { ActiveUnit } from '../services/unit.service';
 import { ActiveCategory } from '../services/category.service';
 import { getTypeByCategory } from '../services/type.service';
-import { IconFileImport, IconPencil } from '@tabler/icons-react';
+import { IconCloudDownload, IconFileImport, IconPencil } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
@@ -16,6 +16,9 @@ import { IconArrowLeft } from '@tabler/icons-react';
 import { IconArrowRight } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import ImportTagNumber from '../components/imports/ImportTagnumber';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { getWITDateLong } from '../utils/dateHelpers';
 
 const Tagnumber = () => {
   const [tagnumber, setTagnumber] = useState([]);
@@ -45,6 +48,7 @@ const fetchTagnumber = async () => {
     setLoading(true);
     const data = await getTagnumber();
     setTagnumber(data.data);
+    console.log(data.data);
     localStorage.setItem("tagnumber", JSON.stringify(data.data));
   } catch (error) {
     console.log(error);
@@ -270,6 +274,70 @@ const handleDelete = async (id) => {
   const handleImportClose = () => {
     setImportMode(false);
   }
+
+  const handleExportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Tag Number Data');
+    worksheet.columns = [
+      { header: 'Unit', key: 'unit', width: 15 },
+      { header: 'Kategori', key: 'category', width: 12 },
+      { header: 'Tipe', key: 'type', width: 20 },
+      { header: 'Tag Number', key: 'tag_number', width: 20 },
+      { header: 'Deskripsi', key: 'description', width: 35 },
+    ];
+    tagnumber.forEach((item) => {
+      worksheet.addRow({
+        unit: item.unit?.unit_name || '',
+        category: item.type?.category?.category_name || '',
+        type: item.type?.type_name || '',
+        tag_number: item.tag_number || '',
+        description: item.description || '',
+      });
+    });
+
+    // Style header
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'ffd4d4d4' }, // warna hijau muda
+      };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
+
+    worksheet.eachRow({ includeEmpty: true }, (row) => {
+      // Dapatkan jumlah kolom dari worksheet (agar semua cell dilintasi, termasuk yang kosong)
+      const totalColumns = worksheet.columnCount;
+
+      for (let col = 1; col <= totalColumns; col++) {
+        const cell = row.getCell(col);
+
+        // Paksa set isi kosong jika memang kosong (agar cell terbuat dan bisa diborder)
+        if (cell.value === undefined || cell.value === null) {
+          cell.value = ''; // Supaya cell eksis
+        }
+
+        // Tambahkan border
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      }
+    });
+
+    // Save
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `tagnumber-export-${getWITDateLong()}.xlsx`);
+  }
   return (
     <div className='flex flex-col md:flex-row w-full'>
       { !hide && <Header />}
@@ -289,30 +357,41 @@ const handleDelete = async (id) => {
           <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">Tag Number</h1>
-              {/* { !importMode ? <button
-                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
-                onClick={() => handleImport()}
-              >
-                <IconFileImport stroke={2} />
-                <span>Import Data</span>
-              </button>
-              :
-              <button
-                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
-                onClick={() => handleImportClose()}
-              >
-                <span>Cancel Import Data</span>
-              </button> 
-              } */}
-              <motion.div
-                onClick={() => fetchTagnumber()}
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
-                className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
-              >
-                <IconRefresh className='hover:rotate-180 transition duration-500' />
-                <span>Refresh</span>
-              </motion.div>
+              <div className='flex flex-row justify-end items-center space-x-2'>
+                {/* { !importMode ? <button
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                  onClick={() => handleImport()}
+                >
+                  <IconFileImport stroke={2} />
+                  <span>Import Data</span>
+                </button>
+                :
+                <button
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                  onClick={() => handleImportClose()}
+                >
+                  <span>Cancel Import Data</span>
+                </button> 
+                }
+                <motion.button
+                  onClick={handleExportToExcel}
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                >
+                  <IconCloudDownload />
+                  <span>Export Excel</span>
+                </motion.button> */}
+                <motion.div
+                  onClick={() => fetchTagnumber()}
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                >
+                  <IconRefresh className='hover:rotate-180 transition duration-500' />
+                  <span>Refresh</span>
+                </motion.div>
+              </div>
             </div>
             <div>
             {loading ? 
