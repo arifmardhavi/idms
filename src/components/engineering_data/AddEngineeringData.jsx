@@ -129,14 +129,14 @@ const AddEngineeringData = () => {
                       </div>
                       <div className='w-full space-y-1'>
                           <label className='text-emerald-950'>
-                              Dokumen GA Drawing <sup className='text-red-500'>*</sup>
+                              Dokumen GA Drawing 
                           </label>
                           <input
                           type='file'
                           name='drawing_file'
                           id='drawing_file'
                           className='w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                          required
+                          
                           />
                               {validation.no_dokumen && (
                                   validation.no_dokumen.map((item, index) => (

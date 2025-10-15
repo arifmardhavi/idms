@@ -257,7 +257,7 @@ const Datasheet = () => {
   };
 
   const columns = [
-    { field: 'no_dokumen', headerName: 'No Dokumen', width:400, renderCell: (params) => <div className="py-4">
+    { field: 'no_dokumen', headerName: 'No Dokumen', width:400, renderCell: (params) => <div className="">
       {params.value ? <Link
         to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
         target='_blank'
@@ -272,7 +272,7 @@ const Datasheet = () => {
       headerName: 'Tanggal Dokumen',
       width: 150,
       renderCell: (params) => (
-        <div className='py-4'>
+        <div className=''>
           {params.value ? new Intl.DateTimeFormat('id-ID', {
             day: '2-digit',
             month: 'long',
