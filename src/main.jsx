@@ -55,6 +55,7 @@ import ReadinessJasa from './pages/ReadinessJasa.jsx';
 import Readiness from './pages/Readiness.jsx';
 import { ActivityProvider } from './utils/ActivityContext.jsx';
 import DashboardReadiness from './pages/DashboardReadiness.jsx';
+import P_Id from './pages/P_Id.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -117,6 +118,7 @@ const router = createBrowserRouter([
       { path: '/readiness_ta_plantstop_jasa/:event_readiness_id', element: <ReadinessJasa /> },
       { path: '/readiness_ta_plantstop', element: <Readiness /> },
       { path: '/dashboard_readiness_ta_plantstop/:id', element: <DashboardReadiness /> },
+      { path: '/p_id', element: <P_Id /> },
 
 
     ],

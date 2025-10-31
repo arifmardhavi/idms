@@ -1,4 +1,4 @@
-import { IconRefresh } from "@tabler/icons-react"
+import { IconArticle, IconRefresh } from "@tabler/icons-react"
 import Header from "../components/Header"
 import { Link } from "react-router-dom"
 import { IconPlus } from "@tabler/icons-react"
@@ -12,8 +12,6 @@ import { IconPencil } from "@tabler/icons-react"
 import { IconCircleMinus } from "@tabler/icons-react"
 import Swal from "sweetalert2"
 import { Badge } from "@mui/material"
-import { IconArrowLeft } from "@tabler/icons-react"
-import { IconArrowRight } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
 
 const EngineeringData = () => {
@@ -154,11 +152,11 @@ const EngineeringData = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
             <div className='md:flex hidden'>
                 <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-                    <IconArrowLeft />
+                    <IconArticle />
                 </div>
             </div>
             <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-                <IconArrowRight />
+                <IconArticle />
             </div>
             <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                 <div className='flex flex-row justify-between'>

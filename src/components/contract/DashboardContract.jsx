@@ -4,15 +4,13 @@ import { useState, useEffect } from "react";
 import { getContractById } from "../../services/contract.service";
 import { api_public } from "../../services/config";
 import { Breadcrumbs, Typography } from "@mui/material";
-import { IconChevronRight } from "@tabler/icons-react";
+import { IconArticle, IconChevronRight } from "@tabler/icons-react";
 import Termin from "./Termin";
 import Billing from "./Billing";
 import Spk from "./Spk";
 import SpkProgress from "./SpkProgress";
 import LumpsumProgress from "./LumpsumProgress";
 import Amandemen from "./amandemen/Amandemen";
-import { IconArrowRight } from "@tabler/icons-react";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
 import { handleAddActivity } from "../../utils/handleAddActivity";
@@ -58,11 +56,11 @@ const DashboardContract = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
           <div className='md:flex hidden'>
             <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArrowLeft />
+              <IconArticle />
             </div>
           </div>
           <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-            <IconArrowRight />
+            <IconArticle />
           </div>
             <Breadcrumbs
                 aria-label='breadcrumb'

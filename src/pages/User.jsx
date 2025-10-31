@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { addUser, deleteUser, getUser, nonactiveUser, updateUser } from '../services/user.service'
 import * as motion from 'motion/react-client';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from '@mui/x-data-grid';
-import { IconColumnInsertLeft, IconColumnRemove, IconPencil, IconTrash } from '@tabler/icons-react';
+import { IconArticle, IconPencil, IconTrash } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
@@ -305,11 +305,11 @@ const User = () => {
       <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
         <div className='md:flex hidden'>
           <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-            <IconColumnRemove />
+            <IconArticle />
           </div>
         </div>
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconColumnInsertLeft />
+          <IconArticle />
         </div>
         {/* Get user */}
         <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">

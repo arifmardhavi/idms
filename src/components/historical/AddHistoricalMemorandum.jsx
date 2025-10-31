@@ -1,6 +1,6 @@
 import { Autocomplete, Breadcrumbs, TextField, Typography } from "@mui/material"
 import Header from "../Header"
-import { IconChevronRight } from "@tabler/icons-react"
+import { IconArticle, IconChevronRight } from "@tabler/icons-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { getTagnumber } from "../../services/tagnumber.service"
@@ -10,8 +10,6 @@ import { addHistoricalMemorandum } from "../../services/historical_memorandum.se
 import Swal from "sweetalert2"
 import { ActiveUnit } from "../../services/unit.service"
 import { ActiveCategory } from "../../services/category.service"
-import { IconArrowLeft } from "@tabler/icons-react"
-import { IconArrowRight } from "@tabler/icons-react"
 
 const AddHistoricalMemorandum = () => {
     const [validation, setValidation] = useState([])
@@ -99,11 +97,11 @@ const AddHistoricalMemorandum = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
             <div className='md:flex hidden'>
                 <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-                    <IconArrowLeft />
+                    <IconArticle />
                 </div>
             </div>
             <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-                <IconArrowRight />
+                <IconArticle />
             </div>
             <Breadcrumbs
                 aria-label='breadcrumb'

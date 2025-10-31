@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../Header";
 import { Breadcrumbs, Typography } from "@mui/material";
-import { IconChevronRight } from "@tabler/icons-react";
+import { IconArticle, IconChevronRight } from "@tabler/icons-react";
 import { useState } from "react";
 import * as motion from 'motion/react-client';
 import { getContractById } from "../../../services/contract.service";
@@ -9,8 +9,6 @@ import { useEffect } from "react";
 import Swal from "sweetalert2";
 import { IconLoader2 } from "@tabler/icons-react";
 import { addAmandemen } from "../../../services/amandemen.service";
-import { IconArrowRight } from "@tabler/icons-react";
-import { IconArrowLeft } from "@tabler/icons-react";
 
 const AddAmandemen = () => {
     const { id } = useParams();
@@ -97,11 +95,11 @@ const AddAmandemen = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
           <div className='md:flex hidden'>
             <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArrowLeft />
+              <IconArticle />
             </div>
           </div>
           <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-            <IconArrowRight />
+            <IconArticle />
           </div>
             <Breadcrumbs
                 aria-label='breadcrumb'

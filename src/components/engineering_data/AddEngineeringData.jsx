@@ -1,6 +1,6 @@
 import { Autocomplete, Breadcrumbs, TextField, Typography } from "@mui/material"
 import Header from "../Header"
-import { IconChevronRight } from "@tabler/icons-react"
+import { IconArticle, IconChevronRight } from "@tabler/icons-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
@@ -8,8 +8,6 @@ import { useEffect } from "react"
 import { getTagnumber } from "../../services/tagnumber.service"
 import { addEngineeringData } from "../../services/engineering_data.service"
 import Swal from "sweetalert2"
-import { IconArrowLeft } from "@tabler/icons-react"
-import { IconArrowRight } from "@tabler/icons-react"
 
 const AddEngineeringData = () => {
   const [loading, setLoading] = useState(false)
@@ -64,11 +62,11 @@ const AddEngineeringData = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
           <div className='md:flex hidden'>
             <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArrowLeft />
+              <IconArticle />
             </div>
           </div>
           <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-            <IconArrowRight />
+            <IconArticle />
           </div>
           <Breadcrumbs
               aria-label='breadcrumb'

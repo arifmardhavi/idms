@@ -7,13 +7,11 @@ import {
 } from '@mui/x-data-grid';
 import { Breadcrumbs, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { IconCloudDownload, IconChevronRight } from '@tabler/icons-react';
+import { IconCloudDownload, IconChevronRight, IconArticle } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { getSkhp, skhpCountDueDays } from "../../services/skhp.service";
 import { api_public } from "../../services/config";
 import { IconLoader2 } from "@tabler/icons-react";
-import { IconArrowRight } from "@tabler/icons-react";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { handleAddActivity } from "../../utils/handleAddActivity";
 
 
@@ -243,11 +241,11 @@ const DashboardSkhp = () => {
       <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
         <div className='md:flex hidden'>
           <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-            <IconArrowLeft />
+            <IconArticle />
           </div>
         </div>
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconArrowRight />
+          <IconArticle />
         </div>
         <Breadcrumbs
           aria-label='breadcrumb'

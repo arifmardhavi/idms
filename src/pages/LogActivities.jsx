@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
-import { IconColumnInsertLeft, IconColumnRemove, IconSettings, IconRefresh, IconTrash } from "@tabler/icons-react";
+import { IconArticle, IconSettings, IconRefresh, IconTrash } from "@tabler/icons-react";
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import {  getLogActivitiesByAllUsers } from "../services/log_activities.service";
 import { Tooltip } from "@mui/material";
@@ -213,11 +213,11 @@ const LogActivities = () => {
           <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
             <div className='md:flex hidden'>
               <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-                <IconColumnRemove />
+                <IconArticle />
               </div>
             </div>
             <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-              <IconColumnInsertLeft />
+              <IconArticle />
             </div>
             { (userLevel == 1 && userEmail == 'faza.ahmad@pertamina.com') || userLevel == 99 ? 
             <>
@@ -248,7 +248,7 @@ const LogActivities = () => {
 
               </div>
               {/* active users */}
-              { 1 == 0 && <div className="flex flex-col space-y-4 bg-white p-2 rounded-md shadow-md">
+              {/* {<div className="flex flex-col space-y-4 bg-white p-2 rounded-md shadow-md">
                 <div className="flex justify-between items-center mb-4">
                   <p className="text-2xl text-gray-900">Log Active Users</p>
     
@@ -272,7 +272,7 @@ const LogActivities = () => {
                   // checkboxSelection
                 />}
 
-              </div>}
+              </div>} */}
               {/* log activity */}
               <div className="flex flex-col space-y-4 bg-white p-2 rounded-md shadow-md">
                 <div className="flex justify-between items-center mb-4">

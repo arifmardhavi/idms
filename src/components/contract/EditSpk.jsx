@@ -1,6 +1,6 @@
 import { Breadcrumbs, Typography } from "@mui/material"
 import Header from "../Header"
-import { IconChevronRight } from "@tabler/icons-react"
+import { IconArticle, IconChevronRight } from "@tabler/icons-react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
 import { updateSpk, getSpkById } from "../../services/spk.service"
@@ -8,8 +8,6 @@ import Swal from "sweetalert2"
 import * as motion from 'motion/react-client';
 import { useEffect } from "react"
 import { api_public } from "../../services/config";
-import { IconArrowLeft } from "@tabler/icons-react"
-import { IconArrowRight } from "@tabler/icons-react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { handleAddActivity } from "../../utils/handleAddActivity"
 
@@ -102,11 +100,11 @@ const EditSpk = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
           <div className='md:flex hidden'>
             <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArrowLeft />
+              <IconArticle />
             </div>
           </div>
           <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-            <IconArrowRight />
+            <IconArticle />
           </div>
             <Breadcrumbs
                 aria-label='breadcrumb'

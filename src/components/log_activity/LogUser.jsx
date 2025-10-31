@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Header from "../Header";
-import { IconChevronRight, IconColumnInsertLeft, IconColumnRemove, IconRefresh } from "@tabler/icons-react";
+import { IconChevronRight, IconArticle, IconRefresh } from "@tabler/icons-react";
 import { getLogActivitiesByUserId } from "../../services/log_activities.service";
 import { Breadcrumbs, Chip, Typography } from "@mui/material";
 
@@ -56,14 +56,14 @@ const LogUser = () => {
             className={`${hide ? "hidden" : "block"} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl`}
             onClick={() => setHide(true)}
           >
-            <IconColumnRemove />
+            <IconArticle />
           </div>
         </div>
         <div
           className={`${hide ? "block" : "hidden"} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl`}
           onClick={() => setHide(false)}
         >
-          <IconColumnInsertLeft />
+          <IconArticle />
         </div>
         <Breadcrumbs
           aria-label='breadcrumb'

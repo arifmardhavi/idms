@@ -1,14 +1,12 @@
 import Header from '../Header';
 import { Breadcrumbs, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import { IconChevronRight } from '@tabler/icons-react';
+import { IconArticle, IconChevronRight } from '@tabler/icons-react';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import * as motion from 'motion/react-client';
 import { addContract } from '../../services/contract.service';
 import { useEffect } from 'react';
-import { IconArrowRight } from '@tabler/icons-react';
-import { IconArrowLeft } from '@tabler/icons-react';
 import { useLocation } from "react-router-dom";
 
 const AddContract = () => {
@@ -98,11 +96,11 @@ const AddContract = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
           <div className='md:flex hidden'>
             <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArrowLeft />
+              <IconArticle />
             </div>
           </div>
           <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-            <IconArrowRight />
+            <IconArticle />
           </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs

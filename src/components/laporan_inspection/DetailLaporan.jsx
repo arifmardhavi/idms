@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "../Header";
 import { useState } from "react";
-import { IconChevronRight, IconColumnInsertLeft, IconColumnRemove } from "@tabler/icons-react";
+import { IconChevronRight, IconArticle } from "@tabler/icons-react";
 import { Breadcrumbs, Typography } from "@mui/material";
 import InternalInspection from "./InternalInspection";
 import ExternalInspection from "./ExternalInspection";
@@ -17,11 +17,11 @@ const DetailLaporan = () => {
       <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
         <div className='md:flex hidden'>
           <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-            <IconColumnRemove />
+            <IconArticle />
           </div>
         </div>
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconColumnInsertLeft />
+          <IconArticle />
         </div>
         <Breadcrumbs
             aria-label='breadcrumb'

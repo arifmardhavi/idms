@@ -1,6 +1,8 @@
 import Header from "../components/Header"
 import { Link } from "react-router-dom"
 import { 
+  IconArticle,
+  IconChartPie,
     IconPlus,
     IconRefresh,
 } from "@tabler/icons-react"
@@ -16,8 +18,6 @@ import Swal from "sweetalert2";
 import { IconSettings } from "@tabler/icons-react";
 import { IconLoader2 } from "@tabler/icons-react";
 import { Box, Modal, Tooltip } from "@mui/material";
-import { IconArrowLeft } from "@tabler/icons-react";
-import { IconArrowRight } from "@tabler/icons-react";
 import { jwtDecode } from "jwt-decode";
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
@@ -504,23 +504,23 @@ const Contract = () => {
         <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
             <div className='md:flex hidden'>
                 <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-                    <IconArrowLeft />
+                    <IconArticle />
                 </div>
             </div>
             <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-                <IconArrowRight />
+                <IconArticle />
             </div>
             <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
                 <div className='flex flex-row justify-between'>
                     <h1 className='text-xl font-bold uppercase'>Contract</h1>
                     <div className='flex flex-row justify-end items-center space-x-2'>
-                        {/* <Link
+                        <Link
                             to='/contract/monitoring'
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
                         >
-                            <IconChartPie className='hover:rotate-180 transition duration-500' />
+                            <IconChartPie className='hover:-rotate-90 transition duration-500' />
                             <span>Dashboard</span>
-                        </Link> */}
+                        </Link>
                         <motion.button
                           onClick={handleExportToExcel}
                           whileTap={{ scale: 0.9 }}

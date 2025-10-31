@@ -1,6 +1,6 @@
 import { Breadcrumbs, Modal, Typography } from "@mui/material"
 import Header from "../Header"
-import { IconChevronRight } from "@tabler/icons-react"
+import { IconArticle, IconChevronRight } from "@tabler/icons-react"
 import { Link, useParams } from "react-router-dom"
 import { IconPlus } from "@tabler/icons-react"
 import { DataGrid, GridLogicOperator, GridToolbarQuickFilter } from "@mui/x-data-grid"
@@ -13,8 +13,6 @@ import { addGaDrawing, deleteGaDrawing, getGaDrawingByEngineering, updateGaDrawi
 import { useEffect } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { IconRefresh } from "@tabler/icons-react"
-import { IconArrowLeft } from "@tabler/icons-react"
-import { IconArrowRight } from "@tabler/icons-react"
 import { IconPencil } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
 import { IconCloudDownload } from "@tabler/icons-react"
@@ -324,11 +322,11 @@ const Ga_Drawing = () => {
       <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
         <div className='md:flex hidden'>
           <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-            <IconArrowLeft />
+            <IconArticle />
           </div>
         </div>
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconArrowRight />
+          <IconArticle />
         </div>
         {/* get GA Drawing  */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>

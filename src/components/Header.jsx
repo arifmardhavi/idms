@@ -9,6 +9,7 @@ import {
   IconLogs,
   IconHeartRateMonitor,
   IconFileImport,
+  IconBookDownload,
 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconLogout, IconContract, IconClipboardText, IconServerCog, IconHelpSquareRounded } from '@tabler/icons-react';
@@ -175,6 +176,12 @@ const Header = () => {
                 {renderTab('masterdata', <IconDatabaseCog />, 'Master Data')}
                 {renderMenu('masterdata')}
               </>
+            )}
+            {renderDirectLink(
+              'P & ID',
+              <IconBookDownload />,
+              'P & ID',
+              '/p_id'
             )}
             {renderTab('regulatorycompliance', <IconFiles />, 'Regulatory Compliance')}
             {renderMenu('regulatorycompliance')}

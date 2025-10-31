@@ -17,12 +17,11 @@ import {
   IconRefresh,
   IconCloudDownload,
   IconPlus,
+  IconArticle,
 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 import { api_public } from '../services/config';
-import { IconArrowRight } from '@tabler/icons-react';
-import { IconArrowLeft } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import ExcelJS from 'exceljs';
@@ -587,11 +586,11 @@ const Coi = () => {
       <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
         <div className='md:flex hidden'>
           <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-            <IconArrowLeft />
+            <IconArticle />
           </div>
         </div>
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconArrowRight />
+          <IconArticle />
         </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:justify-between'>
