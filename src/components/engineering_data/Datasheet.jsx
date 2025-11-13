@@ -15,7 +15,6 @@ import { IconRefresh } from "@tabler/icons-react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { IconPencil } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
-import { IconCloudDownload } from "@tabler/icons-react"
 import { IconFiles } from "@tabler/icons-react"
 import { IconFile } from "@tabler/icons-react"
 import { getCoiByTagNumber } from "../../services/coi.service"
@@ -35,32 +34,8 @@ const Datasheet = () => {
   const [validation, setValidation] = useState([]);
   const [userLevel, setUserLevel] = useState('')
   const [uploadProgress, setUploadProgress] = useState({});
-  const [animatedProgress, setAnimatedProgress] = useState({});
   const [isMultiple, setIsMultiple] = useState(false);
   const [isReEng, setIsReEng] = useState(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAnimatedProgress((prev) => {
-        const updated = { ...prev };
-        Object.entries(uploadProgress).forEach(([filename, { value }]) => {
-          const current = prev[filename]?.value || 0;
-          const diff = value - current;
-
-          if (Math.abs(diff) > 0.01) {
-            updated[filename] = {
-              value: current + diff * 0.1, // naikkan 10% dari jarak setiap interval
-            };
-          } else {
-            updated[filename] = { value }; // capai target
-          }
-        });
-        return updated;
-      });
-    }, 30); // update setiap 30ms untuk smooth
-
-    return () => clearInterval(interval);
-  }, [uploadProgress]);
   
 
   useEffect(() => {
@@ -155,12 +130,28 @@ const Datasheet = () => {
       return;
     }
 
+    const MAX_SIZE = 200 * 1024 * 1024; // 200 MB dalam byte
+    const oversizedFiles = Array.from(files).filter(file => file.size > MAX_SIZE);
+
+    if (oversizedFiles.length > 0) {
+      const list = oversizedFiles.map(f => `• ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('\n');
+      handleCloseMultiple();
+      Swal.fire({
+        icon: "error",
+        title: "Ukuran File Terlalu Besar!",
+        html: `<pre class="text-left text-sm whitespace-pre-wrap">${list}</pre>`,
+        footer: "Setiap file maksimal 200 MB."
+      });
+      return; // stop submit
+    }
+
     setIsSubmitting(true);
     let failedFiles = [];
 
     for (let i = 0; i < files.length; i++) {
       const formData = new FormData();
       if (!isMultiple && files.length === 1) {
+        formData.append('nama_dokumen', e.target.nama_dokumen.value);
         formData.append('no_dokumen', e.target.no_dokumen.value);
         formData.append('date_datasheet', e.target.date_datasheet.value);
       }
@@ -255,15 +246,11 @@ const Datasheet = () => {
   };
 
   const columns = [
-    { field: 'no_dokumen', headerName: 'No Dokumen', width:400, renderCell: (params) => <div className="">
-      {params.value ? <Link
-        to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
-        target='_blank'
-        className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
-      >
-        {params.value}
-      </Link> : '-'}
+    { field: 'no_dokumen', headerName: 'No Dokumen', width:300, renderCell: (params) => <div className="">
+      {params.value ?? '-'}
+    </div> },
+    { field: 'nama_dokumen', headerName: 'Nama Dokumen', width:250, renderCell: (params) => <div className="">
+      {params.value ?? '-'}
     </div> },
     {
       field: 'date_datasheet',
@@ -282,16 +269,23 @@ const Datasheet = () => {
     {
       field: 'datasheet_file',
       headerName: 'File',
-      width: 100,
+      width: 350,
       renderCell: (params) => (
-        <div className='py-4 flex flex-row justify-center items-center'>
+        <div className='flex flex-row items-center'>
           <Link
             to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
             target='_blank'
             className='item-center text-lime-500'
             onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
           >
-            <IconCloudDownload stroke={2} />
+            <Link
+              to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
+              target='_blank'
+              className='text-lime-500 underline'
+              onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
+            >
+              {params.value}
+            </Link>
           </Link>
         </div>
       ),
@@ -424,6 +418,24 @@ const Datasheet = () => {
                     </div>
                     {!isMultiple &&<div className="m-2">
                       <div className="text-emerald-950">
+                        Nama Dokumen
+                      </div>
+                      <input
+                        type="text"
+                        id="nama_dokumen"
+                        name="nama_dokumen"
+                        className="w-full p-2 rounded border"
+                        placeholder="Masukkan nama dokumen"
+                        
+                      />
+                      {validation.nama_dokumen && validation.nama_dokumen.map((item, index) => (
+                        <div key={index} className="text-red-600 text-sm">
+                          {item}
+                        </div>
+                      ))}
+                    </div>}
+                    {!isMultiple &&<div className="m-2">
+                      <div className="text-emerald-950">
                         No Dokumen
                       </div>
                       <input
@@ -486,29 +498,23 @@ const Datasheet = () => {
                   </form>
                   {Object.keys(uploadProgress).length > 0 && (
                     <div className="mt-4 space-y-4">
-                      {Object.entries(uploadProgress).map(([filename, { value }]) => {
-                        const animated = animatedProgress[filename]?.value || 0;
-                        const percentText = animated.toFixed(2).replace('.', ',') + '%';
-
-                        return (
-                          <div key={filename}>
-                            <div className="text-sm text-emerald-950 mb-1">{filename}</div>
-                            <div className="w-full bg-gray-200 rounded h-2 overflow-hidden">
-                              <div
-                                className="bg-emerald-600 h-2 rounded transition-all duration-200 ease-in-out"
-                                style={{ width: `${animated}%` }}
-                              ></div>
-                            </div>
-                            {animated < 100 && (
-                              <div className="text-center text-sm text-emerald-950 font-medium">
-                                Uploading... {percentText}
-                              </div>
-                            )}
+                      {Object.entries(uploadProgress).map(([filename, { value }]) => (
+                        <div key={filename}>
+                          <div className="text-sm text-emerald-950 mb-1">{filename}</div>
+                          <div className="w-full bg-gray-200 rounded h-2 overflow-hidden">
+                            <div
+                              className="bg-emerald-600 h-2 rounded"
+                              style={{ width: `${value}%` }}
+                            ></div>
                           </div>
-                        );
-                      })}
+                          <div className="text-center text-sm text-emerald-950 font-medium">
+                            {value < 100 ? `Uploading... ${value.toFixed(2)}%` : "Completed"}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
+
                 </div>
               </Modal>
               {/* end modal add datasheet */}
@@ -535,6 +541,24 @@ const Datasheet = () => {
                 >
                   <h2 id="modal-modal-title" className="text-emerald-950 font-bold uppercase text-center">Edit Datasheet</h2>
                   {editDatasheet && <form method="post" encType="multipart/form-data" onSubmit={handleSubmitEdit}>
+                    <div className="m-2">
+                      <div className="text-emerald-950">
+                        Nama Dokumen
+                      </div>
+                      <input
+                        type="text"
+                        id="nama_dokumen"
+                        name="nama_dokumen"
+                        className="w-full p-2 rounded border"
+                        placeholder="Masukkan nama dokumen"
+                        defaultValue={editDatasheet.nama_dokumen}
+                      />
+                      {validation.nama_dokumen && validation.nama_dokumen.map((item, index) => (
+                        <div key={index} className="text-red-600 text-sm">
+                          {item}
+                        </div>
+                      ))}
+                    </div>
                     <div className="m-2">
                       <div className="text-emerald-950">
                         No Dokumen

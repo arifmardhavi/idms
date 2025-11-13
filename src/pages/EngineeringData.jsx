@@ -97,8 +97,8 @@ const EngineeringData = () => {
         },
         {
             field: 'datasheet',
-            headerName: 'Datasheet',
-            width: 100,
+            headerName: 'Datasheet/MDR/Other',
+            width: 200,
             renderCell: (params) => (
             <div className='py-4 pl-4'>
                 <Link to={`/engineering_data/datasheet/${params.row.id}`}

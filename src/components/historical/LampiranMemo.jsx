@@ -84,6 +84,21 @@ const LampiranMemo = () => {
       return;
     }
 
+    const MAX_SIZE = 200 * 1024 * 1024; // 200 MB dalam byte
+    const oversizedFiles = Array.from(files).filter(file => file.size > MAX_SIZE);
+
+    if (oversizedFiles.length > 0) {
+      const list = oversizedFiles.map(f => `• ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('\n');
+      handleClose();
+      Swal.fire({
+        icon: "error",
+        title: "Ukuran File Terlalu Besar!",
+        html: `<pre class="text-left text-sm whitespace-pre-wrap">${list}</pre>`,
+        footer: "Setiap file maksimal 200 MB."
+      });
+      return; // stop submit
+    }
+
     setIsSubmitting(true);
     let failedFiles = [];
 
