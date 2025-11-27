@@ -105,7 +105,7 @@ const Datasheet = () => {
       if (res.success) {
         setIsSubmitting(false);
         setOpenEdit(false);
-        Swal.fire("Berhasil!", "Datasheet berhasil diupdate!", "success");
+        Swal.fire("Berhasil!", "Datasheet/MDR/Other berhasil diupdate!", "success");
         fetchDatasheet();
         setValidation([])
       } else {
@@ -221,7 +221,7 @@ const Datasheet = () => {
   const handleDelete = async (row) => {
     const result = await Swal.fire({
       title: "Apakah Anda yakin?",
-      text: "File Datasheet akan dihapus secara permanen!",
+      text: "File Datasheet/MDR/Other akan dihapus secara permanen!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Ya, hapus!",
@@ -232,15 +232,15 @@ const Datasheet = () => {
       try {
         const res = await deleteDatasheet(row.id);
         if (res.success) {
-          Swal.fire("Berhasil!", "Datasheet berhasil dihapus!", "success");
+          Swal.fire("Berhasil!", "Datasheet/MDR/Other berhasil dihapus!", "success");
           setDatasheet([]);
           fetchDatasheet();
         } else {
-          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Datasheet!", "error");
+          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Datasheet/MDR/Other!", "error");
         }
       } catch (error) {
         console.log(error);
-        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Datasheet!", "error");
+        Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Datasheet/MDR/Other!", "error");
       }
     }
   };
@@ -272,21 +272,14 @@ const Datasheet = () => {
       width: 350,
       renderCell: (params) => (
         <div className='flex flex-row items-center'>
-          <Link
-            to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
+          <a
+            href={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
             target='_blank'
             className='item-center text-lime-500'
             onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
           >
-            <Link
-              to={`${base_public_url}engineering_data/datasheet/${params.row.datasheet_file}`}
-              target='_blank'
-              className='text-lime-500 underline'
-              onClick={() => handleAddActivity(params.row.datasheet_file, "DATASHEET")}
-            >
               {params.value}
-            </Link>
-          </Link>
+          </a>
         </div>
       ),
     },
@@ -366,7 +359,7 @@ const Datasheet = () => {
             <Link className='hover:underline text-emerald-950' to='/engineering_data'>
               Engineering Data
             </Link>
-            <Typography className='text-lime-500'>Datasheet </Typography>
+            <Typography className='text-lime-500'>Datasheet/MDR/Other </Typography>
           </Breadcrumbs>
           <div>
             <div className="flex flex-row justify-end py-2">
@@ -407,7 +400,7 @@ const Datasheet = () => {
                     minWidth: '330px',
                   }}
                 >
-                  <h2 id="modal-modal-title" className="text-emerald-950 font-bold uppercase text-center">Tambah Datasheet</h2>
+                  <h2 id="modal-modal-title" className="text-emerald-950 font-bold uppercase text-center">Tambah Datasheet/MDR/Other</h2>
                   <form method="post" encType="multipart/form-data" onSubmit={handleSubmit}>
                     <div className="flex flex-row justify-center items-center">
                       { isMultiple ? 
@@ -454,14 +447,14 @@ const Datasheet = () => {
                     </div>}
                     <div className="m-2">
                       <div className="text-emerald-950">
-                        Upload Datasheet File
+                        Upload Datasheet/MDR/Other File
                       </div>
                       <input
                         type="file"
                         id="datasheet_file"
                         name="datasheet_file[]"
                         multiple
-                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.zip,.rar"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
                         className="w-full p-2 rounded border"
                       />
                     </div>
@@ -539,7 +532,7 @@ const Datasheet = () => {
                     minWidth: '330px',
                   }}
                 >
-                  <h2 id="modal-modal-title" className="text-emerald-950 font-bold uppercase text-center">Edit Datasheet</h2>
+                  <h2 id="modal-modal-title" className="text-emerald-950 font-bold uppercase text-center">Edit Datasheet/MDR/Other</h2>
                   {editDatasheet && <form method="post" encType="multipart/form-data" onSubmit={handleSubmitEdit}>
                     <div className="m-2">
                       <div className="text-emerald-950">
@@ -579,12 +572,13 @@ const Datasheet = () => {
                     </div>
                     <div className="m-2">
                       <div className="text-emerald-950">
-                        Upload Datasheet
+                        Upload Datasheet/MDR/Other
                       </div>
                       <input
                         type="file"
                         id="datasheet_file"
                         name="datasheet_file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
                         className="w-full p-2 rounded border"
                       />
                       {validation.datasheet_file && validation.datasheet_file.map((item, index) => (
