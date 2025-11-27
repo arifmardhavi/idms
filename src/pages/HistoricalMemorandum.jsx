@@ -3,7 +3,7 @@ import Header from "../components/Header"
 import { Link } from "react-router-dom"
 import { IconPlus } from "@tabler/icons-react"
 import { useState, useEffect } from "react"
-import { deleteHistoricalMemorandum, getHistoricalMemorandum } from "../services/historical_memorandum.service"
+import { deleteHistoricalMemorandum, getHistoricalMemorandum, downloadSelectedHistoricalMemorandum } from "../services/historical_memorandum.service"
 import { api_public } from '../services/config';
 import { DataGrid, GridToolbarQuickFilter, GridLogicOperator } from "@mui/x-data-grid"
 import { IconLoader2 } from "@tabler/icons-react"
@@ -21,6 +21,7 @@ const HistoricalMemorandum = () => {
     const base_public_url = api_public;
     const [hide, setHide] = useState(false)
     const [userLevel, setUserLevel] = useState('')
+    const [selectedRows, setSelectedRows] = useState([])
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -183,6 +184,16 @@ const HistoricalMemorandum = () => {
         }] : []),
     ];
 
+    const handleDownloadSelected = () => {
+        if (selectedRows.length === 0) {
+          Swal.fire("Peringatan!", "Tidak ada file yang dipilih!", "warning");
+          return;
+        }
+    
+        downloadSelectedHistoricalMemorandum(selectedRows);
+        Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+    };
+
     const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
       placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
@@ -213,6 +224,15 @@ const HistoricalMemorandum = () => {
                 <div className='flex flex-row justify-between'>
                     <h1 className='text-xl font-bold uppercase'>Historical Memorandum</h1>
                     <div className='flex flex-row justify-end items-center space-x-2'>
+                        {selectedRows.length > 0 && (
+                        <button
+                            onClick={handleDownloadSelected}
+                            className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
+                        >
+                            <IconCloudDownload />
+                            <span>Download file Memorandum</span>
+                        </button>
+                        )}
                         <button
                             className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
                             onClick={fetchHistoricalMemorandum}
@@ -264,6 +284,9 @@ const HistoricalMemorandum = () => {
                             },
                         }}
                         pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
+                        onRowSelectionModelChange={(newSelectionModel) => {
+                            setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
+                        }}
                     />}
                 </div>
             </div>

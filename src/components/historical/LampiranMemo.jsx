@@ -1,12 +1,12 @@
 import { Breadcrumbs, Modal, Typography } from "@mui/material"
 import Header from "../Header"
-import { IconArticle, IconChevronRight } from "@tabler/icons-react"
+import { IconArticle, IconChevronRight, IconCloudDownload } from "@tabler/icons-react"
 import { Link, useParams } from "react-router-dom"
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid"
 import * as motion from 'motion/react-client';
 import { useState } from "react"
 import { IconCircleMinus } from "@tabler/icons-react"
-import { addLampiran, deleteLampiran, getLampiranByHistorical } from "../../services/lampiran_memo.service"
+import { addLampiran, deleteLampiran, downloadSelectedLampiran, getLampiranByHistorical } from "../../services/lampiran_memo.service"
 import { useEffect } from "react"
 import { api_public } from '../../services/config';
 import { IconPlus } from "@tabler/icons-react"
@@ -25,6 +25,7 @@ const LampiranMemo = () => {
   const [userLevel, setUserLevel] = useState('');
   const [uploadProgress, setUploadProgress] = useState({});
   const [animatedProgress, setAnimatedProgress] = useState({});
+  const [selectedRows, setSelectedRows] = useState([])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -224,6 +225,16 @@ const LampiranMemo = () => {
     }] : []),
   ];
 
+  const handleDownloadSelected = () => {
+      if (selectedRows.length === 0) {
+        Swal.fire("Peringatan!", "Tidak ada file yang dipilih!", "warning");
+        return;
+      }
+  
+      downloadSelectedLampiran(selectedRows);
+      Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+  };
+
   const CustomQuickFilter = () => (
     <GridToolbarQuickFilter
       placeholder='cari data disini dan gunakan ; untuk filter lebih spesifik dengan 2 kata kunci'
@@ -272,7 +283,16 @@ const LampiranMemo = () => {
           </Breadcrumbs>
           {/* <p className='text-emerald-950 text-md font-semibold uppercase w-full text-center'>{lampiran[0].historical_memorandum.perihal}</p> */}
           <div>
-            <div className="flex flex-row justify-end py-2">
+            <div className="flex flex-row justify-end py-2 gap-1">
+              {selectedRows.length > 0 && (
+                <button
+                    onClick={handleDownloadSelected}
+                    className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
+                >
+                    <IconCloudDownload />
+                    <span>Download file Lampiran Memo</span>
+                </button>
+                )}
               { userLevel !== '4' && userLevel !== '5' && <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
                 <IconPlus className='hover:rotate-180 transition duration-500' />
                 <span>Tambah Lampiran</span>
@@ -367,8 +387,11 @@ const LampiranMemo = () => {
                   paginationModel: { page: 0, pageSize: 20 },
                 },
               }}
+              checkboxSelection
               pageSizeOptions={[20, 50, 100, 200, { value: -1, label: 'All' }]}
-              // checkboxSelection
+              onRowSelectionModelChange={(newSelectionModel) => {
+                  setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
+              }}
             />}
           </div>
         </div>
