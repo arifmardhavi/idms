@@ -28,6 +28,7 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
+  { name: 'Sertifikat Kalibrasi', icon: <IconFileAnalytics />, path: '/sertifikat_kalibrasi', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {
