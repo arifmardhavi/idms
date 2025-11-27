@@ -56,6 +56,10 @@ import Readiness from './pages/Readiness.jsx';
 import { ActivityProvider } from './utils/ActivityContext.jsx';
 import DashboardReadiness from './pages/DashboardReadiness.jsx';
 import P_Id from './pages/P_Id.jsx';
+import SertifikatKalibrasi from './pages/SertifikatKalibrasi.jsx';
+import EditSertifikatKalibrasi from './components/sertifikat_kalibrasi/EditSertifikatKalibrasi.jsx';
+import AddSertifikatKalibrasi from './components/sertifikat_kalibrasi/AddSertifikatKalibrasi.jsx';
+import DashboardSertifikatKalibrasi from './components/sertifikat_kalibrasi/DashboardSertifikatKalibrasi.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -78,6 +82,7 @@ const router = createBrowserRouter([
       { path: '/plo', element: <Plo /> },
       { path: '/coi', element: <Coi /> },
       { path: '/skhp', element: <Skhp /> },
+      { path: '/sertifikat_kalibrasi', element: <SertifikatKalibrasi /> },
       { path: '/contract', element: <Contract /> },
       { path: '/features/:id', element: <Features /> },
       { path: '/historical_memorandum', element: <HistoricalMemorandum /> },
@@ -92,6 +97,9 @@ const router = createBrowserRouter([
       { path: '/skhp/dashboard', element: <DashboardSkhp /> },
       { path: '/skhp/tambah', element: <AddSkhp /> },
       { path: '/skhp/edit/:id', element: <EditSkhp /> },
+      { path: '/sertifikat_kalibrasi/dashboard', element: <DashboardSertifikatKalibrasi /> },
+      { path: '/sertifikat_kalibrasi/tambah', element: <AddSertifikatKalibrasi /> },
+      { path: '/sertifikat_kalibrasi/edit/:id', element: <EditSertifikatKalibrasi /> },
       { path: '/contract/tambah', element: <AddContract /> },
       { path: '/contract/edit/:id', element: <EditContract /> },
       { path: '/contract/dashboard/:id', element: <DashboardContract /> },

@@ -10,6 +10,7 @@ import { IconRefresh } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconTrash } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
+// import { downloadFile } from '../utils/downloadFile';
 
 const Unit = () => {
   const [unit, setUnit] = useState([]);
@@ -207,6 +208,19 @@ const handleDelete = async (id) => {
   }
 };
 
+// const handleExport = async () => {
+//   setLoading(true);
+
+//   try {
+//     await downloadFile("exportunits", "Unit.xlsx");
+//   } catch (error) {
+//     console.error(error);
+//   }
+
+//   setLoading(false);
+// };
+
+
   return (
     <div className="flex flex-col md:flex-row w-full">
       { !hide && <Header />}
@@ -223,6 +237,9 @@ const handleDelete = async (id) => {
         <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
           <div className="flex flex-row justify-between">
             <h1 className="text-xl font-bold uppercase">Unit</h1>
+            {/* <button className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded" onClick={handleExport} disabled={loading}>
+              {loading ? 'Exporting...' : 'Export'}
+            </button> */}
             <motion.a
               href='/unit'
               whileTap={{ scale: 0.9 }}

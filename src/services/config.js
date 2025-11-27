@@ -50,6 +50,24 @@ export const apiGet = async (endpoint) => {
     }
 };
 
+export const apiGetBlob = async (endpoint) => {
+    try {
+        const config = getAuthHeaders();
+        if (!config) return;
+
+        const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
+            ...config,
+            responseType: "blob", // WAJIB
+        });
+
+        return response; // penting: return full response, bukan response.data
+    } catch (error) {
+        console.error("GET Blob Error:", error);
+        throw error;
+    }
+};
+
+
 export const apiLogout = async (endpoint, token) => {
     try {
         const config = getAuthHeaders();

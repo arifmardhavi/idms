@@ -2,7 +2,8 @@ import {
     apiGet, 
     apiPost, 
     apiPut, 
-    apiDelete, 
+    apiDelete,
+    apiGetBlob,
 } from "./config";
 
 const endpoint = "units";
@@ -29,6 +30,9 @@ export const deleteUnit = async (id) => {
 
 export const ActiveUnit = async () => {
     return await apiGet(`activeunits`);
+};
+export const ExportUnit = async () => {
+    return await apiGetBlob("exportunits");
 };
 
 export const nonactiveUnit = async (id) => {
