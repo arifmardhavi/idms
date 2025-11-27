@@ -356,7 +356,7 @@ const handleDelete = async (id) => {
             <div className="flex flex-row justify-between">
               <h1 className="text-xl font-bold uppercase">Tag Number</h1>
               <div className='flex flex-row justify-end items-center space-x-2'>
-                {/* { !importMode ? <button
+                { !importMode ? <button
                   className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
                   onClick={() => handleImport()}
                 >
@@ -379,7 +379,7 @@ const handleDelete = async (id) => {
                 >
                   <IconCloudDownload />
                   <span>Export Excel</span>
-                </motion.button> */}
+                </motion.button>
                 <motion.div
                   onClick={() => fetchTagnumber()}
                   whileTap={{ scale: 0.9 }}

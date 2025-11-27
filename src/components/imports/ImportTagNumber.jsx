@@ -109,9 +109,9 @@ function ImportTagNumber({ onImportRefresh }) {
       {previewData.length > 0 && (
         <div className="mt-4">
           <h3 className="font-semibold mb-2">Preview Data:</h3>
-          <div className="overflow-auto">
+          <div className="max-h-[300px] overflow-auto">
             <table className="min-w-full border text-sm">
-              <thead className="bg-gray-100 text-left">
+              <thead className="bg-gray-100 text-left sticky top-0">
                 <tr>
                   {Object.keys(previewData[0]).map((key, index) => (
                     <th key={index} className="border px-2 py-1">{key}</th>
@@ -137,7 +137,7 @@ function ImportTagNumber({ onImportRefresh }) {
       {errors.length > 0 && (
         <div className="mt-4 bg-red-100 border border-red-300 p-3 rounded">
           <h4 className="font-bold text-red-700">Error Import:</h4>
-          <ul className="text-sm text-red-800 mt-1 list-disc pl-4">
+          <ul className="text-sm text-red-800 mt-1 list-disc pl-4 max-h-64 overflow-auto">
             {errors.map((e, i) => (
               <li key={i}>
                 Baris {e.row}: {e.message}
