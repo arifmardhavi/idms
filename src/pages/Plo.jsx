@@ -370,8 +370,8 @@ const Plo = () => {
     },
     {
       field: 'report_plo',
-      headerName: 'Report',
-      width: 100,
+      headerName: 'Report/BAPK',
+      width: 120,
       renderCell: (params) => (
         <div className='py-4 pl-4'>
           <Link to={`/plo/report/${params.row.id}`}

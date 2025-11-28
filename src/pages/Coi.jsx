@@ -18,6 +18,7 @@ import {
   IconCloudDownload,
   IconPlus,
   IconArticle,
+  IconEye,
 } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
@@ -398,8 +399,22 @@ const Coi = () => {
       ),
     },
     {
+      field: 'report_coi',
+      headerName: 'Report/BAPK',
+      width: 120,
+      renderCell: (params) => (
+        <div className='py-4 pl-4'>
+          <Link to={`/coi/report/${params.row.id}`}
+            className=' text-lime-500'
+          >
+            <IconEye stroke={2} />
+          </Link>
+        </div>
+      ),
+    },
+    {
       field: 'rla',
-      headerName: 'RLA',
+      headerName: 'Laporan & RLA',
       width: 70,
       valueGetter: (params) => (params == 1 ? 'YES' : 'NO'),
       renderCell: (params) => (
@@ -476,7 +491,7 @@ const Coi = () => {
     },
     {
       field: 'rla_certificate',
-      headerName: 'RLA file',
+      headerName: 'Laporan & RLA file',
       width: 80,
       renderCell: (params) => (
         <div className='py-4 pl-4'>
@@ -497,7 +512,7 @@ const Coi = () => {
     },
     {
       field: 'rla_old_certificate',
-      headerName: 'RLA lama',
+      headerName: 'Laporan & RLA lama',
       width: 80,
       renderCell: (params) => (
         <div className='py-4 pl-4'>

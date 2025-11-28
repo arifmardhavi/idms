@@ -60,6 +60,7 @@ import SertifikatKalibrasi from './pages/SertifikatKalibrasi.jsx';
 import EditSertifikatKalibrasi from './components/sertifikat_kalibrasi/EditSertifikatKalibrasi.jsx';
 import AddSertifikatKalibrasi from './components/sertifikat_kalibrasi/AddSertifikatKalibrasi.jsx';
 import DashboardSertifikatKalibrasi from './components/sertifikat_kalibrasi/DashboardSertifikatKalibrasi.jsx';
+import ReportCoi from './components/coi/ReportCoi.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -91,6 +92,7 @@ const router = createBrowserRouter([
       { path: '/plo/tambah', element: <AddPlo /> },
       { path: '/plo/edit/:id', element: <EditPlo /> },
       { path: '/plo/report/:id', element: <ReportPlo /> },
+      { path: '/coi/report/:id', element: <ReportCoi /> },
       { path: '/coi/dashboard', element: <DashboardCoi /> },
       { path: '/coi/tambah', element: <AddCoi /> },
       { path: '/coi/edit/:id', element: <EditCoi /> },

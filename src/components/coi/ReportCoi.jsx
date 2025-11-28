@@ -7,7 +7,7 @@ import { GridLogicOperator } from '@mui/x-data-grid';
 import * as motion from 'motion/react-client';
 import { useState } from "react"
 import { IconCircleMinus } from "@tabler/icons-react"
-import { addReport, deleteReport, getReportByPlo } from "../../services/report_plo.service"
+import { addReport, deleteReport, getReportByCoi } from "../../services/report_coi.service"
 import { useEffect } from "react"
 import { api_public } from '../../services/config';
 import { IconCloudDownload } from "@tabler/icons-react"
@@ -17,7 +17,7 @@ import { IconLoader2 } from "@tabler/icons-react"
 import { jwtDecode } from "jwt-decode"
 import { handleAddActivity } from "../../utils/handleAddActivity"
 
-const ReportPlo = () => {
+const ReportCoi = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -42,10 +42,10 @@ const ReportPlo = () => {
   const fetchReport = async () => {
     try {
       setLoading(true);
-      const data = await getReportByPlo(id);
+      const data = await getReportByCoi(id);
       setReport(data.data);
     } catch (error) {
-      console.error("Error fetching REPORT PLO:", error);
+      console.error("Error fetching REPORT COI:", error);
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ const ReportPlo = () => {
     e.preventDefault();
     try {
       const formData = new FormData(e.target);
-      formData.append('plo_id', id);
+      formData.append('coi_id', id);
       const res = await addReport(formData);
       if (res.success) {
         fetchReport();
@@ -65,7 +65,7 @@ const ReportPlo = () => {
         console.log(res.response.data.errors);
       }
     } catch (error) {
-      console.error("Error adding REPORT PLO:", error);
+      console.error("Error adding REPORT Coi:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -74,7 +74,7 @@ const ReportPlo = () => {
   const handleDelete = async (row) => {
       const result = await Swal.fire({
         title: "Apakah Anda yakin?",
-        text: "File Report PLO akan dihapus secara permanen!",
+        text: "File Report Coi akan dihapus secara permanen!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Ya, hapus!",
@@ -85,38 +85,38 @@ const ReportPlo = () => {
         try {
           const res = await deleteReport(row.id);
           if (res.success) {
-            Swal.fire("Berhasil!", "Report PLO berhasil dihapus!", "success");
+            Swal.fire("Berhasil!", "Report Coi berhasil dihapus!", "success");
             fetchReport();
           } else {
-            Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Report PLO!", "error");
+            Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Report Coi!", "error");
           }
         } catch (error) {
           console.log(error);
-          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Report PLO!", "error");
+          Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Report Coi!", "error");
         }
       }
     };
 
   const columns = [
-    { field: 'plo', headerName: 'PLO',  valueGetter: (params) => params.unit.unit_name ,renderCell: (params) => <div className="py-4">
+    { field: 'coi', headerName: 'PLO',  valueGetter: (params) => params.plo.unit.unit_name ,renderCell: (params) => <div className="py-4">
       {params.value}
     </div> },
-    { field: 'report_plo', headerName: 'Report/BAPK', width:400, renderCell: (params) => <div className="py-4">
+    { field: 'report_coi', headerName: 'Report/BAPK', width:400, renderCell: (params) => <div className="py-4">
       <Link
-        to={`${base_public_url}plo/reports/${params.row.report_plo}`}
+        to={`${base_public_url}coi/reports/${params.row.report_coi}`}
         target='_blank'
         className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.report_plo, "PLO")}
+        onClick={() => handleAddActivity(params.row.report_coi, "Coi")}
       >
         {params.value}
       </Link>
     </div> },
     { field: 'file_report', headerName: ' File Report', width:100, renderCell: (params) => <div className="py-4">
       <Link
-        to={`${base_public_url}plo/reports/${params.row.report_plo}`}
+        to={`${base_public_url}coi/reports/${params.row.report_coi}`}
         target='_blank'
         className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.report_plo, "PLO")}
+        onClick={() => handleAddActivity(params.row.report_coi, "Coi")}
       >
         <IconCloudDownload stroke={2} />
       </Link>
@@ -170,7 +170,7 @@ const ReportPlo = () => {
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
           <IconArticle />
         </div>
-        {/* get report plo  */}
+        {/* get report coi  */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs
             aria-label='breadcrumb'
@@ -181,8 +181,8 @@ const ReportPlo = () => {
             <Link className='hover:underline text-emerald-950' to='/'>
               Home
             </Link>
-            <Link className='hover:underline text-emerald-950' to='/plo'>
-              PLO
+            <Link className='hover:underline text-emerald-950' to='/coi'>
+              Coi
             </Link>
             <Typography className='text-lime-500'>Report/BAPK </Typography>
           </Breadcrumbs>
@@ -190,7 +190,7 @@ const ReportPlo = () => {
             <div className="flex flex-row justify-end py-2">
               { userLevel !== '4' && userLevel !== '5' && <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
                 <IconPlus className='hover:rotate-180 transition duration-500' />
-                <span>Tambah Report</span>
+                <span>Tambah Report/BAPK</span>
               </button>}
               <Modal
                 open={open}
@@ -219,8 +219,8 @@ const ReportPlo = () => {
                       </div>
                       <input
                         type="file"
-                        id="report_plo"
-                        name="report_plo"
+                        id="report_coi"
+                        name="report_coi"
                         className="w-full p-2 rounded border"
                       />
                     </div>
@@ -284,4 +284,4 @@ const ReportPlo = () => {
   )
 }
 
-export default ReportPlo
+export default ReportCoi
