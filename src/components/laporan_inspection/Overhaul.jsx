@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { addSurveillance, deleteSurveillance, getSurveillanceByLaporanInspection, updateSurveillance } from "../../services/surveillance.service";
+import { addOverhaul, deleteOverhaul, getOverhaulByLaporanInspection, updateOverhaul } from "../../services/overhaul.service";
 import { useEffect } from "react";
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import { Autocomplete, Box, Modal, TextField, Tooltip } from "@mui/material";
@@ -11,9 +11,9 @@ import { api_public } from '../../services/config';
 import Swal from "sweetalert2";
 import { handleAddActivity } from "../../utils/handleAddActivity";
 
-const Surveillance = () => {
+const Overhaul = () => {
   const { id } = useParams();
-  const [Surveillance, setSurveillance] = useState([]);
+  const [Overhaul, setOverhaul] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -26,22 +26,22 @@ const Surveillance = () => {
   const base_public_url = api_public;
   const handleClose = () => {setOpen(false); setOpenEdit(false); setValidation({}); setSelectedHistoricalMemo(null); setHasMemo(false);};
   useEffect(() => {
-    fetchSurveillance();
+    fetchOverhaul();
     fetchHistoricalMemorandum();
   }, []);
   
 
-  const fetchSurveillance = async () => {
+  const fetchOverhaul = async () => {
     try {
       setLoading(true);
-      const data = await getSurveillanceByLaporanInspection(id);
-      setSurveillance(data.data);
-      console.log("Surveillance Data:", data.data);
+      const data = await getOverhaulByLaporanInspection(id);
+      setOverhaul(data.data);
+      console.log("Overhaul Data:", data.data);
       
       // Fetch data logic here
-      // setSurveillance(data);
+      // setOverhaul(data);
     } catch (error) {
-      console.error("Error fetching Surveillance data:", error);
+      console.error("Error fetching Overhaul data:", error);
     } finally {
       setLoading(false);
     }
@@ -61,32 +61,32 @@ const Surveillance = () => {
 }
       
 
-  const handleAddSurveillance = async (e) => {
+  const handleAddOverhaul = async (e) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
       const formData = new FormData(e.target);
       hasMemo ? formData.append('historical_memorandum_id', selectedHistoricalMemo) : formData.append('laporan_file', e.target.laporan_file.files[0]);
       formData.append('laporan_inspection_id', id);
-      const data = await addSurveillance(formData);
-      console.log("Added Surveillance / Conmon:", data);
+      const data = await addOverhaul(formData);
+      console.log("Added Overhaul:", data);
       handleClose();
-      fetchSurveillance();
+      fetchOverhaul();
       Swal.fire({
         title: 'Berhasil!',
-        text: 'Surveillance / Conmon berhasil ditambahkan!',
+        text: 'Overhaul berhasil ditambahkan!',
         icon: 'success',
         showConfirmButton: true,
         timer: 1500
       });
     } catch (error) {
-      console.error("Error adding Surveillance / Conmon:", error);
+      console.error("Error adding Overhaul:", error);
       setValidation(error.response?.data.errors || []);
     } finally {
       setIsSubmitting(false);
     }
   }
-  const handleUpdateSurveillance = async (e) => {
+  const handleUpdateOverhaul = async (e) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
@@ -99,19 +99,19 @@ const Surveillance = () => {
         formData.delete('historical_memorandum_id');
       }
       formData.append('laporan_inspection_id', id);
-      const data = await updateSurveillance(SelectedEditData.id, formData);
-      console.log("updated Surveillance / Conmon:", data);
+      const data = await updateOverhaul(SelectedEditData.id, formData);
+      console.log("updated Overhaul:", data);
       handleClose();
-      fetchSurveillance();
+      fetchOverhaul();
       Swal.fire({
         title: 'Berhasil!',
-        text: 'Surveillance / Conmon berhasil diupdate!',
+        text: 'Overhaul berhasil diupdate!',
         icon: 'success',
         showConfirmButton: true,
         timer: 1500
       });
     } catch (error) {
-      console.error("Error updating Surveillance:", error);
+      console.error("Error updating Overhaul:", error);
       setValidation(error.response?.data.errors || []);
     } finally {
       setIsSubmitting(false);
@@ -127,7 +127,7 @@ const Surveillance = () => {
 
   const columns = [
     { field: 'judul', headerName: 'Judul', width: 200 },
-    { field: 'surveillance_date', headerName: 'Tanggal Surveillance / Conmon', width: 220 },
+    { field: 'overhaul_date', headerName: 'Tanggal Overhaul', width: 220 },
     { field: 'historical_memorandum',
       valueGetter: (params) => {params ? (params?.perihal + '-' + params?.no_dokumen) : '-';},
       headerName: 'Historical Memo', 
@@ -164,7 +164,7 @@ const Surveillance = () => {
         {params.row.laporan_file ? (
           <Tooltip title={`${params.row.laporan_file}`} placement='bottom'>
             <Link
-              to={`${base_public_url}laporan_inspection/surveillance/${params.value}`}
+              to={`${base_public_url}laporan_inspection/overhaul/${params.value}`}
               target='_blank'
               className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
               onClick={() => handleAddActivity(params.row.laporan_file, "LAPORAN INSPEKSI") }
@@ -208,7 +208,7 @@ const Surveillance = () => {
   const handleDelete = async (row) => {
       const result = await Swal.fire({
           title: "Apakah Anda yakin?",
-          text: "Data Surveillance / Conmon akan dihapus secara permanen!",
+          text: "Data Overhaul akan dihapus secara permanen!",
           icon: "warning",
           showCancelButton: true,
           confirmButtonText: "Ya, hapus!",
@@ -217,16 +217,16 @@ const Surveillance = () => {
   
       if (result.isConfirmed) {
           try {
-              const res = await deleteSurveillance(row.id);
+              const res = await deleteOverhaul(row.id);
               if (res.success) {
-                  Swal.fire("Berhasil!", "Surveillance / Conmon berhasil dihapus!", "success");
-                  fetchSurveillance();
+                  Swal.fire("Berhasil!", "Overhaul berhasil dihapus!", "success");
+                  fetchOverhaul();
               } else {
-                  Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Surveillance / Conmon!", "error");
+                  Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Overhaul!", "error");
               }
           } catch (error) {
-              console.error("Error deleting Surveillance / Conmon:", error);
-              Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Surveillance / Conmon!", "error");
+              console.error("Error deleting Overhaul:", error);
+              Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Overhaul!", "error");
           }
       }
   };
@@ -247,11 +247,11 @@ const Surveillance = () => {
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-row justify-between space-x-4">
-        <h1 className="text-xl font-bold p-2 uppercase">Surveillance / Conmon</h1>
+        <h1 className="text-xl font-bold p-2 uppercase">Overhaul</h1>
         <div className="flex justify-end gap-2 items-center">
           <button className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900" onClick={() => setOpen(true)}> <IconPlus className="hover:rotate-90 duration-300" /> Tambah</button>
           <button
-            onClick={fetchSurveillance}
+            onClick={fetchOverhaul}
             className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900"
           >
           <IconRefresh className="hover:rotate-90 duration-300" /> Refresh
@@ -260,7 +260,7 @@ const Surveillance = () => {
       </div>
       <div>
         { loading ? <p>Loading...</p> : <DataGrid
-          rows={Surveillance}
+          rows={Overhaul}
           columns={columns}
           slots={{ toolbar: CustomQuickFilter }}
           initialState={{
@@ -282,9 +282,9 @@ const Surveillance = () => {
         aria-describedby="modal-modal-description"
       >
         <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
-          <form onSubmit={(e) => handleAddSurveillance(e)} method="POST" className="space-y-4">
+          <form onSubmit={(e) => handleAddOverhaul(e)} method="POST" className="space-y-4">
             <h1 className="text-xl uppercase text-gray-900 mb-4">
-              Tambah Surveillance / Conmon
+              Tambah Overhaul
             </h1>
             <div className="space-y-3">
               <div>
@@ -292,8 +292,8 @@ const Surveillance = () => {
                 <input type="text" name="judul" className="border rounded-md p-2 w-full" placeholder="Masukkan Judul" required />
               </div>
               <div>
-                <label htmlFor="surveillance_date">Surveillance / Conmon Date<sup className='text-red-500'>*</sup></label>
-                <input type="date" name="surveillance_date" className="border rounded-md p-2 w-full" required />
+                <label htmlFor="overhaul_date">Overhaul Date<sup className='text-red-500'>*</sup></label>
+                <input type="date" name="overhaul_date" className="border rounded-md p-2 w-full" required />
               </div>
               <div>
                 <label htmlFor="memo">Ada Memo ?</label>
@@ -359,9 +359,9 @@ const Surveillance = () => {
         aria-describedby="modal-modal-description"
       >
         <Box className="bg-white rounded-2xl shadow-lg p-4 relative top-1/2 left-1/2 w-[90%] md:w-1/3 transform -translate-x-1/2 -translate-y-1/2 ">
-          <form onSubmit={(e) => handleUpdateSurveillance(e)} method="POST" className="space-y-4">
+          <form onSubmit={(e) => handleUpdateOverhaul(e)} method="POST" className="space-y-4">
             <h1 className="text-xl uppercase text-gray-900 mb-4">
-              Update Surveillance / Conmon
+              Update Overhaul
             </h1>
             <div className="space-y-3">
               <div>
@@ -369,11 +369,11 @@ const Surveillance = () => {
                 <input type="text" name="judul" className="border rounded-md p-2 w-full" placeholder="Masukkan Judul" defaultValue={SelectedEditData.judul} required />
               </div>
               <div>
-                <label htmlFor="surveillance_date">Surveillance / Conmon Date<sup className='text-red-500'>*</sup></label>
-                <input type="date" name="surveillance_date" defaultValue={SelectedEditData.surveillance_date} className="border rounded-md p-2 w-full" required />
+                <label htmlFor="overhaul_date">Overhaul Date<sup className='text-red-500'>*</sup></label>
+                <input type="date" name="overhaul_date" defaultValue={SelectedEditData.overhaul_date} className="border rounded-md p-2 w-full" required />
               </div>
               <div>
-                <label htmlFor="surveillance_date">Ada Memo ?</label>
+                <label htmlFor="overhaul_date">Ada Memo ?</label>
                 <select onChange={(e) => (e.target.value === 'yes') ? setHasMemo(true) : setHasMemo(false) } defaultValue={hasMemo ? 'yes' : 'no'} className="border rounded-md p-2 w-full">
                   <option value="no">Tidak</option>
                   <option value="yes">Ada</option>
@@ -419,7 +419,7 @@ const Surveillance = () => {
                   name="laporan_file"
                   className="border rounded-md p-2 w-full" />
                   <div className="text-sm bg-lime-300 text-emerald-950 p-2 rounded-xl">
-                    <Link className="hover:underline" target="_blank" onClick={() => handleAddActivity(SelectedEditData?.laporan_file, "LAPORAN INSPEKSI") } to={`${base_public_url}laporan_inspection/surveillance/${SelectedEditData.laporan_file}`}>{SelectedEditData.laporan_file ? SelectedEditData.laporan_file : '-'}</Link>
+                    <Link className="hover:underline" target="_blank" onClick={() => handleAddActivity(SelectedEditData?.laporan_file, "LAPORAN INSPEKSI") } to={`${base_public_url}laporan_inspection/overhaul/${SelectedEditData.laporan_file}`}>{SelectedEditData.laporan_file ? SelectedEditData.laporan_file : '-'}</Link>
                   </div>
               </div>
               }
@@ -435,4 +435,4 @@ const Surveillance = () => {
   )
 }
 
-export default Surveillance
+export default Overhaul
