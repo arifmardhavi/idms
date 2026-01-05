@@ -352,12 +352,12 @@ const Contract = () => {
         {
           field: 'actual_progress',
           headerName: 'Aktual Progress',
-          valueGetter: (params) => `${params}%`,
+          valueGetter: (params) => Number(params),
           width: 150,
           renderCell: (params) => 
           <div className='py-4 flex flex-row justify-center items-center'>
             <p >
-              {params.value}
+              {params.value}%
             </p>
           </div>,
         },
