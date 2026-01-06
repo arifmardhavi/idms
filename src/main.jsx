@@ -61,6 +61,12 @@ import EditSertifikatKalibrasi from './components/sertifikat_kalibrasi/EditSerti
 import AddSertifikatKalibrasi from './components/sertifikat_kalibrasi/AddSertifikatKalibrasi.jsx';
 import DashboardSertifikatKalibrasi from './components/sertifikat_kalibrasi/DashboardSertifikatKalibrasi.jsx';
 import ReportCoi from './components/coi/ReportCoi.jsx';
+import IzinUsaha from './pages/IzinUsaha.jsx';
+import IzinDisnaker from './pages/IzinDisnaker.jsx';
+import AddIzinDisnaker from './components/izin_disnaker/AddIzinDisnaker.jsx';
+import DashboardIzinDisnaker from './components/izin_disnaker/DashboardIzinDisnaker.jsx';
+import EditIzinDisnaker from './components/izin_disnaker/EditIzinDisnaker.jsx';
+import ReportIzinDisnaker from './components/izin_disnaker/ReportIzinDisnaker.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -129,6 +135,12 @@ const router = createBrowserRouter([
       { path: '/readiness_ta_plantstop', element: <Readiness /> },
       { path: '/dashboard_readiness_ta_plantstop/:id', element: <DashboardReadiness /> },
       { path: '/p_id', element: <P_Id /> },
+      { path: '/izin_usaha', element: <IzinUsaha /> },
+      { path: '/izin_disnaker', element: <IzinDisnaker /> },
+      { path: '/izin_disnaker/dashboard', element: <DashboardIzinDisnaker /> },
+      { path: '/izin_disnaker/tambah', element: <AddIzinDisnaker /> },
+      { path: '/izin_disnaker/edit/:id', element: <EditIzinDisnaker /> },
+      { path: '/izin_disnaker/report/:id', element: <ReportIzinDisnaker /> },
 
 
     ],

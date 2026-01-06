@@ -10,6 +10,9 @@ import {
   IconHeartRateMonitor,
   IconFileImport,
   IconBookDownload,
+  IconLicense,
+  IconCertificate,
+  IconBuildingEstate,
 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconLogout, IconContract, IconClipboardText, IconServerCog, IconHelpSquareRounded } from '@tabler/icons-react';
@@ -28,7 +31,9 @@ const SidesMenu = [
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
   { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'Sertifikat Kalibrasi', icon: <IconFileAnalytics />, path: '/sertifikat_kalibrasi', tab: 'regulatorycompliance' },
+  { name: 'Sertifikat Kalibrasi', icon: <IconCertificate />, path: '/sertifikat_kalibrasi', tab: 'regulatorycompliance' },
+  { name: 'Izin Usaha', icon: <IconLicense />, path: '/izin_usaha', tab: 'regulatorycompliance' },
+  { name: 'Izin Disnaker', icon: <IconBuildingEstate />, path: '/izin_disnaker', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {
