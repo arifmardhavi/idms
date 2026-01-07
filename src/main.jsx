@@ -67,6 +67,11 @@ import AddIzinDisnaker from './components/izin_disnaker/AddIzinDisnaker.jsx';
 import DashboardIzinDisnaker from './components/izin_disnaker/DashboardIzinDisnaker.jsx';
 import EditIzinDisnaker from './components/izin_disnaker/EditIzinDisnaker.jsx';
 import ReportIzinDisnaker from './components/izin_disnaker/ReportIzinDisnaker.jsx';
+import IzinOperasi from './pages/IzinOperasi.jsx';
+import AddIzinOperasi from './components/izin_operasi/AddCoi.jsx';
+import EditIzinOperasi from './components/izin_operasi/EditIzinOperasi.jsx';
+import DashboardIzinOperasi from './components/izin_operasi/DashboardIzinOperasi.jsx';
+import ReportIzinOperasi from './components/izin_operasi/ReportIzinOperasi.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -141,6 +146,11 @@ const router = createBrowserRouter([
       { path: '/izin_disnaker/tambah', element: <AddIzinDisnaker /> },
       { path: '/izin_disnaker/edit/:id', element: <EditIzinDisnaker /> },
       { path: '/izin_disnaker/report/:id', element: <ReportIzinDisnaker /> },
+      { path: '/izin_operasi', element: <IzinOperasi /> },
+      { path: '/izin_operasi/dashboard', element: <DashboardIzinOperasi /> },
+      { path: '/izin_operasi/tambah', element: <AddIzinOperasi /> },
+      { path: '/izin_operasi/edit/:id', element: <EditIzinOperasi /> },
+      { path: '/izin_operasi/report/:id', element: <ReportIzinOperasi /> },
 
 
     ],

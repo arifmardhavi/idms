@@ -13,6 +13,7 @@ import {
   IconLicense,
   IconCertificate,
   IconBuildingEstate,
+  IconBuildingCog,
 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconLogout, IconContract, IconClipboardText, IconServerCog, IconHelpSquareRounded } from '@tabler/icons-react';
@@ -34,6 +35,7 @@ const SidesMenu = [
   { name: 'Sertifikat Kalibrasi', icon: <IconCertificate />, path: '/sertifikat_kalibrasi', tab: 'regulatorycompliance' },
   { name: 'Izin Usaha', icon: <IconLicense />, path: '/izin_usaha', tab: 'regulatorycompliance' },
   { name: 'Izin Disnaker', icon: <IconBuildingEstate />, path: '/izin_disnaker', tab: 'regulatorycompliance' },
+  { name: 'Izin Operasi', icon: <IconBuildingCog />, path: '/izin_operasi', tab: 'regulatorycompliance' },
 ];
 
 const Header = () => {
