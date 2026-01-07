@@ -14,6 +14,8 @@ import {
   IconCertificate,
   IconBuildingEstate,
   IconBuildingCog,
+  IconCalendarClock,
+  IconReportAnalytics,
 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import { IconLogout, IconContract, IconClipboardText, IconServerCog, IconHelpSquareRounded } from '@tabler/icons-react';
@@ -36,6 +38,8 @@ const SidesMenu = [
   { name: 'Izin Usaha', icon: <IconLicense />, path: '/izin_usaha', tab: 'regulatorycompliance' },
   { name: 'Izin Disnaker', icon: <IconBuildingEstate />, path: '/izin_disnaker', tab: 'regulatorycompliance' },
   { name: 'Izin Operasi', icon: <IconBuildingCog />, path: '/izin_operasi', tab: 'regulatorycompliance' },
+  { name: 'Readiness TA', icon: <IconHeartRateMonitor />, path: '/readiness_ta_plantstop', tab: 'plantstop' },
+  { name: 'PIR', icon: <IconReportAnalytics />, path: '/pir', tab: 'plantstop' },
 ];
 
 const Header = () => {
@@ -212,12 +216,14 @@ const Header = () => {
               'Laporan Inspection',
               '/laporan_inspection'
             )}
-            {renderDirectLink(
+            {renderTab('plantstop', <IconCalendarClock />, 'Plant Stop')}
+            {renderMenu('plantstop')}
+            {/* {renderDirectLink(
               'Readiness Ta / Plant Stop',
               <IconHeartRateMonitor />,
               'Readiness Ta / Plant Stop',
               '/readiness_ta_plantstop'
-            )}
+            )} */}
           </>
         )}
         {userLevel === '5' && (

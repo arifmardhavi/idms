@@ -68,10 +68,11 @@ import DashboardIzinDisnaker from './components/izin_disnaker/DashboardIzinDisna
 import EditIzinDisnaker from './components/izin_disnaker/EditIzinDisnaker.jsx';
 import ReportIzinDisnaker from './components/izin_disnaker/ReportIzinDisnaker.jsx';
 import IzinOperasi from './pages/IzinOperasi.jsx';
-import AddIzinOperasi from './components/izin_operasi/AddCoi.jsx';
+import AddIzinOperasi from './components/izin_operasi/AddIzinOperasi.jsx';
 import EditIzinOperasi from './components/izin_operasi/EditIzinOperasi.jsx';
 import DashboardIzinOperasi from './components/izin_operasi/DashboardIzinOperasi.jsx';
 import ReportIzinOperasi from './components/izin_operasi/ReportIzinOperasi.jsx';
+import Pir from './pages/Pir.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -151,6 +152,7 @@ const router = createBrowserRouter([
       { path: '/izin_operasi/tambah', element: <AddIzinOperasi /> },
       { path: '/izin_operasi/edit/:id', element: <EditIzinOperasi /> },
       { path: '/izin_operasi/report/:id', element: <ReportIzinOperasi /> },
+      { path: '/pir', element: <Pir /> },
 
 
     ],
