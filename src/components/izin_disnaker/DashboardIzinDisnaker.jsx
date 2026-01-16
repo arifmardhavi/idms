@@ -9,22 +9,21 @@ import { Breadcrumbs, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { IconCloudDownload, IconChevronRight, IconArticle } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
-import { getIzinDisnaker, izinDisnakerCountDueDays } from "../../services/izin_disnaker.service";
+import { getIzinDisnaker, izinDisnakerCountDueDays } from "../../services/izin_disnaker1.service";
 import { api_public } from "../../services/config";
 import { IconLoader2 } from "@tabler/icons-react";
 import { handleAddActivity } from "../../utils/handleAddActivity";
 
-const DashboardIzinDisnaker = () => {
 
+const DashboardIzinDisnaker = () => {
   const [izinDisnaker, setIzinDisnaker] = useState([]);
   const [countIzinDisnaker, setCountIzinDisnaker] = useState({});
   const [loading, setLoading] = useState(false);
   const [clickIzinDisnaker, setClickIzinDisnaker] = useState(null);
-  const [clickRla, setclickRla] = useState(null);
+  const [clickRla, setClickRla] = useState(null);
   const [filteredIzinDisnaker, setFilteredIzinDisnaker] = useState([]);
-  const [hide, setHide] = useState(false);
-  
   const base_public_url = api_public;
+  const [hide, setHide] = useState(false);
 
   useEffect(() => {
     fetchIzinDisnaker();
@@ -32,44 +31,44 @@ const DashboardIzinDisnaker = () => {
   }, []);
 
   useEffect(() => {
-      if (clickIzinDisnaker) {
-        setclickRla(null); // Reset clickRla when clickIzinDisnaker changes
-        const filtered = izinDisnaker.filter((row) => {
-          if (clickIzinDisnaker === 'Expired') {
-            return row.due_days <= 0;
-          } else if (clickIzinDisnaker === '< 9 Bulan') {
-            return row.due_days < 272 && row.due_days > 0;
-          } else if (clickIzinDisnaker === '> 9 Bulan') {
-            return row.due_days >= 272;
-          } else {
-            return true;
-          }
-        });
-        setFilteredIzinDisnaker(filtered);
-        // console.log("click:-", clickIzinDisnaker);
-        // console.log("Filtered IzinDisnaker Data:", filtered);
-      }
-    }, [clickIzinDisnaker]);
-  
-    useEffect(() => {
-      if (clickRla) {
-        setClickIzinDisnaker(null); // Reset clickIzinDisnaker when clickRla changes
-        const filtered = izinDisnaker.filter((row) => {
-          if (clickRla === 'Expired') {
-            return row.rla_due_days <= 0 && row.rla_due_days !== null;
-          } else if (clickRla === '< 9 Bulan') {
-            return row.rla_due_days < 272 && row.rla_due_days > 0;
-          } else if (clickRla === '> 9 Bulan') {
-            return row.rla_due_days >= 272;
-          } else {
-            return true;
-          }
-        });
-        setFilteredIzinDisnaker(filtered);
-        // console.log("click:-", clickRla);
-        // console.log("Filtered RLA Data:", filtered);
-      }
-    }, [clickRla]);
+    if (clickIzinDisnaker) {
+      setClickRla(null); // Reset clickRla when clickIzinDisnaker changes
+      const filtered = izinDisnaker.filter((row) => {
+        if (clickIzinDisnaker === 'Expired') {
+          return row.due_days <= 0;
+        } else if (clickIzinDisnaker === '< 9 Bulan') {
+          return row.due_days < 272 && row.due_days > 0;
+        } else if (clickIzinDisnaker === '> 9 Bulan') {
+          return row.due_days >= 272;
+        } else {
+          return true;
+        }
+      });
+      setFilteredIzinDisnaker(filtered);
+      // console.log("click:-", clickIzinDisnaker);
+      // console.log("Filtered Izin Disnaker Data:", filtered);
+    }
+  }, [clickIzinDisnaker]);
+
+  useEffect(() => {
+    if (clickRla) {
+      setClickIzinDisnaker(null); // Reset clickIzinDisnaker when clickRla changes
+      const filtered = izinDisnaker.filter((row) => {
+        if (clickRla === 'Expired') {
+          return row.rla_due_days <= 0 && row.rla_due_days !== null;
+        } else if (clickRla === '< 9 Bulan') {
+          return row.rla_due_days < 272 && row.rla_due_days > 0;
+        } else if (clickRla === '> 9 Bulan') {
+          return row.rla_due_days >= 272;
+        } else {
+          return true;
+        }
+      });
+      setFilteredIzinDisnaker(filtered);
+      // console.log("click:-", clickRla);
+      // console.log("Filtered RLA Data:", filtered);
+    }
+  }, [clickRla]);
 
   const fetchIzinDisnaker = async () => {
     try {
@@ -77,7 +76,7 @@ const DashboardIzinDisnaker = () => {
       const data = await getIzinDisnaker();
       setIzinDisnaker(data.data);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching Izin Disnaker:", error);
     } finally {
       setLoading(false);
     }
@@ -88,7 +87,7 @@ const DashboardIzinDisnaker = () => {
       const data = await izinDisnakerCountDueDays();
       setCountIzinDisnaker(data.data);
     } catch (error) {
-      console.error("Error fetching IzinDisnaker:", error);
+      console.error("Error fetching Izin Disnaker:", error);
     } finally {
       setLoading(false);
     }
@@ -96,25 +95,30 @@ const DashboardIzinDisnaker = () => {
 
   const columns = [
     {
-      field: 'unit',
-      headerName: 'Unit',
-      width: 130,
-      valueGetter: (params) => params.unit_name,
-      renderCell: (params) => (
-        <div className='py-4'>{params.row.unit.unit_name}</div>
-      ),
+      field: 'tag_number',
+      valueGetter: (params) => params.tag_number,
+      headerName: 'Tag Number',
+      width: 150,
+      renderCell: (params) => <div className='py-4'>{params.value}</div>,
+    },
+    {
+      field: 'plo',
+      valueGetter: (params) => params.unit.unit_name,
+      headerName: 'PLO',
+      width: 150,
+      renderCell: (params) => <div className='py-4'>{params.value}</div>,
     },
     {
       field: 'no_certificate',
-      headerName: 'Nomor Izin Disnaker',
-      width: 200,
+      headerName: 'No Certificate',
+      width: 150,
       renderCell: (params) => (
         <div className='py-4'>
           <Link
             to={`${base_public_url}izin_disnaker/certificates/${params.row.izin_disnaker_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
-            onClick={() => handleAddActivity(params.row.izin_disnaker_certificate, "IzinDisnaker")}
+            onClick={() => handleAddActivity(params.row.izin_disnaker_certificate, "Izin Disnaker")}
           >
             {params.value}
           </Link>
@@ -163,8 +167,8 @@ const DashboardIzinDisnaker = () => {
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
                 : diffDays < 272
-                ? 'bg-yellow-400 text-black' // Kurang dari 9 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 9 bulan
+                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
+                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
               } rounded-full w-fit p-2`}
             >
               {diffDays}
@@ -183,7 +187,7 @@ const DashboardIzinDisnaker = () => {
             to={`${base_public_url}izin_disnaker/certificates/${params.row.izin_disnaker_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
-            onClick={() => handleAddActivity(params.row.izin_disnaker_certificate, "IzinDisnaker")}
+            onClick={() => handleAddActivity(params.row.izin_disnaker_certificate, "Izin Disnaker")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -201,7 +205,7 @@ const DashboardIzinDisnaker = () => {
               to={`${base_public_url}izin_disnaker/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "IzinDisnaker")}
+              onClick={() => handleAddActivity(params.value, "Izin Disnaker")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -299,7 +303,7 @@ const DashboardIzinDisnaker = () => {
               to={`${base_public_url}izin_disnaker/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "IzinDisnaker")}
+              onClick={() => handleAddActivity(params.value, "Izin Disnaker")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -320,7 +324,28 @@ const DashboardIzinDisnaker = () => {
               to={`${base_public_url}izin_disnaker/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "IzinDisnaker")}
+              onClick={() => handleAddActivity(params.value, "Izin Disnaker")}
+            >
+              <IconCloudDownload stroke={2} />
+            </Link>
+          ) : (
+            <p>-</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      field: 're_engineer_certificate',
+      headerName: 'Re-Engineering file',
+      width: 150,
+      renderCell: (params) => (
+        <div className='py-4 pl-4'>
+          {params.value ? (
+            <Link
+              to={`${base_public_url}izin_disnaker/re_engineer/${params.value}`}
+              target='_blank'
+              className=' text-lime-500'
+              onClick={() => handleAddActivity(params.value, "Izin Disnaker")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -347,14 +372,14 @@ const DashboardIzinDisnaker = () => {
   
 
   const dataPieIzinDisnaker = [
-    { label: "> 9 Bulan", value: countIzinDisnaker.izin_disnaker_more_than_9_months || 0, color: "#06d6a0" },
-    { label: "< 9 Bulan", value: countIzinDisnaker.izin_disnaker_less_than_9_months || 0, color: "#ffd166" },
+    { label: "> 9 Bulan", value: countIzinDisnaker.izin_disnaker_more_than_nine_months || 0, color: "#06d6a0" },
+    { label: "< 9 Bulan", value: countIzinDisnaker.izin_disnaker_less_than_nine_months || 0, color: "#ffd166" },
     { label: "Expired", value: countIzinDisnaker.izin_disnaker_expired || 0, color: "#ef476f" },
   ];
 
   const dataPieRla = [
-    { label: "> 9 Bulan", value: countIzinDisnaker.rla_more_than_9_months || 0, color: "#06d6a0" },
-    { label: "< 9 Bulan", value: countIzinDisnaker.rla_less_than_9_months || 0, color: "#ffd166" },
+    { label: "> 9 Bulan", value: countIzinDisnaker.rla_more_than_nine_months || 0, color: "#06d6a0" },
+    { label: "< 9 Bulan", value: countIzinDisnaker.rla_less_than_nine_months || 0, color: "#ffd166" },
     { label: "Expired", value: countIzinDisnaker.rla_expired || 0, color: "#ef476f" }, 
   ];
 
@@ -371,7 +396,7 @@ const DashboardIzinDisnaker = () => {
       },
     },
   };
-  const sizingrla = {
+  const sizingRla = {
     margin: {left: 90},
     legend: {
       direction: 'column',
@@ -382,18 +407,19 @@ const DashboardIzinDisnaker = () => {
       },
     },
   };
+
   return (
     <div className='flex flex-col md:flex-row w-full'>
       { !hide && <Header />}
-      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
-        <div className='md:flex hidden'>
-          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+          <div className='md:flex hidden'>
+            <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+              <IconArticle />
+            </div>
+          </div>
+          <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
             <IconArticle />
           </div>
-        </div>
-        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
-          <IconArticle />
-        </div>
         <Breadcrumbs
           aria-label='breadcrumb'
           separator={
@@ -414,11 +440,11 @@ const DashboardIzinDisnaker = () => {
         </Breadcrumbs>
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-        {loading ? 
+        {loading ?
           <div className="flex flex-col items-center justify-center h-20">
               <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
           </div> 
-        : (
+        :(
           <div className='flex flex-col md:flex-row justify-evenly'>
             <div className="flex flex-col items-center">
               <span>Izin Disnaker</span>
@@ -437,6 +463,7 @@ const DashboardIzinDisnaker = () => {
                   const clickedData = dataPieIzinDisnaker[d.dataIndex];
                   setClickIzinDisnaker(clickedData.label);
                 }}
+
                 sx={{
                   [`& .${pieArcLabelClasses.root}`]: {
                     fill: 'white',
@@ -447,7 +474,7 @@ const DashboardIzinDisnaker = () => {
               />
             </div>
             <div className="flex flex-col items-center text-center">
-              <span>RLA Instalasi</span>
+              <span>RLA</span>
               <PieChart
                 series={[
                   {
@@ -467,22 +494,26 @@ const DashboardIzinDisnaker = () => {
                 height={200}
                 onItemClick={(event, d) => {
                   const clickedData = dataPieRla[d.dataIndex];
-                  setclickRla(clickedData.label);
+                  setClickRla(clickedData.label);
                 }}
-                {...sizingrla}
+
+                {...sizingRla}
               />
             </div>
           </div>
         )}
         </div>
-        {/* TABLE IZIN DISNAKER */}
+        {/* TABLE izin_disnaker */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-          <div className='flex flex-row justify-between'>
-          {loading ? <p>Loading...</p> : <div className="flex flex-col w-full">
+        {loading ?
+              <div className="flex flex-col items-center justify-center h-20">
+                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
+              </div> 
+            :(<div className='flex flex-col'>
             <div className='flex justify-end items-center mb-4'>
-              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredIzinDisnaker(izinDisnaker); setClickIzinDisnaker(null); setclickRla(null);}} >Reset Filter</button>
+              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredIzinDisnaker(izinDisnaker); setClickIzinDisnaker(null); setClickRla(null);}} >Reset Filter</button>
             </div>
-          <DataGrid
+            <DataGrid
               rows={filteredIzinDisnaker.length > 0 ? filteredIzinDisnaker : izinDisnaker}
               columns={columns}
               // checkboxSelection
@@ -513,10 +544,11 @@ const DashboardIzinDisnaker = () => {
               }}
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
-            /> </div> }
-          </div>
+            />
+          </div> )}
         </div>
       </div>
+      
     </div>
   );
 };

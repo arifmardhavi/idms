@@ -45,7 +45,7 @@ const ReportIzinDisnaker = () => {
       const data = await getReportByIzinDisnaker(id);
       setReport(data.data);
     } catch (error) {
-      console.error("Error fetching REPORT Izin Disnaker:", error);
+      console.error("Error fetching REPORT IZIN DISNAKER:", error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ const ReportIzinDisnaker = () => {
     };
 
   const columns = [
-    { field: 'izin_disnaker', headerName: 'Izin Disnaker',  valueGetter: (params) => params.unit.unit_name ,renderCell: (params) => <div className="py-4">
+    { field: 'izin_disnaker', headerName: 'PLO',  valueGetter: (params) => params.plo.unit.unit_name ,renderCell: (params) => <div className="py-4">
       {params.value}
     </div> },
     { field: 'report_izin_disnaker', headerName: 'Report/BAPK', width:400, renderCell: (params) => <div className="py-4">
@@ -106,7 +106,7 @@ const ReportIzinDisnaker = () => {
         to={`${base_public_url}izin_disnaker/reports/${params.row.report_izin_disnaker}`}
         target='_blank'
         className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.report_izin_disnaker, "IzinDisnaker")}
+        onClick={() => handleAddActivity(params.row.report_izin_disnaker, "Izin Disnaker")}
       >
         {params.value}
       </Link>
@@ -116,7 +116,7 @@ const ReportIzinDisnaker = () => {
         to={`${base_public_url}izin_disnaker/reports/${params.row.report_izin_disnaker}`}
         target='_blank'
         className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.report_izin_disnaker, "IzinDisnaker")}
+        onClick={() => handleAddActivity(params.row.report_izin_disnaker, "Izin Disnaker")}
       >
         <IconCloudDownload stroke={2} />
       </Link>
@@ -190,7 +190,7 @@ const ReportIzinDisnaker = () => {
             <div className="flex flex-row justify-end py-2">
               { userLevel !== '4' && userLevel !== '5' && <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
                 <IconPlus className='hover:rotate-180 transition duration-500' />
-                <span>Tambah Report</span>
+                <span>Tambah Report/BAPK</span>
               </button>}
               <Modal
                 open={open}
