@@ -45,7 +45,7 @@ const ReportIzinOperasi = () => {
       const data = await getReportByIzinOperasi(id);
       setReport(data.data);
     } catch (error) {
-      console.error("Error fetching REPORT IZIN OPERASI:", error);
+      console.error("Error fetching REPORT Izin Operasi:", error);
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ const ReportIzinOperasi = () => {
     };
 
   const columns = [
-    { field: 'izin_operasi', headerName: 'PLO',  valueGetter: (params) => params.plo.unit.unit_name ,renderCell: (params) => <div className="py-4">
+    { field: 'izin_operasi', headerName: 'Izin Operasi',  valueGetter: (params) => params.unit.unit_name ,renderCell: (params) => <div className="py-4">
       {params.value}
     </div> },
     { field: 'report_izin_operasi', headerName: 'Report/BAPK', width:400, renderCell: (params) => <div className="py-4">
@@ -106,7 +106,7 @@ const ReportIzinOperasi = () => {
         to={`${base_public_url}izin_operasi/reports/${params.row.report_izin_operasi}`}
         target='_blank'
         className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.report_izin_operasi, "Izin Operasi")}
+        onClick={() => handleAddActivity(params.row.report_izin_operasi, "IzinOperasi")}
       >
         {params.value}
       </Link>
@@ -116,7 +116,7 @@ const ReportIzinOperasi = () => {
         to={`${base_public_url}izin_operasi/reports/${params.row.report_izin_operasi}`}
         target='_blank'
         className='text-lime-500 underline'
-        onClick={() => handleAddActivity(params.row.report_izin_operasi, "Izin Operasi")}
+        onClick={() => handleAddActivity(params.row.report_izin_operasi, "IzinOperasi")}
       >
         <IconCloudDownload stroke={2} />
       </Link>
@@ -190,7 +190,7 @@ const ReportIzinOperasi = () => {
             <div className="flex flex-row justify-end py-2">
               { userLevel !== '4' && userLevel !== '5' && <button onClick={() => setOpen(true)} className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100' >
                 <IconPlus className='hover:rotate-180 transition duration-500' />
-                <span>Tambah Report/BAPK</span>
+                <span>Tambah Report</span>
               </button>}
               <Modal
                 open={open}

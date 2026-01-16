@@ -9,21 +9,22 @@ import { Breadcrumbs, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { IconCloudDownload, IconChevronRight, IconArticle } from '@tabler/icons-react';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
-import { getIzinOperasi, izinOperasiCountDueDays } from "../../services/izin_operasi.service";
+import { getIzinOperasi, izinOperasiCountDueDays } from "../../services/izin_operasi1.service";
 import { api_public } from "../../services/config";
 import { IconLoader2 } from "@tabler/icons-react";
 import { handleAddActivity } from "../../utils/handleAddActivity";
 
-
 const DashboardIzinOperasi = () => {
+
   const [izinOperasi, setIzinOperasi] = useState([]);
   const [countIzinOperasi, setCountIzinOperasi] = useState({});
   const [loading, setLoading] = useState(false);
   const [clickIzinOperasi, setClickIzinOperasi] = useState(null);
-  const [clickRla, setClickRla] = useState(null);
+  const [clickRla, setclickRla] = useState(null);
   const [filteredIzinOperasi, setFilteredIzinOperasi] = useState([]);
-  const base_public_url = api_public;
   const [hide, setHide] = useState(false);
+  
+  const base_public_url = api_public;
 
   useEffect(() => {
     fetchIzinOperasi();
@@ -31,44 +32,44 @@ const DashboardIzinOperasi = () => {
   }, []);
 
   useEffect(() => {
-    if (clickIzinOperasi) {
-      setClickRla(null); // Reset clickRla when clickIzinOperasi changes
-      const filtered = izinOperasi.filter((row) => {
-        if (clickIzinOperasi === 'Expired') {
-          return row.due_days <= 0;
-        } else if (clickIzinOperasi === '< 9 Bulan') {
-          return row.due_days < 272 && row.due_days > 0;
-        } else if (clickIzinOperasi === '> 9 Bulan') {
-          return row.due_days >= 272;
-        } else {
-          return true;
-        }
-      });
-      setFilteredIzinOperasi(filtered);
-      // console.log("click:-", clickIzinOperasi);
-      // console.log("Filtered Izin Operasi Data:", filtered);
-    }
-  }, [clickIzinOperasi]);
-
-  useEffect(() => {
-    if (clickRla) {
-      setClickIzinOperasi(null); // Reset clickIzinOperasi when clickRla changes
-      const filtered = izinOperasi.filter((row) => {
-        if (clickRla === 'Expired') {
-          return row.rla_due_days <= 0 && row.rla_due_days !== null;
-        } else if (clickRla === '< 9 Bulan') {
-          return row.rla_due_days < 272 && row.rla_due_days > 0;
-        } else if (clickRla === '> 9 Bulan') {
-          return row.rla_due_days >= 272;
-        } else {
-          return true;
-        }
-      });
-      setFilteredIzinOperasi(filtered);
-      // console.log("click:-", clickRla);
-      // console.log("Filtered RLA Data:", filtered);
-    }
-  }, [clickRla]);
+      if (clickIzinOperasi) {
+        setclickRla(null); // Reset clickRla when clickIzinOperasi changes
+        const filtered = izinOperasi.filter((row) => {
+          if (clickIzinOperasi === 'Expired') {
+            return row.due_days <= 0;
+          } else if (clickIzinOperasi === '< 9 Bulan') {
+            return row.due_days < 272 && row.due_days > 0;
+          } else if (clickIzinOperasi === '> 9 Bulan') {
+            return row.due_days >= 272;
+          } else {
+            return true;
+          }
+        });
+        setFilteredIzinOperasi(filtered);
+        // console.log("click:-", clickIzinOperasi);
+        // console.log("Filtered IzinOperasi Data:", filtered);
+      }
+    }, [clickIzinOperasi]);
+  
+    useEffect(() => {
+      if (clickRla) {
+        setClickIzinOperasi(null); // Reset clickIzinOperasi when clickRla changes
+        const filtered = izinOperasi.filter((row) => {
+          if (clickRla === 'Expired') {
+            return row.rla_due_days <= 0 && row.rla_due_days !== null;
+          } else if (clickRla === '< 9 Bulan') {
+            return row.rla_due_days < 272 && row.rla_due_days > 0;
+          } else if (clickRla === '> 9 Bulan') {
+            return row.rla_due_days >= 272;
+          } else {
+            return true;
+          }
+        });
+        setFilteredIzinOperasi(filtered);
+        // console.log("click:-", clickRla);
+        // console.log("Filtered RLA Data:", filtered);
+      }
+    }, [clickRla]);
 
   const fetchIzinOperasi = async () => {
     try {
@@ -76,7 +77,7 @@ const DashboardIzinOperasi = () => {
       const data = await getIzinOperasi();
       setIzinOperasi(data.data);
     } catch (error) {
-      console.error("Error fetching Izin Operasi:", error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -87,7 +88,7 @@ const DashboardIzinOperasi = () => {
       const data = await izinOperasiCountDueDays();
       setCountIzinOperasi(data.data);
     } catch (error) {
-      console.error("Error fetching Izin Operasi:", error);
+      console.error("Error fetching IzinOperasi:", error);
     } finally {
       setLoading(false);
     }
@@ -95,30 +96,25 @@ const DashboardIzinOperasi = () => {
 
   const columns = [
     {
-      field: 'tag_number',
-      valueGetter: (params) => params.tag_number,
-      headerName: 'Tag Number',
-      width: 150,
-      renderCell: (params) => <div className='py-4'>{params.value}</div>,
-    },
-    {
-      field: 'plo',
-      valueGetter: (params) => params.unit.unit_name,
-      headerName: 'PLO',
-      width: 150,
-      renderCell: (params) => <div className='py-4'>{params.value}</div>,
+      field: 'unit',
+      headerName: 'Unit',
+      width: 130,
+      valueGetter: (params) => params.unit_name,
+      renderCell: (params) => (
+        <div className='py-4'>{params.row.unit.unit_name}</div>
+      ),
     },
     {
       field: 'no_certificate',
-      headerName: 'No Certificate',
-      width: 150,
+      headerName: 'Nomor Izin Operasi',
+      width: 200,
       renderCell: (params) => (
         <div className='py-4'>
           <Link
             to={`${base_public_url}izin_operasi/certificates/${params.row.izin_operasi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
-            onClick={() => handleAddActivity(params.row.izin_operasi_certificate, "Izin Operasi")}
+            onClick={() => handleAddActivity(params.row.izin_operasi_certificate, "IzinOperasi")}
           >
             {params.value}
           </Link>
@@ -167,8 +163,8 @@ const DashboardIzinOperasi = () => {
                 diffDays <= 0
                 ? 'text-white bg-red-600' // Expired
                 : diffDays < 272
-                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
+                ? 'bg-yellow-400 text-black' // Kurang dari 9 bulan
+                : 'bg-emerald-950 text-white' // Lebih dari 9 bulan
               } rounded-full w-fit p-2`}
             >
               {diffDays}
@@ -187,7 +183,7 @@ const DashboardIzinOperasi = () => {
             to={`${base_public_url}izin_operasi/certificates/${params.row.izin_operasi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
-            onClick={() => handleAddActivity(params.row.izin_operasi_certificate, "Izin Operasi")}
+            onClick={() => handleAddActivity(params.row.izin_operasi_certificate, "IzinOperasi")}
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -205,7 +201,7 @@ const DashboardIzinOperasi = () => {
               to={`${base_public_url}izin_operasi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
+              onClick={() => handleAddActivity(params.value, "IzinOperasi")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -303,7 +299,7 @@ const DashboardIzinOperasi = () => {
               to={`${base_public_url}izin_operasi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
+              onClick={() => handleAddActivity(params.value, "IzinOperasi")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -324,28 +320,7 @@ const DashboardIzinOperasi = () => {
               to={`${base_public_url}izin_operasi/rla/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
-            >
-              <IconCloudDownload stroke={2} />
-            </Link>
-          ) : (
-            <p>-</p>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: 're_engineer_certificate',
-      headerName: 'Re-Engineering file',
-      width: 150,
-      renderCell: (params) => (
-        <div className='py-4 pl-4'>
-          {params.value ? (
-            <Link
-              to={`${base_public_url}izin_operasi/re_engineer/${params.value}`}
-              target='_blank'
-              className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
+              onClick={() => handleAddActivity(params.value, "IzinOperasi")}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -372,14 +347,14 @@ const DashboardIzinOperasi = () => {
   
 
   const dataPieIzinOperasi = [
-    { label: "> 9 Bulan", value: countIzinOperasi.izin_operasi_more_than_nine_months || 0, color: "#06d6a0" },
-    { label: "< 9 Bulan", value: countIzinOperasi.izin_operasi_less_than_nine_months || 0, color: "#ffd166" },
+    { label: "> 9 Bulan", value: countIzinOperasi.izin_operasi_more_than_9_months || 0, color: "#06d6a0" },
+    { label: "< 9 Bulan", value: countIzinOperasi.izin_operasi_less_than_9_months || 0, color: "#ffd166" },
     { label: "Expired", value: countIzinOperasi.izin_operasi_expired || 0, color: "#ef476f" },
   ];
 
   const dataPieRla = [
-    { label: "> 9 Bulan", value: countIzinOperasi.rla_more_than_nine_months || 0, color: "#06d6a0" },
-    { label: "< 9 Bulan", value: countIzinOperasi.rla_less_than_nine_months || 0, color: "#ffd166" },
+    { label: "> 9 Bulan", value: countIzinOperasi.rla_more_than_9_months || 0, color: "#06d6a0" },
+    { label: "< 9 Bulan", value: countIzinOperasi.rla_less_than_9_months || 0, color: "#ffd166" },
     { label: "Expired", value: countIzinOperasi.rla_expired || 0, color: "#ef476f" }, 
   ];
 
@@ -396,7 +371,7 @@ const DashboardIzinOperasi = () => {
       },
     },
   };
-  const sizingRla = {
+  const sizingrla = {
     margin: {left: 90},
     legend: {
       direction: 'column',
@@ -407,19 +382,18 @@ const DashboardIzinOperasi = () => {
       },
     },
   };
-
   return (
     <div className='flex flex-col md:flex-row w-full'>
       { !hide && <Header />}
-        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
-          <div className='md:flex hidden'>
-            <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArticle />
-            </div>
-          </div>
-          <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
             <IconArticle />
           </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArticle />
+        </div>
         <Breadcrumbs
           aria-label='breadcrumb'
           separator={
@@ -440,11 +414,11 @@ const DashboardIzinOperasi = () => {
         </Breadcrumbs>
         {/* PIE CHART */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-        {loading ?
+        {loading ? 
           <div className="flex flex-col items-center justify-center h-20">
               <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
           </div> 
-        :(
+        : (
           <div className='flex flex-col md:flex-row justify-evenly'>
             <div className="flex flex-col items-center">
               <span>Izin Operasi</span>
@@ -463,7 +437,6 @@ const DashboardIzinOperasi = () => {
                   const clickedData = dataPieIzinOperasi[d.dataIndex];
                   setClickIzinOperasi(clickedData.label);
                 }}
-
                 sx={{
                   [`& .${pieArcLabelClasses.root}`]: {
                     fill: 'white',
@@ -474,7 +447,7 @@ const DashboardIzinOperasi = () => {
               />
             </div>
             <div className="flex flex-col items-center text-center">
-              <span>RLA</span>
+              <span>RLA Instalasi</span>
               <PieChart
                 series={[
                   {
@@ -494,30 +467,22 @@ const DashboardIzinOperasi = () => {
                 height={200}
                 onItemClick={(event, d) => {
                   const clickedData = dataPieRla[d.dataIndex];
-                  setClickRla(clickedData.label);
+                  setclickRla(clickedData.label);
                 }}
-
-                {...sizingRla}
+                {...sizingrla}
               />
             </div>
           </div>
         )}
         </div>
-        {/* TABLE izin_operasi */}
-        {/* <div> 
-          <h1 className='text-2xl font-semibold text-emerald-950'>Data Izin Operasi</h1>
-          <div>{clickIzinOperasi ? clickIzinOperasi : 'izin_operasi'} | {clickRla ? clickRla : 'rla'}</div>
-        </div> */}
+        {/* TABLE IZIN OPERASI */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-        {loading ?
-              <div className="flex flex-col items-center justify-center h-20">
-                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
-              </div> 
-            :(<div className='flex flex-col'>
+          <div className='flex flex-row justify-between'>
+          {loading ? <p>Loading...</p> : <div className="flex flex-col w-full">
             <div className='flex justify-end items-center mb-4'>
-              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredIzinOperasi(izinOperasi); setClickIzinOperasi(null); setClickRla(null);}} >Reset Filter</button>
+              <button className='px-2 py-2 flex justify-end bg-emerald-950 text-lime-400 text-sm rounded w-fit' onClick={() => {setFilteredIzinOperasi(izinOperasi); setClickIzinOperasi(null); setclickRla(null);}} >Reset Filter</button>
             </div>
-            <DataGrid
+          <DataGrid
               rows={filteredIzinOperasi.length > 0 ? filteredIzinOperasi : izinOperasi}
               columns={columns}
               // checkboxSelection
@@ -548,11 +513,10 @@ const DashboardIzinOperasi = () => {
               }}
               pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
               
-            />
-          </div> )}
+            /> </div> }
+          </div>
         </div>
       </div>
-      
     </div>
   );
 };

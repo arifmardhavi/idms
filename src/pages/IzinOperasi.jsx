@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { useEffect, useState } from 'react';
 import * as motion from 'motion/react-client';
 import {
   DataGrid,
@@ -10,19 +10,16 @@ import {
   deleteIzinOperasi,
   getIzinOperasi,
   downloadSelectedIzinOperasi,
-} from '../services/izin_operasi.service';
-import {
-  IconPencil,
-  IconCircleMinus,
-  IconRefresh,
-  IconCloudDownload,
-  IconPlus,
-  IconArticle,
-  IconEye,
-} from '@tabler/icons-react';
+} from '../services/izin_operasi1.service';
+import { IconArticle, IconPencil } from '@tabler/icons-react';
+import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
+import { IconRefresh } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
+import { IconCloudDownload } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { api_public } from '../services/config';
+import { IconEye } from '@tabler/icons-react';
 import { IconLoader2 } from '@tabler/icons-react';
 import { jwtDecode } from 'jwt-decode';
 import ExcelJS from 'exceljs';
@@ -30,13 +27,15 @@ import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
 import { handleAddActivity } from '../utils/handleAddActivity';
 
+
 const IzinOperasi = () => {
-  const [izinOperasi, setIzinOperasi] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [izinOperasi, setIzinOperasi] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hide, setHide] = useState(false);
   const base_public_url = api_public;
+  const [hide, setHide] = useState(false);
   const [userLevel, setUserLevel] = useState('')
+  
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -55,9 +54,8 @@ const IzinOperasi = () => {
       setLoading(true);
       const data = await getIzinOperasi();
       setIzinOperasi(data.data);
-      // console.log(data.data);
     } catch (error) {
-      console.error("Error fetching Izin Operasi:", error);
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -83,7 +81,7 @@ const IzinOperasi = () => {
           Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Izin Operasi!", "error");
         }
       } catch (error) {
-        console.error("Error deleting Izin Operasi:", error);
+        console.log(error);
         Swal.fire("Gagal!", "Terjadi kesalahan saat menghapus Izin Operasi!", "error");
       }
     }
@@ -96,7 +94,11 @@ const IzinOperasi = () => {
     }
 
     downloadSelectedIzinOperasi(selectedRows);
-    Swal.fire("Berhasil!", `${selectedRows.length} file berhasil didownload!`, "success");
+    Swal.fire(
+      "Berhasil!",
+      `${selectedRows.length} file berhasil didownload!`,
+      "success"
+    );
   };
 
   const handleExportToExcel = async () => {
@@ -104,42 +106,25 @@ const IzinOperasi = () => {
     const worksheet = workbook.addWorksheet('Izin Operasi Data');
 
     worksheet.columns = [
-      { header: 'PLO', key: 'plo', width: 15 },
-      { header: 'Tag Number', key: 'tag_number', width: 18 },
-      { header: 'No Certificate', key: 'no_certificate', width: 32 },
+      { header: 'Unit', key: 'unit', width: 15 },
+      { header: 'Nomor Izin', key: 'no_certificate', width: 32 },
       { header: 'Issue Date', key: 'issue_date', width: 15 },
-      { header: 'Inspection Due Date', key: 'overdue_date', width: 18 },
+      { header: 'Expired Date', key: 'overdue_date', width: 18 },
       { header: 'Due Days', key: 'due_days', width: 10 },
-      { header: 'RLA Certificate', key: 'rla_certificate', width: 32 },
-      { header: 'RLA Issue Date', key: 'rla_issue', width: 15 },
-      { header: 'RLA Due Date', key: 'rla_overdue', width: 15 },
-      { header: 'RLA Due Days', key: 'rla_due_days', width: 12 },
-      { header: 'Re-Engineering File', key: 're_engineer_certificate', width: 32 },
     ];
-
 
     izinOperasi.forEach((item) => {
       worksheet.addRow({
-        plo: item.plo?.unit?.unit_name || '',
-        tag_number: item.tag_number?.tag_number || '',
+        unit: item.unit?.unit_name || '',
         no_certificate: item.no_certificate,
         issue_date: item.issue_date,
         overdue_date: item.overdue_date,
         due_days: item.due_days,
-        rla_certificate: item.rla_certificate || '',
-        rla_issue: item.rla_issue,
-        rla_overdue: item.rla_overdue,
-        rla_due_days: item.rla_due_days,
-        re_engineer_certificate: item.re_engineer_certificate || '',
       });
 
       const lastRow = worksheet.lastRow;
-
       const no_certificate = lastRow.getCell('no_certificate');
-      const rla_certificate = lastRow.getCell('rla_certificate');
-      const re_engineer_certificate = lastRow.getCell('re_engineer_certificate');
 
-      // No Certificate
       if (item.no_certificate && item.izin_operasi_certificate) {
         no_certificate.value = {
           text: item.no_certificate,
@@ -150,41 +135,14 @@ const IzinOperasi = () => {
           underline: true,
         };
       }
-
-      // RLA Certificate
-      if (item.rla_certificate) {
-        rla_certificate.value = {
-          text: item.rla_certificate,
-          hyperlink: `${api_public}izin_operasi/rla/${item.rla_certificate}`,
-        };
-        rla_certificate.font = {
-          color: { argb: 'FF0000FF' },
-          underline: true,
-        };
-      }
-
-      // Re-Engineer Certificate
-      if (item.re_engineer_certificate) {
-        re_engineer_certificate.value = {
-          text: item.re_engineer_certificate,
-          hyperlink: `${api_public}izin_operasi/re_engineer/${item.re_engineer_certificate}`,
-        };
-        re_engineer_certificate.font = {
-          color: { argb: 'FF0000FF' },
-          underline: true,
-        };
-      }
     });
 
-
-
-    // Style header
     worksheet.getRow(1).eachCell((cell) => {
       cell.font = { bold: true };
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'A7F3D0' }, // warna hijau muda
+        fgColor: { argb: 'A7F3D0' },
       };
       cell.border = {
         top: { style: 'thin' },
@@ -195,18 +153,12 @@ const IzinOperasi = () => {
     });
 
     worksheet.eachRow({ includeEmpty: true }, (row) => {
-      // Dapatkan jumlah kolom dari worksheet (agar semua cell dilintasi, termasuk yang kosong)
       const totalColumns = worksheet.columnCount;
-
       for (let col = 1; col <= totalColumns; col++) {
         const cell = row.getCell(col);
-
-        // Paksa set isi kosong jika memang kosong (agar cell terbuat dan bisa diborder)
         if (cell.value === undefined || cell.value === null) {
-          cell.value = ''; // Supaya cell eksis
+          cell.value = '';
         }
-
-        // Tambahkan border
         cell.border = {
           top: { style: 'thin' },
           left: { style: 'thin' },
@@ -216,92 +168,37 @@ const IzinOperasi = () => {
       }
     });
 
-    // Mulai dari baris ke-2 karena baris ke-1 adalah header
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-      if (rowNumber === 1) return; // skip header
-
-      const dueDaysCell = row.getCell('due_days');
-      const rlaDueDaysCell = row.getCell('rla_due_days');
-
-      const formatDueDaysCell = (cell) => {
-        const raw = cell.value;
-        // Kalau kosong/null/undefined
-        if (raw === null || raw === undefined || raw === '') {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'E5E7EB' }, // abu-abu Tailwind slate-200
-          };
-          cell.font = { color: { argb: '000000' } }; // teks hitam
-          return;
-        }
-
-        const value = Number(raw);
-        if (isNaN(value)) return;
-
-        if (value <= 0) {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'DC2626' }, // merah
-          };
-          cell.font = { color: { argb: 'FFFFFF' } }; // putih
-        } else if (value < 272) {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'FACC15' }, // kuning
-          };
-          cell.font = { color: { argb: '000000' } }; // hitam
-        } else {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: '065F46' }, // hijau tua
-          };
-          cell.font = { color: { argb: 'FFFFFF' } }; // putih
-        }
-      };
-
-      formatDueDaysCell(dueDaysCell);
-      formatDueDaysCell(rlaDueDaysCell);
-    });
-
-
-
-    // Save
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, `izin-operasi-export-${getWITDateLong()}.xlsx`);
+    const blob = new Blob(
+      [buffer],
+      { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+    );
+    saveAs(blob, `izin_operasi-export-${getWITDateLong()}.xlsx`);
   };
-
 
   const columns = [
     {
-      field: 'tag_number',
-      valueGetter: (params) => params.tag_number,
-      headerName: 'Tag Number',
-      width: 150,
-      renderCell: (params) => <div className='py-4'>{params.value}</div>,
-    },
-    {
-      field: 'plo',
-      valueGetter: (params) => params.unit.unit_name,
-      headerName: 'PLO',
-      width: 150,
-      renderCell: (params) => <div className='py-4'>{params.value}</div>,
+      field: 'unit',
+      headerName: 'Unit',
+      width: 130,
+      valueGetter: (params) => params.unit_name,
+      renderCell: (params) => (
+        <div className='py-4'>{params.row.unit.unit_name}</div>
+      ),
     },
     {
       field: 'no_certificate',
-      headerName: 'No Certificate',
-      width: 150,
+      headerName: 'Nomor Izin Operasi',
+      width: 200,
       renderCell: (params) => (
         <div className='py-4'>
           <Link
             to={`${base_public_url}izin_operasi/certificates/${params.row.izin_operasi_certificate}`}
             target='_blank'
             className='text-lime-500 underline'
-            onClick={() => handleAddActivity(params.row.izin_operasi_certificate, "Izin Operasi")}
+            onClick={() =>
+              handleAddActivity(params.row.izin_operasi_certificate, 'IZIN_OPERASI')
+            }
           >
             {params.value}
           </Link>
@@ -324,7 +221,7 @@ const IzinOperasi = () => {
     },
     {
       field: 'overdue_date',
-      headerName: 'Inspection Due Date',
+      headerName: 'Expired Date',
       width: 150,
       renderCell: (params) => (
         <div className='py-4'>
@@ -348,10 +245,10 @@ const IzinOperasi = () => {
             <p
               className={`${
                 diffDays <= 0
-                ? 'text-white bg-red-600' // Expired
-                : diffDays < 272
-                ? 'bg-yellow-400 text-black' // Kurang dari 9 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 9 bulan
+                  ? 'text-white bg-red-600'
+                  : diffDays < 272
+                  ? 'bg-yellow-400 text-black'
+                  : 'bg-emerald-950 text-white'
               } rounded-full w-fit p-2`}
             >
               {diffDays}
@@ -370,7 +267,9 @@ const IzinOperasi = () => {
             to={`${base_public_url}izin_operasi/certificates/${params.row.izin_operasi_certificate}`}
             target='_blank'
             className='item-center text-lime-500'
-            onClick={() => handleAddActivity(params.row.izin_operasi_certificate, "Izin Operasi")}
+            onClick={() =>
+              handleAddActivity(params.row.izin_operasi_certificate, 'IZIN_OPERASI')
+            }
           >
             <IconCloudDownload stroke={2} />
           </Link>
@@ -388,7 +287,7 @@ const IzinOperasi = () => {
               to={`${base_public_url}izin_operasi/certificates/${params.value}`}
               target='_blank'
               className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
+              onClick={() => handleAddActivity(params.value, 'IZIN_OPERASI')}
             >
               <IconCloudDownload stroke={2} />
             </Link>
@@ -404,7 +303,8 @@ const IzinOperasi = () => {
       width: 120,
       renderCell: (params) => (
         <div className='py-4 pl-4'>
-          <Link to={`/izin_operasi/report/${params.row.id}`}
+          <Link
+            to={`/izin_operasi/report/${params.row.id}`}
             className=' text-lime-500'
           >
             <IconEye stroke={2} />
@@ -412,173 +312,36 @@ const IzinOperasi = () => {
         </div>
       ),
     },
-    {
-      field: 'rla',
-      headerName: 'Laporan & RLA',
-      width: 150,
-      valueGetter: (params) => (params == 1 ? 'YES' : 'NO'),
-      renderCell: (params) => (
-        <div className='py-4'>
-          <span
-            className={`${
-              params.row.rla == 0
-                ? 'text-lime-300 bg-emerald-950'
-                : 'bg-lime-400 text-emerald-950'
-            } rounded-lg w-fit px-2 py-1`}
-          >
-            {params.row.rla == 0 ? 'NO' : 'YES'}
-          </span>
-        </div>
-      ),
-    },
-    {
-      field: 'rla_issue',
-      headerName: 'RLA Issue Date',
-      width: 150,
-      renderCell: (params) => (
-        <div className='py-4'>
-          {params.value
-            ? new Intl.DateTimeFormat('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              }).format(new Date(params.value))
-            : '-'}
-        </div>
-      ),
-    },
-    {
-      field: 'rla_overdue',
-      headerName: 'RLA Due Date',
-      width: 150,
-      renderCell: (params) => (
-        <div className='py-4'>
-          {params.value
-            ? new Intl.DateTimeFormat('id-ID', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              }).format(new Date(params.value))
-            : '-'}
-        </div>
-      ),
-    },
-    {
-      field: 'rla_due_days',
-      headerName: 'RLA Due',
-      width: 80,
-      renderCell: (params) => {
-        const diffDays = params.value;
-
-        return (
-          <div className='py-2 pl-3'>
-            <p
-              className={`${
-                params.row.rla == 0
-                ? 'text-emerald-950'
-                : diffDays <= 0
-                ? 'text-white bg-red-600' // Expired
-                : diffDays < 272
-                ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
-                : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
-              } rounded-full w-fit p-2`}
-            >
-              {params.row.rla == 0 ? '-' : diffDays}
-            </p>
-          </div>
-        );
-      },
-    },
-    {
-      field: 'rla_certificate',
-      headerName: 'Laporan & RLA file',
-      width: 160,
-      renderCell: (params) => (
-        <div className='py-4 pl-4'>
-          {params.value ? (
-            <Link
-              to={`${base_public_url}izin_operasi/rla/${params.value}`}
-              target='_blank'
-              className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
-            >
-              <IconCloudDownload stroke={2} />
-            </Link>
-          ) : (
-            <p>-</p>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: 'rla_old_certificate',
-      headerName: 'Laporan & RLA lama',
-      width: 160,
-      renderCell: (params) => (
-        <div className='py-4 pl-4'>
-          {params.value ? (
-            <Link
-              to={`${base_public_url}izin_operasi/rla/${params.value}`}
-              target='_blank'
-              className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
-            >
-              <IconCloudDownload stroke={2} />
-            </Link>
-          ) : (
-            <p>-</p>
-          )}
-        </div>
-      ),
-    },
-    {
-      field: 're_engineer_certificate',
-      headerName: 'Re-Engineering file',
-      width: 150,
-      renderCell: (params) => (
-        <div className='py-4 pl-4'>
-          {params.value ? (
-            <Link
-              to={`${base_public_url}izin_operasi/re_engineer/${params.value}`}
-              target='_blank'
-              className=' text-lime-500'
-              onClick={() => handleAddActivity(params.value, "Izin Operasi")}
-            >
-              <IconCloudDownload stroke={2} />
-            </Link>
-          ) : (
-            <p>-</p>
-          )}
-        </div>
-      ),
-    },
-    ...(userLevel !== '4' && userLevel !== '5' ? [{
-      field: 'actions',
-      headerName: 'Aksi',
-      width: 150,
-      renderCell: (params) => (
-        <div className='flex flex-row justify-center py-2 items-center space-x-2'>
-          <Link to={`/izin_operasi/edit/${params.row.id}`}>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
-              // onClick={() => handleEdit(params.row)}
-            >
-              <IconPencil stroke={2} />
-            </motion.button>
-          </Link>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
-            onClick={() => handleDelete(params.row)}
-          >
-            <IconCircleMinus stroke={2} />
-          </motion.button>
-        </div>
-      ),
-    }] : [])
+    ...(userLevel !== '4' && userLevel !== '5'
+      ? [
+          {
+            field: 'actions',
+            headerName: 'Aksi',
+            width: 150,
+            renderCell: (params) => (
+              <div className='flex flex-row justify-center py-2 items-center space-x-2'>
+                <Link to={`/izin_operasi/edit/${params.row.id}`}>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className='px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+                  >
+                    <IconPencil stroke={2} />
+                  </motion.button>
+                </Link>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className='px-2 py-1 bg-emerald-950 text-red-500 text-sm rounded'
+                  onClick={() => handleDelete(params.row)}
+                >
+                  <IconCircleMinus stroke={2} />
+                </motion.button>
+              </div>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const CustomQuickFilter = () => (
@@ -596,25 +359,43 @@ const IzinOperasi = () => {
 
   return (
     <div className='flex flex-col md:flex-row w-full'>
-      { !hide && <Header />}
-      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+      {!hide && <Header />}
+      <div
+        className={`flex flex-col ${
+          hide ? '' : 'md:pl-64'
+        } w-full px-2 py-4 space-y-3`}
+      >
         <div className='md:flex hidden'>
-          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
+          <div
+            className={`${
+              hide ? 'hidden' : 'block'
+            } w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`}
+            onClick={() => setHide(true)}
+          >
             <IconArticle />
           </div>
         </div>
-        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+        <div
+          className={`${
+            hide ? 'block' : 'hidden'
+          }  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`}
+          onClick={() => setHide(false)}
+        >
           <IconArticle />
         </div>
+
+        {/* GET IZIN OPERASI */}
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
-          <div className='flex flex-col sm:flex-row justify-center items-center space-y-1 sm:space-y-0 sm:justify-between'>
-            <h1 className='text-xl font-bold uppercase'>Izin Operasi</h1>
+          <div className='flex flex-row justify-between'>
+            <h1 className='text-xl font-bold uppercase'>IZIN OPERASI</h1>
+
             <Link
               to={'/izin_operasi/dashboard'}
-              className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded w-fit'
+              className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
             >
               Dashboard Izin Operasi
             </Link>
+
             <div className='flex flex-row justify-end items-center space-x-2'>
               <motion.button
                 onClick={handleExportToExcel}
@@ -625,6 +406,7 @@ const IzinOperasi = () => {
                 <IconCloudDownload />
                 <span>Export Excel</span>
               </motion.button>
+
               {selectedRows.length > 0 && (
                 <motion.button
                   onClick={handleDownloadSelected}
@@ -636,65 +418,73 @@ const IzinOperasi = () => {
                   <span>Download file Izin Operasi</span>
                 </motion.button>
               )}
-              <motion.a
-                href='/izin_operasi'
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
-                className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded'
+
+              <button
+                onClick={fetchIzinOperasi}
+                className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900"
               >
-                <IconRefresh className='hover:rotate-180 transition duration-500' />
-                <span>Refresh</span>
-              </motion.a>
-              { userLevel !== '4' && userLevel !== '5' && <Link
-                to='/izin_operasi/tambah'
-                className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded  hover:scale-110 transition duration-100'
-              >
-                <IconPlus className='hover:rotate-180 transition duration-500' />
-                <span>Tambah</span>
-              </Link>}
+              <IconRefresh className="hover:rotate-90 duration-300" /> Refresh
+              </button>
+
+              {userLevel !== '4' && userLevel !== '5' && (
+                <Link
+                  to='/izin_operasi/tambah'
+                  className='flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded hover:scale-110 transition duration-100'
+                >
+                  <IconPlus className='hover:rotate-180 transition duration-500' />
+                  <span>Tambah</span>
+                </Link>
+              )}
             </div>
           </div>
+
           <div>
-          {loading ? 
-              <div className="flex flex-col items-center justify-center h-20">
-                  <IconLoader2 stroke={2} className="animate-spin rounded-full h-10 w-10 " />
-              </div> 
-            : <DataGrid
-              rows={izinOperasi}
-              columns={columns}
-              checkboxSelection
-              disableColumnFilter
-              disableColumnSelector
-              disableDensitySelector
-              pagination
-              getRowHeight={() => 'auto'}
-              slots={{ toolbar: CustomQuickFilter }}
-              slotProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                  printOptions: { disableToolbarButton: true },
-                  csvOptions: { disableToolbarButton: true },
-                },
-              }}
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
-                },
-                filter: {
-                  filterModel: {
-                    items: [],
-                    quickFilterExcludeHiddenColumns: false,
-                    quickFilterLogicOperator: GridLogicOperator.And,
+            {loading ? (
+              <div className='flex flex-col items-center justify-center h-20'>
+                <IconLoader2
+                  stroke={2}
+                  className='animate-spin rounded-full h-10 w-10'
+                />
+              </div>
+            ) : (
+              <DataGrid
+                rows={izinOperasi}
+                columns={columns}
+                checkboxSelection
+                disableColumnFilter
+                disableColumnSelector
+                disableDensitySelector
+                pagination
+                getRowHeight={() => 'auto'}
+                slots={{ toolbar: CustomQuickFilter }}
+                slotProps={{
+                  toolbar: {
+                    showQuickFilter: true,
+                    printOptions: { disableToolbarButton: true },
+                    csvOptions: { disableToolbarButton: true },
                   },
-                },
-              }}
-              pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
-              onRowSelectionModelChange={(newSelectionModel) => {
-                setSelectedRows(newSelectionModel); // Update state dengan ID yang dipilih
-              }}
-            />}
+                }}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 10, page: 0 },
+                  },
+                  filter: {
+                    filterModel: {
+                      items: [],
+                      quickFilterExcludeHiddenColumns: false,
+                      quickFilterLogicOperator: GridLogicOperator.And,
+                    },
+                  },
+                }}
+                pageSizeOptions={[10, 25, 50, { value: -1, label: 'All' }]}
+                onRowSelectionModelChange={(newSelectionModel) => {
+                  setSelectedRows(newSelectionModel);
+                }}
+              />
+            )}
           </div>
         </div>
+        {/* GET IZIN OPERASI */}
       </div>
     </div>
   );

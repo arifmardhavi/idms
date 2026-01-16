@@ -1,87 +1,33 @@
 import Header from '../Header';
-import { Autocomplete, Breadcrumbs, TextField, Typography } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Breadcrumbs, Typography } from '@mui/material';
 import { IconArticle, IconChevronRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
-import { addIzinOperasi } from '../../services/izin_operasi.service';
-import { getPlo } from '../../services/plo.service';
-import { getCategory } from '../../services/category.service';
-import { getTypeByCategory } from '../../services/type.service';
-import { getTagnumberByTypeUnit } from '../../services/tagnumber.service';
+import { addIzinOperasi } from '../../services/izin_operasi1.service';
+import { ActiveUnit } from '../../services/unit.service';
 import Swal from 'sweetalert2';
 import * as motion from 'motion/react-client';
 
 const AddIzinOperasi = () => {
   const navigate = useNavigate();
   const [IsRLA, setIsRLA] = useState(false);
-  const [IsReEng, setIsReEng] = useState(false);
-  const [unitId, setUnitId] = useState('');
-  const [ploList, setPloList] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
-  const [selectedPlo, setSelectedPlo] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
-  const [TagNumbers, setTagNumbers] = useState([]);
+  const [IsUnit, setIsUnit] = useState([]);
+  const [selectedUnit, setSelectedUnit] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
-  const [tagnumberId, setTagnumberId] = useState([]);
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
-    fetchPlo();
-    fetchCategories();
+    fetchUnits();
   }, []);
 
-  const fetchPlo = async () => {
+  const fetchUnits = async () => {
     try {
-      const data = await getPlo();
-      setPloList(data.data);
+      const data = await ActiveUnit();
+      setIsUnit(data.data);
     } catch (error) {
-      console.error("Error fetching PLO:", error);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const data = await getCategory();
-      setCategoryList(data.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const handleCategoryChange = async (categoryId) => {
-    setSelectedCategory(categoryId);
-    setSelectedType('');
-    setTagNumbers([]);
-    
-    if (categoryId) {
-      try {
-        const data = await getTypeByCategory(categoryId);
-        setFilteredTypes(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching types:", error);
-        setFilteredTypes([]);
-      }
-    } else {
-      setFilteredTypes([]);
-    }
-  };
-
-  const handleTypeChange = async (typeId) => {
-    setSelectedType(typeId);
-    
-    if (typeId && unitId) {
-      try {
-        const data = await getTagnumberByTypeUnit(typeId, unitId);
-        setTagNumbers(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching tag numbers:", error);
-        setTagNumbers([]);
-      }
-    } else {
-      setTagNumbers([]);
+      console.error("Error fetching units:", error);
     }
   };
 
@@ -91,14 +37,12 @@ const AddIzinOperasi = () => {
 
     try {
       const formData = new FormData();
-      formData.append('plo_id', e.target.plo_id.value);
-      formData.append('tag_number_id', tagnumberId ?? 0);
+      formData.append('unit_id', e.target.unit_id.value);
       formData.append('no_certificate', e.target.no_certificate.value);
       formData.append('izin_operasi_certificate', e.target.izin_operasi_certificate.files[0]);
       formData.append('issue_date', e.target.issue_date.value);
       formData.append('overdue_date', e.target.overdue_date.value);
       formData.append('rla', e.target.rla.value);
-      formData.append('re_engineer', e.target.re_engineer.value);
 
       if (IsRLA) {
         formData.append('rla_issue', e.target.rla_issue.value);
@@ -106,20 +50,18 @@ const AddIzinOperasi = () => {
         formData.append('rla_certificate', e.target.rla_certificate.files[0]);
       }
 
-      if (IsReEng){
-        formData.append('re_engineer_certificate', e.target.re_engineer_certificate.files[0]);
-      }
-
       const res = await addIzinOperasi(formData);
       if (res.success) {
         Swal.fire("Berhasil!", "Izin Operasi berhasil ditambahkan!", "success");
         navigate('/izin_operasi');
       } else {
+        console.log(res.response.data.errors);
         setValidation(res.response?.data.errors || []);
         Swal.fire("Gagal!", "Izin Operasi gagal ditambahkan!", "error");
       }
     } catch (error) {
       console.error("Error adding Izin Operasi:", error);
+      console.log(error.response.data.errors);
       setValidation(error.response?.data.errors || []);
       Swal.fire("Error!", "Terjadi kesalahan saat menambahkan Izin Operasi!", "error");
     } finally {
@@ -131,15 +73,15 @@ const AddIzinOperasi = () => {
   return (
     <div className='flex flex-col md:flex-row w-full'>
       { !hide && <Header />}
-        <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
-          <div className='md:flex hidden'>
-            <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
-              <IconArticle />
-            </div>
-          </div>
-          <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+      <div className={`flex flex-col ${hide ? '' : 'md:pl-64'} w-full px-2 py-4 space-y-3`}>
+        <div className='md:flex hidden'>
+          <div className={`${hide ? 'hidden' : 'block'} w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(true)}>
             <IconArticle />
           </div>
+        </div>
+        <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
+          <IconArticle />
+        </div>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <Breadcrumbs
             aria-label='breadcrumb'
@@ -147,7 +89,11 @@ const AddIzinOperasi = () => {
               <IconChevronRight className='text-emerald-950' stroke={2} />
             }
           >
-            <Link className='hover:underline text-emerald-950' to='/'>
+            <Link
+              className='hover:underline text-emerald-950'
+              to='/'
+              onClick={() => localStorage.setItem('active', 'Home')}
+            >
               Home
             </Link>
             <Link className='hover:underline text-emerald-950' to='/izin_operasi'>
@@ -164,140 +110,25 @@ const AddIzinOperasi = () => {
               <div className='flex flex-col space-y-2'>
                 <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
-                    <label htmlFor='plo' className='text-emerald-950'>
-                      Plo <sup className='text-red-500'>*</sup>
+                    <label htmlFor='unit' className='text-emerald-950'>
+                      Unit <sup className='text-red-500'>*</sup>
                     </label>
                     <select
-                      name='plo_id'
-                      id='plo'
+                      name='unit_id'
+                      id='unit'
                       className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                      value={selectedPlo}
-                      onChange={(e) => {
-                        setSelectedPlo(e.target.value);
-                        setSelectedType('');
-                        setTagNumbers([]);
-                        setUnitId(
-                          e.target.options[e.target.selectedIndex].getAttribute(
-                            'unit'
-                          )
-                        );
-                      }} // Panggil fungsi saat unit berubah
+                      value={selectedUnit}
+                      onChange={(e) => setSelectedUnit(e.target.value)} // Panggil fungsi saat unit berubah
                       required
                     >
-                      <option value=''>Pilih Plo</option>
-                      {ploList.map((plo) => (
-                        <option key={plo.id} value={plo.id} unit={plo.unit_id}>
-                          {plo.unit.unit_name}
+                      <option value=''>Pilih Unit</option>
+                      {IsUnit.map((unit) => (
+                        <option key={unit.id} value={unit.id}>
+                          {unit.unit_name}
                         </option>
                       ))}
                     </select>
-                    {validation.plo_id && (
-                      validation.plo_id.map((item, index) => (
-                        <div key={index}>
-                          <small className="text-red-600 text-sm">{item}</small>
-                        </div>
-                      ))
-                    )}
                   </div>
-                  <div className='w-full'>
-                    <label htmlFor='category' className='text-emerald-950'>
-                      Kategori <sup className='text-red-500'>*</sup>
-                    </label>
-                    <select
-                      name='category_id'
-                      id='category'
-                      className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                      value={selectedCategory}
-                      onChange={(e) => handleCategoryChange(e.target.value)}
-                    >
-                      <option value=''>Pilih Kategori</option>
-                      {categoryList.length > 0 ? (
-                        categoryList.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.category_name}
-                          </option>
-                        ))
-                      ) : (
-                        <option value='' disabled>
-                          Tidak ada kategori
-                        </option>
-                      )}
-                    </select>
-                    {validation.category_id && (
-                      validation.category_id.map((item, index) => (
-                        <div key={index}>
-                          <small className="text-red-600 text-sm">{item}</small>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-                <div className='flex flex-row space-x-2'>
-                  <div className='w-full'>
-                    <label htmlFor='type' className='text-emerald-950'>
-                      Tipe <sup className='text-red-500'>*</sup>
-                    </label>
-                    <Autocomplete
-                      id="type"
-                      value={filteredTypes.find((type) => type.id === selectedType) || null}
-                      onChange={(event, newValue) => handleTypeChange(newValue ? newValue.id : '')}
-                      options={selectedPlo === '' ? [] : filteredTypes}
-                      getOptionLabel={(option) => option.type_name || ''}
-                      isOptionEqualToValue={(option, value) => option.id === value.id}
-                      noOptionsText={selectedPlo === '' ? 'Pilih Plo terlebih dahulu' : 'Tidak ada Tipe'}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          name="type_id" // Tambahkan name di sini
-                          placeholder={selectedPlo === '' ? 'Pilih Plo terlebih dahulu' : 'Pilih Tipe'}
-                          variant="outlined"
-                          error={!!validation.type_id}
-                          helperText={
-                            validation.type_id &&
-                            validation.type_id.map((item, index) => (
-                              <span key={index} className="text-red-600 text-sm">
-                                {item}
-                              </span>
-                            ))
-                          }
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className='w-full'>
-                    <label htmlFor='tag_number' className='text-emerald-950'>
-                      Tag Number <sup className='text-red-500'>*</sup>
-                    </label>
-                    <Autocomplete 
-                      id="tag_number"
-                      options={TagNumbers}
-                      getOptionLabel={(option) => option.tag_number} // Tampilkan tag_number
-                      isOptionEqualToValue={(option, value) => option.id === value} // Bandingkan ID langsung
-                      onChange={(event, newValue) => {
-                        const selectedId = newValue ? newValue.id : '';
-                        setTagnumberId(selectedId);
-                      }}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          name="tag_number_id"
-                          placeholder="Pilih Tag Number"
-                          variant="outlined"
-                          error={!!validation.tag_number_id}
-                          helperText={
-                            validation.tag_number_id &&
-                            validation.tag_number_id.map((item, index) => (
-                              <span key={index} className="text-red-600 text-sm">
-                                {item}
-                              </span>
-                            ))
-                          }
-                        />
-                      )}
-                    />
-                  </div>
-                </div>
-                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='w-full'>
                     <label className='text-emerald-950'>
                       No Certificate <sup className='text-red-500'>*</sup>{' '}
@@ -310,38 +141,9 @@ const AddIzinOperasi = () => {
                       className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                       required
                     />
-                    {validation.no_certificate && (
-                      validation.no_certificate.map((item, index) => (
-                        <div key={index}>
-                          <small className="text-red-600 text-sm">{item}</small>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className='w-full'>
-                    <label
-                      className='text-emerald-950'
-                      htmlFor='izin_operasi_certificate'
-                    >
-                      Izin Operasi Certificate <sup className='text-red-500'>*</sup>
-                    </label>
-                    <input
-                      type='file'
-                      name='izin_operasi_certificate'
-                      id='izin_operasi_certificate'
-                      className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                      required
-                    />
-                    {validation.izin_operasi_certificate && (
-                      validation.izin_operasi_certificate.map((item, index) => (
-                        <div key={index}>
-                          <small className="text-red-600 text-sm">{item}</small>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </div>
-                <div className='flex flex-col space-y-2'>
+                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
                   <div className='flex flex-row space-x-2 w-full'>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
@@ -354,13 +156,6 @@ const AddIzinOperasi = () => {
                         className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
                         required
                       />
-                      {validation.issue_date && (
-                        validation.issue_date.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
                     </div>
                     <div className='w-full'>
                       <label className='text-emerald-950'>
@@ -382,77 +177,42 @@ const AddIzinOperasi = () => {
                       )}
                     </div>
                   </div>
-                  <div className='flex flex-row space-x-2 w-full'>
-                    <div className='w-full'>
-                      <label className='text-emerald-950' htmlFor='rla'>
-                        RLA
-                      </label>
-                      <select
-                        name='rla'
-                        id='rla'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                        onChange={(e) =>
-                          e.target.value == 1 ? setIsRLA(true) : setIsRLA(false)
-                        }
-                      >
-                        <option value='0'>N/A</option>
-                        <option value='1'>Available</option>
-                      </select>
-                      {validation.rla && (
-                        validation.rla.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    <div className='w-full'>
-                      <label className='text-emerald-950' htmlFor='rla'>
-                        Re-Engineer
-                      </label>
-                      <select
-                        name='re_engineer'
-                        id='re_engineer'
-                        className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                        onChange={(e) =>
-                          e.target.value == 1 ? setIsReEng(true) : setIsReEng(false)
-                        }
-                      >
-                        <option value='0'>N/A</option>
-                        <option value='1'>Available</option>
-                      </select>
-                      {validation.re_engineer && (
-                        validation.re_engineer.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    {IsReEng && (
-                      <div className='w-full'>
-                        <label
-                          className='text-emerald-950'
-                          htmlFor='re_engineer_certificate'
-                        >
-                          Re-Engineer Certificate <sup className='text-red-500'>*</sup>
-                        </label>
-                        <input
-                          type='file'
-                          name='re_engineer_certificate'
-                          id='re_engineer_certificate'
-                          className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
-                          required
-                        />
-                        {validation.re_engineer_certificate && (
-                          validation.re_engineer_certificate.map((item, index) => (
-                            <div key={index}>
-                              <small className="text-red-600 text-sm">{item}</small>
-                            </div>
-                          ))
-                        )}
-                      </div>
+                </div>
+                <div className='flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2'>
+                  <div className='w-full'>
+                    <label className='text-emerald-950'>
+                      Izin Operasi Certificate <sup className='text-red-500'>*</sup>
+                    </label>
+                    <input
+                      type='file'
+                      name='izin_operasi_certificate'
+                      id='izin_operasi_certificate'
+                      className='w-full px-3 py-2 md:pt-2 md:pb-1 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                      required
+                    />
+                    {validation.izin_operasi_certificate && (
+                      validation.izin_operasi_certificate.map((item, index) => (
+                        <div key={index}>
+                          <small className="text-red-600 text-sm">{item}</small>
+                        </div>
+                      ))
                     )}
+                  </div>
+                  <div className='w-full'>
+                    <label className='text-emerald-950' htmlFor='rla'>
+                      RLA
+                    </label>
+                    <select
+                      name='rla'
+                      id='rla'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-950'
+                      onChange={(e) =>
+                        e.target.value == 1 ? setIsRLA(true) : setIsRLA(false)
+                      }
+                    >
+                      <option value='0'>N/A</option>
+                      <option value='1'>Available</option>
+                    </select>
                   </div>
                 </div>
                 {IsRLA && (
@@ -496,10 +256,7 @@ const AddIzinOperasi = () => {
                       </div>
                     </div>
                     <div className='w-full'>
-                      <label
-                        className='text-emerald-950'
-                        htmlFor='rla_certificate'
-                      >
+                      <label className='text-emerald-950'>
                         RLA Certificate
                       </label>
                       <input
@@ -518,28 +275,28 @@ const AddIzinOperasi = () => {
                     </div>
                   </div>
                 )}
-              </div>
-              <div className='w-full flex flex-row space-x-2 py-2'>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ scale: 0.99 }}
-                  type='submit'
-                  className={`w-full px-4 py-2 rounded-lg ${
-                    isSubmitting
-                      ? 'bg-gray-500 cursor-not-allowed'
-                      : 'bg-emerald-950 text-white'
-                  }`}
-                  disabled={isSubmitting} // Disable tombol jika sedang submit
-                >
-                  {isSubmitting ? 'Processing...' : 'Save'}
-                </motion.button>
-                <button
-                  type='button'
-                  className='w-1/3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 mr-2'
-                  onClick={() => navigate('/izin_operasi')}
-                >
-                  Batal
-                </button>
+                <div className='w-full flex flex-row space-x-2 py-2'>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 0.99 }}
+                    type='submit'
+                    className={`w-full bg-emerald-950 text-white py-2 rounded-md uppercase ${
+                      isSubmitting
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-emerald-950 text-white'
+                    }`}
+                    disabled={isSubmitting} // Disable tombol jika sedang submit
+                  >
+                    {isSubmitting ? 'Processing...' : 'Save'}
+                  </motion.button>
+                  <button
+                    type='button'
+                    className='w-1/3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 mr-2'
+                    onClick={() => navigate('/izin_operasi')}
+                  >
+                    Batal
+                  </button>
+                </div>
               </div>
             </form>
           </div>
