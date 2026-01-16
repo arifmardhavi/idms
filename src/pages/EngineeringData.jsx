@@ -97,14 +97,30 @@ const EngineeringData = () => {
         },
         {
             field: 'datasheet',
-            headerName: 'Datasheet/MDR/Other',
-            width: 200,
+            headerName: 'Datasheet',
+            width: 120,
             renderCell: (params) => (
             <div className='py-4 pl-4'>
                 <Link to={`/engineering_data/datasheet/${params.row.id}`}
                 className=' text-lime-500'
                 >
                     <Badge color="secondary" badgeContent={params.row.datasheets_count} >
+                        <IconEye stroke={2} />
+                    </Badge>
+                </Link>
+            </div>
+            ),
+        },
+        {
+            field: 'mdr',
+            headerName: 'MDR',
+            width: 200,
+            renderCell: (params) => (
+            <div className='py-4 pl-4'>
+                <Link to={`/engineering_data/mdr/${params.row.id}`}
+                className=' text-lime-500'
+                >
+                    <Badge color="secondary" badgeContent={params.row.mdr_count} >
                         <IconEye stroke={2} />
                     </Badge>
                 </Link>

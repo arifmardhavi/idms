@@ -33,11 +33,11 @@ const SidesMenu = [
   { name: 'User', icon: <IconUser />, path: '/user', tab: 'masterdata' },
   { name: 'PLO', icon: <IconStack2 />, path: '/plo', tab: 'regulatorycompliance' },
   { name: 'COI', icon: <IconRectangularPrism />, path: '/coi', tab: 'regulatorycompliance' },
-  { name: 'SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
-  { name: 'Sertifikat Kalibrasi', icon: <IconCertificate />, path: '/sertifikat_kalibrasi', tab: 'regulatorycompliance' },
+  { name: 'Sertifikat SKHP', icon: <IconFileAnalytics />, path: '/skhp', tab: 'regulatorycompliance' },
+  { name: 'Sertifikat Kalibrasi Non SKHP', icon: <IconCertificate />, path: '/sertifikat_kalibrasi', tab: 'regulatorycompliance' },
   { name: 'Izin Usaha', icon: <IconLicense />, path: '/izin_usaha', tab: 'regulatorycompliance' },
+  { name: 'Izin Operasi Jetty', icon: <IconBuildingCog />, path: '/izin_operasi', tab: 'regulatorycompliance' },
   { name: 'Izin Disnaker', icon: <IconBuildingEstate />, path: '/izin_disnaker', tab: 'regulatorycompliance' },
-  { name: 'Izin Operasi', icon: <IconBuildingCog />, path: '/izin_operasi', tab: 'regulatorycompliance' },
   { name: 'Readiness TA', icon: <IconHeartRateMonitor />, path: '/readiness_ta_plantstop', tab: 'plantstop' },
   { name: 'PIR', icon: <IconReportAnalytics />, path: '/pir', tab: 'plantstop' },
 ];
@@ -218,12 +218,6 @@ const Header = () => {
             )}
             {renderTab('plantstop', <IconCalendarClock />, 'Plant Stop')}
             {renderMenu('plantstop')}
-            {/* {renderDirectLink(
-              'Readiness Ta / Plant Stop',
-              <IconHeartRateMonitor />,
-              'Readiness Ta / Plant Stop',
-              '/readiness_ta_plantstop'
-            )} */}
           </>
         )}
         {userLevel === '5' && (

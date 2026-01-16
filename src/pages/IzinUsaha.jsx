@@ -44,6 +44,7 @@ const IzinUsaha = () => {
     setOpenEdit(false);
     setIsSubmitting(false);
     setSelectedEditData({});
+    setValidation([]);
   }
 
   const handleAddIzinUsaha = async (e) => {
@@ -64,6 +65,7 @@ const IzinUsaha = () => {
       });
     } catch (error) {
       console.error("Error adding izin usaha:", error);
+      console.error("validation:", error.response?.data.errors);
       setValidation(error.response?.data.errors || []);
     } finally {
       setIsSubmitting(false);
@@ -126,6 +128,7 @@ const IzinUsaha = () => {
   };
 
   const columns = [
+    { field: 'no_izin_usaha', headerName: 'No Izin Usaha', width: 200 },
     { field: 'judul', headerName: 'Judul', width: 300 },
     {
       field: 'tanggal_izin_usaha',
@@ -219,7 +222,7 @@ const IzinUsaha = () => {
               <div className="flex justify-end gap-2 items-center">
                 <button className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900" onClick={() => setOpen(true)}> <IconPlus className="hover:rotate-90 duration-300" /> Tambah</button>
                 <button
-                  // onClick={fetchInternalInspection}
+                  onClick={fetchIzinUsaha}
                   className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900"
                 >
                 <IconRefresh className="hover:rotate-90 duration-300" /> Refresh
@@ -256,16 +259,48 @@ const IzinUsaha = () => {
                   </h1>
                   <div className="space-y-3">
                     <div>
+                      <label htmlFor="no_izin_usaha">No Izin Usaha<sup className='text-red-500'>*</sup> </label>
+                      <input type="text" name="no_izin_usaha" className="border rounded-md p-2 w-full" placeholder="Masukkan No Izin Usaha" required />
+                      {validation.no_izin_usaha && (
+                        validation.no_izin_usaha.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <div>
                       <label htmlFor="judul">Judul<sup className='text-red-500'>*</sup> </label>
                       <input type="text" name="judul" className="border rounded-md p-2 w-full" placeholder="Masukkan Judul" required />
+                      {validation.judul && (
+                        validation.judul.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div>
                       <label htmlFor="tanggal_izin_usaha">Tanggal Izin Usaha<sup className='text-red-500'>*</sup></label>
                       <input type="date" name="tanggal_izin_usaha" className="border rounded-md p-2 w-full" required />
+                      {validation.tanggal_izin_usaha && (
+                        validation.tanggal_izin_usaha.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                     <div>
                       <label htmlFor="izin_usaha_file">Izin Usaha File<sup className='text-red-500'>*</sup></label>
                       <input type="file" name="izin_usaha_file" className="border rounded-md p-2 w-full" required />
+                      {validation.izin_usaha_file && (
+                        validation.izin_usaha_file.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-row space-x-2 justify-end text-center items-center">
@@ -288,6 +323,17 @@ const IzinUsaha = () => {
                     Update Izin Usaha
                   </h1>
                   <div className="space-y-3">
+                    <div>
+                      <label htmlFor="no_izin_usaha">No Izin Usaha<sup className='text-red-500'>*</sup> </label>
+                      <input type="text" name="no_izin_usaha" className="border rounded-md p-2 w-full" placeholder="Masukkan No Izin Usaha" defaultValue={SelectedEditData.no_izin_usaha} required />
+                      {validation.no_izin_usaha && (
+                        validation.no_izin_usaha.map((item, index) => (
+                          <div key={index}>
+                            <small className="text-red-600 text-sm">{item}</small>
+                          </div>
+                        ))
+                      )}
+                    </div>
                     <div>
                       <label htmlFor="judul">Judul<sup className='text-red-500'>*</sup> </label>
                       <input type="text" name="judul" className="border rounded-md p-2 w-full" placeholder="Masukkan Judul" defaultValue={SelectedEditData.judul} required />

@@ -73,6 +73,8 @@ import EditIzinOperasi from './components/izin_operasi/EditIzinOperasi.jsx';
 import DashboardIzinOperasi from './components/izin_operasi/DashboardIzinOperasi.jsx';
 import ReportIzinOperasi from './components/izin_operasi/ReportIzinOperasi.jsx';
 import Pir from './pages/Pir.jsx';
+import Mdr from './components/engineering_data/Mdr.jsx';
+import MdrFiles from './components/engineering_data/MdrFiles.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -153,6 +155,8 @@ const router = createBrowserRouter([
       { path: '/izin_operasi/edit/:id', element: <EditIzinOperasi /> },
       { path: '/izin_operasi/report/:id', element: <ReportIzinOperasi /> },
       { path: '/pir', element: <Pir /> },
+      { path: '/engineering_data/mdr/:id', element: <Mdr /> },
+      { path: '/engineering_data/mdr/:folder/:id', element: <MdrFiles /> },
 
 
     ],

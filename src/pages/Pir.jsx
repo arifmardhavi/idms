@@ -129,7 +129,7 @@ const Pir = () => {
     { field: 'judul', headerName: 'Judul', width: 300 },
     {
       field: 'tanggal_pir',
-      headerName: 'Tanggal PIR',
+      headerName: 'Tanggal Terbit',
       width: 150,
       renderCell: (params) => (
         <div className=''>
@@ -219,7 +219,7 @@ const Pir = () => {
               <div className="flex justify-end gap-2 items-center">
                 <button className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900" onClick={() => setOpen(true)}> <IconPlus className="hover:rotate-90 duration-300" /> Tambah</button>
                 <button
-                  // onClick={fetchInternalInspection}
+                  onClick={fetchPir}
                   className="bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-xl flex gap-1 hover:bg-emerald-900"
                 >
                 <IconRefresh className="hover:rotate-90 duration-300" /> Refresh
@@ -260,7 +260,7 @@ const Pir = () => {
                       <input type="text" name="judul" className="border rounded-md p-2 w-full" placeholder="Masukkan Judul" required />
                     </div>
                     <div>
-                      <label htmlFor="tanggal_pir">Tanggal PIR<sup className='text-red-500'>*</sup></label>
+                      <label htmlFor="tanggal_pir">Tanggal Terbit<sup className='text-red-500'>*</sup></label>
                       <input type="date" name="tanggal_pir" className="border rounded-md p-2 w-full" required />
                     </div>
                     <div>
@@ -300,7 +300,7 @@ const Pir = () => {
                       )}
                     </div>
                     <div>
-                      <label htmlFor="tanggal_pir">Tanggal PIR<sup className='text-red-500'>*</sup></label>
+                      <label htmlFor="tanggal_pir">Tanggal Terbit<sup className='text-red-500'>*</sup></label>
                       <input type="date" name="tanggal_pir" defaultValue={SelectedEditData.tanggal_pir} className="border rounded-md p-2 w-full" required />
                       {validation.tanggal_pir && (
                         validation.tanggal_pir.map((item, index) => (
