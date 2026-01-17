@@ -4,22 +4,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import { IconArticle, IconChevronRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { addSertifikatKalibrasi } from '../../services/sertifikat_kalibrasi.service';
-import { getPlo } from '../../services/plo.service';
-import { getCategory } from '../../services/category.service';
-import { getTypeByCategory } from '../../services/type.service';
-import { getTagnumberByTypeUnit } from '../../services/tagnumber.service';
+// import { getPlo } from '../../services/plo.service';
+// import { getCategory } from '../../services/category.service';
+// import { getTypeByCategory } from '../../services/type.service';
+import { getTagnumber } from '../../services/tagnumber.service';
 import Swal from 'sweetalert2';
 import * as motion from 'motion/react-client';
 
 const AddSertifikatKalibrasi = () => {
   const navigate = useNavigate();
-  const [unitId, setUnitId] = useState('');
-  const [ploList, setPloList] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
-  const [selectedPlo, setSelectedPlo] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
+  // const [unitId, setUnitId] = useState('');
+  // const [ploList, setPloList] = useState([]);
+  // const [categoryList, setCategoryList] = useState([]);
+  // const [selectedPlo, setSelectedPlo] = useState('');
+  // const [selectedCategory, setSelectedCategory] = useState('');
+  // const [filteredTypes, setFilteredTypes] = useState([]);
+  // const [selectedType, setSelectedType] = useState('');
   const [Tagnumbers, setTagnumbers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
@@ -27,61 +27,70 @@ const AddSertifikatKalibrasi = () => {
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
-    fetchPlo();
-    fetchCategories();
+    fetchTagNumber();
+    // fetchPlo();
+    // fetchCategories();
   }, []);
 
-  const fetchPlo = async () => {
+  const fetchTagNumber = async () => {
     try {
-      const data = await getPlo();
-      setPloList(data.data);
+      const data = await getTagnumber();
+      setTagnumbers(data.data);
     } catch (error) {
-      console.error("Error fetching PLO:", error);
+      console.error("Error fetching tag number:", error);
     }
-  };
+  }
+  // const fetchPlo = async () => {
+  //   try {
+  //     const data = await getPlo();
+  //     setPloList(data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching PLO:", error);
+  //   }
+  // };
 
-  const fetchCategories = async () => {
-    try {
-      const data = await getCategory();
-      setCategoryList(data.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  // const fetchCategories = async () => {
+  //   try {
+  //     const data = await getCategory();
+  //     setCategoryList(data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching categories:", error);
+  //   }
+  // };
 
-  const handleCategoryChange = async (categoryId) => {
-    setSelectedCategory(categoryId);
-    setSelectedType('');
-    setTagnumbers([]);
+  // const handleCategoryChange = async (categoryId) => {
+  //   setSelectedCategory(categoryId);
+  //   setSelectedType('');
+  //   setTagnumbers([]);
     
-    if (categoryId) {
-      try {
-        const data = await getTypeByCategory(categoryId);
-        setFilteredTypes(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching types:", error);
-        setFilteredTypes([]);
-      }
-    } else {
-      setFilteredTypes([]);
-    }
-  };
+  //   if (categoryId) {
+  //     try {
+  //       const data = await getTypeByCategory(categoryId);
+  //       setFilteredTypes(data?.data || []);
+  //     } catch (error) {
+  //       console.error("Error fetching types:", error);
+  //       setFilteredTypes([]);
+  //     }
+  //   } else {
+  //     setFilteredTypes([]);
+  //   }
+  // };
 
-  const handleTypeChange = async (typeId) => {
-    setSelectedType(typeId);
+  // const handleTypeChange = async (typeId) => {
+  //   setSelectedType(typeId);
     
-    if (typeId && unitId) {
-      try {
-        const data = await getTagnumberByTypeUnit(typeId, unitId);
-        setTagnumbers(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching tag numbers:", error);
-        setTagnumbers([]);
-      }
-    } else {
-      setTagnumbers([]);
-    }
-  };
+  //   if (typeId && unitId) {
+  //     try {
+  //       const data = await getTagnumberByTypeUnit(typeId, unitId);
+  //       setTagnumbers(data?.data || []);
+  //     } catch (error) {
+  //       console.error("Error fetching tag numbers:", error);
+  //       setTagnumbers([]);
+  //     }
+  //   } else {
+  //     setTagnumbers([]);
+  //   }
+  // };
 
   const handleAddSertifikatKalibrasi = async (e) => {
     e.preventDefault();
@@ -89,7 +98,6 @@ const AddSertifikatKalibrasi = () => {
 
     try {
       const formData = new FormData();
-      formData.append('plo_id', e.target.plo_id.value);
       formData.append('tag_number_id', tagnumberId);
       formData.append('no_sertifikat_kalibrasi', e.target.no_sertifikat_kalibrasi.value);
       formData.append('file_sertifikat_kalibrasi', e.target.file_sertifikat_kalibrasi.files[0]);
@@ -148,7 +156,7 @@ const AddSertifikatKalibrasi = () => {
               onSubmit={(e) => handleAddSertifikatKalibrasi(e)}
             >
               <div className='flex flex-col space-y-2'>
-                <div className='flex flex-row space-x-2'>
+                {/* <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
                     <label htmlFor='plo' className='text-emerald-950'>
                       Plo <sup className='text-red-500'>*</sup>
@@ -210,9 +218,9 @@ const AddSertifikatKalibrasi = () => {
                       )}
                     </select>
                   </div>
-                </div>
+                </div> */}
                 <div className='flex flex-row space-x-2'>
-                  <div className='w-full'>
+                  {/* <div className='w-full'>
                     <label htmlFor='type' className='text-emerald-950'>
                       Tipe <sup className='text-red-500'>*</sup>
                     </label>
@@ -242,7 +250,7 @@ const AddSertifikatKalibrasi = () => {
                         />
                       )}
                     />
-                  </div>
+                  </div> */}
                   <div className='w-full'>
                     <label htmlFor='tag_number' className='text-emerald-950'>
                       Tag Number <sup className='text-red-500'>*</sup>

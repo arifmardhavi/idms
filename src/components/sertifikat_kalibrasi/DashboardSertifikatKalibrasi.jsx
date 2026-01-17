@@ -86,13 +86,6 @@ const DashboardSertifikatKalibrasi = () => {
       renderCell: (params) => <div className='py-4'>{params.value}</div>,
     },
     {
-      field: 'plo',
-      valueGetter: (params) => params.unit.unit_name,
-      headerName: 'plo',
-      width: 150,
-      renderCell: (params) => <div className='py-4'>{params.value}</div>,
-    },
-    {
       field: 'no_sertifikat_kalibrasi',
       headerName: 'No Sertifikat Kalibrasi',
       width: 150,

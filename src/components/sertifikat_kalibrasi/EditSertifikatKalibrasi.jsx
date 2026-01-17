@@ -10,12 +10,13 @@ import {
   deleteSertifikatKalibrasiFile,
 } from '../../services/sertifikat_kalibrasi.service';
 
-import { getPlo } from '../../services/plo.service';
-import { getCategory } from '../../services/category.service';
-import { getTypeByCategory } from '../../services/type.service';
+// import { getPlo } from '../../services/plo.service';
+// import { getCategory } from '../../services/category.service';
+// import { getTypeByCategory } from '../../services/type.service';
 import {
-  getTagnumberById,
-  getTagnumberByTypeUnit,
+  getTagnumber,
+  // getTagnumberById,
+  // getTagnumberByTypeUnit,
 } from '../../services/tagnumber.service';
 import * as motion from 'motion/react-client';
 import { api_public } from "../../services/config";
@@ -27,14 +28,14 @@ const EditSertifikatKalibrasi = () => {
 const { id } = useParams();
 
 const [isLoading, setIsLoading] = useState(true);
-const [unitId, setUnitId] = useState('');
-const [ploList, setPloList] = useState([]);
-const [categoryList, setCategoryList] = useState([]);
-const [selectedPlo, setSelectedPlo] = useState('');
-const [selectedCategory, setSelectedCategory] = useState('');
-const [selectedType, setSelectedType] = useState('');
-const [filteredTypes, setFilteredTypes] = useState([]);
-const [selectedTagNumber, setSelectedTagNumber] = useState('');
+// const [unitId, setUnitId] = useState('');
+// const [ploList, setPloList] = useState([]);
+// const [categoryList, setCategoryList] = useState([]);
+// const [selectedPlo, setSelectedPlo] = useState('');
+// const [selectedCategory, setSelectedCategory] = useState('');
+// const [selectedType, setSelectedType] = useState('');
+// const [filteredTypes, setFilteredTypes] = useState([]);
+// const [selectedTagNumber, setSelectedTagNumber] = useState('');
 const [Tagnumbers, setTagnumbers] = useState([]);
 const [SertifikatKalibrasi, setSertifikatKalibrasi] = useState({});
 const [validation, setValidation] = useState([]);
@@ -44,35 +45,45 @@ const base_public_url = api_public;
 const [hide, setHide] = useState(false);
 
 useEffect(() => {
-  fetchPlo();
-  fetchCategories();
+  // fetchPlo();
+  fetchTagnumber();
+  // fetchCategories();
 }, []);
 
 useEffect(() => {
   fetchSertifikatKalibrasiById();
 }, [id]);
 
-useEffect(() => {
-  if (selectedTagNumber) fetchTagNumberById();
-}, [selectedTagNumber]);
+// useEffect(() => {
+//   if (selectedTagNumber) fetchTagNumberById();
+// }, [selectedTagNumber]);
 
-const fetchPlo = async () => {
+const fetchTagnumber = async () => {
   try {
-    const data = await getPlo();
-    setPloList(data?.data || []);
+    const data = await getTagnumber();
+    setTagnumbers(data?.data || []);
   } catch (error) {
-    console.error("Error fetching PLO:", error);
+    console.error("Error fetching Tag Number:", error);
   }
 };
 
-const fetchCategories = async () => {
-  try {
-    const data = await getCategory();
-    setCategoryList(data?.data || []);
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-  }
-};
+// const fetchPlo = async () => {
+//   try {
+//     const data = await getPlo();
+//     setPloList(data?.data || []);
+//   } catch (error) {
+//     console.error("Error fetching PLO:", error);
+//   }
+// };
+
+// const fetchCategories = async () => {
+//   try {
+//     const data = await getCategory();
+//     setCategoryList(data?.data || []);
+//   } catch (error) {
+//     console.error("Error fetching categories:", error);
+//   }
+// };
 
 const fetchSertifikatKalibrasiById = async () => {
   setIsLoading(true);
@@ -80,10 +91,10 @@ const fetchSertifikatKalibrasiById = async () => {
     const data = await getSertifikatKalibrasiById(id);
     const SertifikatKalibrasiData = data?.data || {};
     setSertifikatKalibrasi(SertifikatKalibrasiData);
-    setSelectedTagNumber(SertifikatKalibrasiData?.tag_number_id || '');
     setTagnumberId(SertifikatKalibrasiData?.tag_number_id || '');
-    setUnitId(SertifikatKalibrasiData?.plo?.unit_id || '');
-    setSelectedPlo(SertifikatKalibrasiData?.plo?.id || '');
+    // setSelectedTagNumber(SertifikatKalibrasiData?.tag_number_id || '');
+    // setUnitId(SertifikatKalibrasiData?.plo?.unit_id || '');
+    // setSelectedPlo(SertifikatKalibrasiData?.plo?.id || '');
   } catch (error) {
     console.error("Error fetching Sertifikat Kalibrasi:", error);
   } finally {
@@ -91,48 +102,48 @@ const fetchSertifikatKalibrasiById = async () => {
   }
 };
 
-const fetchTagNumberById = async () => {
-  setIsLoading(true);
-  try {
-    const data = await getTagnumberById(selectedTagNumber);
-    handleCategoryChange(data?.data?.type?.category_id, true);
-    handleTypeChange(data?.data?.type_id, true);
-  } catch (error) {
-    console.error("Error fetching tag number:", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+// const fetchTagNumberById = async () => {
+//   setIsLoading(true);
+//   try {
+//     const data = await getTagnumberById(selectedTagNumber);
+//     handleCategoryChange(data?.data?.type?.category_id, true);
+//     handleTypeChange(data?.data?.type_id, true);
+//   } catch (error) {
+//     console.error("Error fetching tag number:", error);
+//   } finally {
+//     setIsLoading(false);
+//   }
+// };
 
-const handleCategoryChange = async (categoryId, force = false) => {
-  setSelectedCategory(categoryId);
-  setTagnumbers([]);
-  if (!force) {
-    setSelectedType('');
-    setSelectedTagNumber('');
-  }
-  try {
-    const data = await getTypeByCategory(categoryId);
-    setFilteredTypes(data?.data || []);
-  } catch (error) {
-    console.error("Error fetching types:", error);
-    setFilteredTypes([]);
-  }
-};
+// const handleCategoryChange = async (categoryId, force = false) => {
+//   setSelectedCategory(categoryId);
+//   setTagnumbers([]);
+//   if (!force) {
+//     setSelectedType('');
+//     setSelectedTagNumber('');
+//   }
+//   try {
+//     const data = await getTypeByCategory(categoryId);
+//     setFilteredTypes(data?.data || []);
+//   } catch (error) {
+//     console.error("Error fetching types:", error);
+//     setFilteredTypes([]);
+//   }
+// };
 
-const handleTypeChange = async (typeId, force = false) => {
-  setSelectedType(typeId);
-  if (typeId && unitId) {
-    try {
-      const data = await getTagnumberByTypeUnit(typeId, unitId);
-      if (!force) setSelectedTagNumber('');
-      setTagnumbers(data?.data || []);
-    } catch (error) {
-      console.error("Error fetching tag numbers:", error);
-      setTagnumbers([]);
-    }
-  }
-};
+// const handleTypeChange = async (typeId, force = false) => {
+//   setSelectedType(typeId);
+//   if (typeId && unitId) {
+//     try {
+//       const data = await getTagnumberByTypeUnit(typeId, unitId);
+//       if (!force) setSelectedTagNumber('');
+//       setTagnumbers(data?.data || []);
+//     } catch (error) {
+//       console.error("Error fetching tag numbers:", error);
+//       setTagnumbers([]);
+//     }
+//   }
+// };
 
 const handleUpdateSertifikatKalibrasi = async (e) => {
   e.preventDefault();
@@ -226,7 +237,7 @@ const handledeleteFile = async (file) => {
               onSubmit={(e) => handleUpdateSertifikatKalibrasi(e)}
             >
               <div className='flex flex-col space-y-2'>
-                <div className='flex flex-row space-x-2'>
+                {/* <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
                     <label htmlFor='unit' className='text-emerald-950'>
                       Unit <sup className='text-red-500'>*</sup>
@@ -293,9 +304,9 @@ const handledeleteFile = async (file) => {
                       ))
                     )}
                   </div>
-                </div>
+                </div> */}
                 <div className='flex flex-row space-x-2'>
-                  <div className='w-full'>
+                  {/* <div className='w-full'>
                     <label htmlFor='type' className='text-emerald-950'>
                       Tipe
                     </label>
@@ -329,7 +340,7 @@ const handledeleteFile = async (file) => {
                       noOptionsText="Tipe tidak ditemukan"
                     />
 
-                  </div>
+                  </div> */}
                   <div className='w-full'>
                     <label htmlFor='tag_number' className='text-emerald-950'>
                       Tag Number
@@ -342,7 +353,7 @@ const handledeleteFile = async (file) => {
                         const selectedId = newValue ? newValue.id : '';
                         setTagnumberId(selectedId);  // Simpan ID ke state
                       }}
-                      value={Tagnumbers.find((tag) => tag.id === selectedTagNumber) || null}
+                      value={Tagnumbers.find((tag) => tag.id === tagnumberId) || null}
                       isOptionEqualToValue={(option, value) => option.id === value}
                       renderInput={(params) => (
                         <TextField
