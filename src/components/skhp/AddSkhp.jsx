@@ -4,22 +4,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import { IconArticle, IconChevronRight } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { addSkhp } from '../../services/skhp.service';
-import { getPlo } from '../../services/plo.service';
-import { getCategory } from '../../services/category.service';
-import { getTypeByCategory } from '../../services/type.service';
-import { getTagnumberByTypeUnit } from '../../services/tagnumber.service';
+// import { getCategory } from '../../services/category.service';
+// import { getTypeByCategory } from '../../services/type.service';
+import { getTagnumber } from '../../services/tagnumber.service';
 import Swal from 'sweetalert2';
 import * as motion from 'motion/react-client';
+// import { getUnit } from '../../services/unit.service';
 
 const AddSkhp = () => {
   const navigate = useNavigate();
-  const [unitId, setUnitId] = useState('');
-  const [ploList, setPloList] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
-  const [selectedPlo, setSelectedPlo] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [filteredTypes, setFilteredTypes] = useState([]);
-  const [selectedType, setSelectedType] = useState('');
+  // const [unitId, setUnitId] = useState('');
+  // const [unitList, setUnitList] = useState([]);
+  // const [categoryList, setCategoryList] = useState([]);
+  // const [selectedUnit, setSelectedUnit] = useState('');
+  // const [selectedCategory, setSelectedCategory] = useState('');
+  // const [filteredTypes, setFilteredTypes] = useState([]);
+  // const [selectedType, setSelectedType] = useState('');
   const [Tagnumbers, setTagnumbers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState([]);
@@ -27,61 +27,71 @@ const AddSkhp = () => {
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
-    fetchPlo();
-    fetchCategories();
+    // fetchUnit();
+    // fetchCategories();
+    fetchTagNumber();
   }, []);
 
-  const fetchPlo = async () => {
+  // const fetchUnit = async () => {
+  //   try {
+  //     const data = await getUnit();
+  //     setUnitList(data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching unit:", error);
+  //   }
+  // };
+  const fetchTagNumber = async () => {
     try {
-      const data = await getPlo();
-      setPloList(data.data);
+      const data = await getTagnumber();
+      setTagnumbers(data.data);
     } catch (error) {
-      console.error("Error fetching PLO:", error);
+      console.error("Error fetching tag number:", error);
     }
-  };
+  }
 
-  const fetchCategories = async () => {
-    try {
-      const data = await getCategory();
-      setCategoryList(data.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  // const fetchCategories = async () => {
+  //   try {
+  //     const data = await getCategory();
+  //     setCategoryList(data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching categories:", error);
+  //   }
+  // };
 
-  const handleCategoryChange = async (categoryId) => {
-    setSelectedCategory(categoryId);
-    setSelectedType('');
-    setTagnumbers([]);
+  // const handleCategoryChange = async (categoryId) => {
+  //   setSelectedCategory(categoryId);
+  //   setSelectedType('');
+  //   setTagnumbers([]);
     
-    if (categoryId) {
-      try {
-        const data = await getTypeByCategory(categoryId);
-        setFilteredTypes(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching types:", error);
-        setFilteredTypes([]);
-      }
-    } else {
-      setFilteredTypes([]);
-    }
-  };
+  //   if (categoryId) {
+  //     try {
+  //       const data = await getTypeByCategory(categoryId);
+  //       setFilteredTypes(data?.data || []);
+  //     } catch (error) {
+  //       console.error("Error fetching types:", error);
+  //       setFilteredTypes([]);
+  //     }
+  //   } else {
+  //     setFilteredTypes([]);
+  //   }
+  // };
 
-  const handleTypeChange = async (typeId) => {
-    setSelectedType(typeId);
+  // const handleTypeChange = async (typeId) => {
+  //   setSelectedType(typeId);
     
-    if (typeId && unitId) {
-      try {
-        const data = await getTagnumberByTypeUnit(typeId, unitId);
-        setTagnumbers(data?.data || []);
-      } catch (error) {
-        console.error("Error fetching tag numbers:", error);
-        setTagnumbers([]);
-      }
-    } else {
-      setTagnumbers([]);
-    }
-  };
+  //   if (typeId) {
+  //     try {
+  //       const data = await getTagnumberByTypeUnit(typeId, unitId);
+  //       setTagnumbers(data?.data || []);
+  //     } catch (error) {
+  //       console.error("Error fetching tag numbers:", error);
+  //       setTagnumbers([]);
+  //     }
+  //   } else {
+  //     const tagData = await getTagnumber();
+  //     setTagnumbers(tagData?.data || []);
+  //   }
+  // };
 
   const handleAddSkhp = async (e) => {
     e.preventDefault();
@@ -89,7 +99,6 @@ const AddSkhp = () => {
 
     try {
       const formData = new FormData();
-      formData.append('plo_id', e.target.plo_id.value);
       formData.append('tag_number_id', tagnumberId);
       formData.append('no_skhp', e.target.no_skhp.value);
       formData.append('file_skhp', e.target.file_skhp.files[0]);
@@ -148,18 +157,18 @@ const AddSkhp = () => {
               onSubmit={(e) => handleAddSkhp(e)}
             >
               <div className='flex flex-col space-y-2'>
-                <div className='flex flex-row space-x-2'>
+                {/* <div className='flex flex-row space-x-2'>
                   <div className='w-full'>
-                    <label htmlFor='plo' className='text-emerald-950'>
-                      Plo <sup className='text-red-500'>*</sup>
+                    <label htmlFor='unit' className='text-emerald-950'>
+                      Unit
                     </label>
                     <select
-                      name='plo_id'
-                      id='plo'
+                      name='unit_id'
+                      id='unit'
                       className='w-full px-1 py-2 border border-gray-300 rounded-md'
-                      value={selectedPlo}
+                      value={selectedUnit}
                       onChange={(e) => {
-                        setSelectedPlo(e.target.value);
+                        setSelectedUnit(e.target.value);
                         setSelectedType('');
                         setTagnumbers([]);
                         setUnitId(
@@ -168,17 +177,17 @@ const AddSkhp = () => {
                           )
                         );
                       }} // Panggil fungsi saat unit berubah
-                      required
+                      
                     >
-                      <option value=''>Pilih Plo</option>
-                      {ploList.map((plo) => (
-                        <option key={plo.id} value={plo.id} unit={plo.unit_id}>
-                          {plo.unit.unit_name}
+                      <option value=''>Pilih Unit</option>
+                      {unitList.map((unit) => (
+                        <option key={unit.id} value={unit.id} unit={unit.unit_id}>
+                          {unit.unit_name}
                         </option>
                       ))}
                     </select>
-                    {validation.plo_id && (
-                      validation.plo_id.map((item, index) => (
+                    {validation.unit_id && (
+                      validation.unit_id.map((item, index) => (
                         <div key={index}>
                           <small className="text-red-600 text-sm">{item}</small>
                         </div>
@@ -187,7 +196,7 @@ const AddSkhp = () => {
                   </div>
                   <div className='w-full'>
                     <label htmlFor='category' className='text-emerald-950'>
-                      Kategori <sup className='text-red-500'>*</sup>
+                      Kategori
                     </label>
                     <select
                       name='category_id'
@@ -210,25 +219,25 @@ const AddSkhp = () => {
                       )}
                     </select>
                   </div>
-                </div>
+                </div> */}
                 <div className='flex flex-row space-x-2'>
-                  <div className='w-full'>
+                  {/* <div className='w-full'>
                     <label htmlFor='type' className='text-emerald-950'>
-                      Tipe <sup className='text-red-500'>*</sup>
+                      Tipe
                     </label>
                     <Autocomplete
                       id="type"
                       value={filteredTypes.find((type) => type.id === selectedType) || null}
                       onChange={(event, newValue) => handleTypeChange(newValue ? newValue.id : '')}
-                      options={selectedPlo === '' ? [] : filteredTypes}
+                      options={filteredTypes}
                       getOptionLabel={(option) => option.type_name || ''}
                       isOptionEqualToValue={(option, value) => option.id === value.id}
-                      noOptionsText={selectedPlo === '' ? 'Pilih Plo terlebih dahulu' : 'Tidak ada Tipe'}
+                      noOptionsText={'Tidak ada Tipe'}
                       renderInput={(params) => (
                         <TextField
                           {...params}
                           name="type_id" // Tambahkan name di sini
-                          placeholder={selectedPlo === '' ? 'Pilih Plo terlebih dahulu' : 'Pilih Tipe'}
+                          placeholder={'Pilih Tipe'}
                           variant="outlined"
                           error={!!validation.type_id}
                           helperText={
@@ -242,7 +251,7 @@ const AddSkhp = () => {
                         />
                       )}
                     />
-                  </div>
+                  </div> */}
                   <div className='w-full'>
                     <label htmlFor='tag_number' className='text-emerald-950'>
                       Tag Number <sup className='text-red-500'>*</sup>

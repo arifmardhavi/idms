@@ -86,13 +86,6 @@ const DashboardSkhp = () => {
       renderCell: (params) => <div className='py-4'>{params.value}</div>,
     },
     {
-      field: 'plo',
-      valueGetter: (params) => params.unit.unit_name,
-      headerName: 'plo',
-      width: 150,
-      renderCell: (params) => <div className='py-4'>{params.value}</div>,
-    },
-    {
       field: 'no_skhp',
       headerName: 'No SKHP',
       width: 150,
