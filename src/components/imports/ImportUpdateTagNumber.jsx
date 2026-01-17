@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { importTagnumber } from '../../services/tagnumber.service';
+import { importUpdateTagnumber } from '../../services/tagnumber.service';
 import * as XLSX from 'xlsx';
 
-function ImportTagNumber({ onImportRefresh }) {
+function ImportUpdateTagNumber({ onImportRefresh }) {
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -59,7 +59,7 @@ function ImportTagNumber({ onImportRefresh }) {
 
     setUploading(true);
     try {
-      const res = await importTagnumber(formData, (progressEvent) => {
+      const res = await importUpdateTagnumber(formData, (progressEvent) => {
         const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
         setUploadProgress(percent);
       });
@@ -87,7 +87,7 @@ function ImportTagNumber({ onImportRefresh }) {
 
   return (
     <div className="p-4 rounded shadow bg-white w-full mx-auto">
-      <h2 className="text-xl font-bold mb-4">Import Tag Number</h2>
+      <h2 className="text-xl font-bold mb-4">Import Update Tag Number</h2>
       <input
         type="file"
         accept=".xlsx,.xls,.csv"
@@ -97,7 +97,7 @@ function ImportTagNumber({ onImportRefresh }) {
       <button
         onClick={handleUpload}
         disabled={uploading || !file}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
+        className="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500 cursor-pointer"
       >
         {uploading ? 'Uploading...' : 'Upload'}
       </button>
@@ -150,4 +150,4 @@ function ImportTagNumber({ onImportRefresh }) {
   );
 }
 
-export default ImportTagNumber;
+export default ImportUpdateTagNumber;

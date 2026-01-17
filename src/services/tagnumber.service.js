@@ -14,3 +14,4 @@ export const updateTagnumber = async (id, data) => await apiPut(`${endpoint}/${i
 export const deleteTagnumber = async (id) => await apiDelete(`${endpoint}/${id}`);
 export const nonactiveTagnumber = async (id) => await apiPut(`${endpoint}/nonactive/${id}`, {});
 export const importTagnumber = async (data, onUploadProgress) => await apiPostProgress(`${endpoint}/import`, data, onUploadProgress);
+export const importUpdateTagnumber = async (data, onUploadProgress) => await apiPostProgress(`${endpoint}/import_update`, data, onUploadProgress);

@@ -6,7 +6,7 @@ import { getTagnumber, addTagnumber, updateTagnumber, nonactiveTagnumber, delete
 import { ActiveUnit } from '../services/unit.service';
 import { ActiveCategory } from '../services/category.service';
 import { getTypeByCategory } from '../services/type.service';
-import { IconArticle, IconCloudDownload, IconFileImport, IconPencil } from '@tabler/icons-react';
+import { IconArticle, IconCloudDownload, IconFileImport, IconPencil, IconTableExport } from '@tabler/icons-react';
 import { IconCircleMinus } from '@tabler/icons-react';
 import Swal from 'sweetalert2';
 import { IconRefresh } from '@tabler/icons-react';
@@ -17,6 +17,7 @@ import ImportTagNumber from '../components/imports/ImportTagnumber';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { getWITDateLong } from '../utils/dateHelpers';
+import ImportUpdateTagNumber from '../components/imports/ImportUpdateTagNumber';
 
 const Tagnumber = () => {
   const [tagnumber, setTagnumber] = useState([]);
@@ -34,6 +35,8 @@ const [hide, setHide] = useState(false);
 const token = localStorage.getItem('token');
 const userLevel = String(jwtDecode(token).level_user);
 const [importMode, setImportMode] = useState(false);
+const [importUpdateMode, setImportUpdateMode] = useState(false);
+
 
 useEffect(() => {
   fetchTagnumber();
@@ -272,6 +275,13 @@ const handleDelete = async (id) => {
   const handleImportClose = () => {
     setImportMode(false);
   }
+  const handleImportUpdate = () => {
+    setImportUpdateMode(true);
+  }
+
+  const handleImportUpdateClose = () => {
+    setImportUpdateMode(false);
+  }
 
   const handleExportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
@@ -348,8 +358,9 @@ const handleDelete = async (id) => {
         <div className={` ${hide ? 'block' : 'hidden'}  w-fit bg-emerald-950 text-lime-300 p-2 cursor-pointer rounded-md`} onClick={() => setHide(false)}>
           <IconArticle />
         </div>
-        <div className='w-full flex' >
+        <div className='w-full flex flex-col gap-1' >
         { importMode && <ImportTagNumber onImportRefresh={fetchTagnumber} />}
+        { importUpdateMode && <ImportUpdateTagNumber onImportRefresh={fetchTagnumber} />}
         </div>
           {/* Get Tag Number */}
           <div className="w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2">
@@ -369,6 +380,23 @@ const handleDelete = async (id) => {
                   onClick={() => handleImportClose()}
                 >
                   <span>Cancel Import Data</span>
+                </button> 
+                }
+
+                {/* import update */}
+                { !importUpdateMode ? <button
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                  onClick={() => handleImportUpdate()}
+                >
+                  <IconTableExport stroke={2} />
+                  <span>Import Update Data</span>
+                </button>
+                :
+                <button
+                  className="flex space-x-1 items-center px-2 py-1 bg-emerald-950 text-lime-300 text-sm rounded"
+                  onClick={() => handleImportUpdateClose()}
+                >
+                  <span>Cancel Import Update Data</span>
                 </button> 
                 }
                 <motion.button
