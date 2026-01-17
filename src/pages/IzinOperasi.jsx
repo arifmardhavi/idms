@@ -111,6 +111,10 @@ const IzinOperasi = () => {
       { header: 'Issue Date', key: 'issue_date', width: 15 },
       { header: 'Expired Date', key: 'overdue_date', width: 18 },
       { header: 'Due Days', key: 'due_days', width: 10 },
+      { header: 'RLA Certificate', key: 'rla_certificate', width: 32 },
+      { header: 'RLA Issue Date', key: 'rla_issue', width: 18 },
+      { header: 'RLA Due Date', key: 'rla_overdue', width: 18 },
+      { header: 'RLA Due Days', key: 'rla_due_days', width: 12 },
     ];
 
     izinOperasi.forEach((item) => {
@@ -120,10 +124,15 @@ const IzinOperasi = () => {
         issue_date: item.issue_date,
         overdue_date: item.overdue_date,
         due_days: item.due_days,
+        rla_issue: item.rla_issue,
+        rla_certificate: item.rla_certificate,
+        rla_overdue: item.rla_overdue,
+        rla_due_days: item.rla_due_days,
       });
 
       const lastRow = worksheet.lastRow;
       const no_certificate = lastRow.getCell('no_certificate');
+      const rla_certificate = lastRow.getCell('rla_certificate');
 
       if (item.no_certificate && item.izin_operasi_certificate) {
         no_certificate.value = {
@@ -131,6 +140,18 @@ const IzinOperasi = () => {
           hyperlink: `${api_public}izin_operasi/certificates/${item.izin_operasi_certificate}`,
         };
         no_certificate.font = {
+          color: { argb: 'FF0000FF' },
+          underline: true,
+        };
+      }
+
+      // RLA Certificate
+      if (item.rla_certificate) {
+        rla_certificate.value = {
+          text: item.rla_certificate,
+          hyperlink: `${api_public}plo/rla/${item.rla_certificate}`,
+        };
+        rla_certificate.font = {
           color: { argb: 'FF0000FF' },
           underline: true,
         };
@@ -312,6 +333,125 @@ const IzinOperasi = () => {
         </div>
       ),
     },
+    {
+          field: 'rla',
+          headerName: 'Laporan & RLA',
+          width: 150,
+          valueGetter: (params) => (params == 1 ? 'YES' : 'NO'),
+          renderCell: (params) => (
+            <div className='py-4'>
+              <span
+                className={`${
+                  params.row.rla == 0
+                    ? 'text-lime-300 bg-emerald-950'
+                    : 'bg-lime-400 text-emerald-950'
+                } rounded-lg w-fit px-2 py-1`}
+              >
+                {params.row.rla == 0 ? 'NO' : 'YES'}
+              </span>
+            </div>
+          ),
+        },
+        {
+          field: 'rla_issue',
+          headerName: 'RLA Issue Date',
+          width: 150,
+          renderCell: (params) => (
+            <div className='py-4'>
+              {params.value
+                ? new Intl.DateTimeFormat('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  }).format(new Date(params.value))
+                : '-'}
+            </div>
+          ),
+        },
+        {
+          field: 'rla_overdue',
+          headerName: 'RLA Due Date',
+          width: 150,
+          renderCell: (params) => (
+            <div className='py-4'>
+              {params.value
+                ? new Intl.DateTimeFormat('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                  }).format(new Date(params.value))
+                : '-'}
+            </div>
+          ),
+        },
+        {
+          field: 'rla_due_days',
+          headerName: 'RLA Due',
+          width: 80,
+          renderCell: (params) => {
+            const diffDays = params.value;
+    
+            return (
+              <div className='py-2 pl-3'>
+                <p
+                  className={`${
+                    params.row.rla == 0
+                    ? 'text-emerald-950'
+                    : diffDays <= 0
+                    ? 'text-white bg-red-600' // Expired
+                    : diffDays < 272
+                    ? 'bg-yellow-400 text-black' // Kurang dari 6 bulan
+                    : 'bg-emerald-950 text-white' // Lebih dari 6 bulan
+                  } rounded-full w-fit p-2`}
+                >
+                  {params.row.rla == 0 ? '-' : diffDays}
+                </p>
+              </div>
+            );
+          },
+        },
+        {
+          field: 'rla_certificate',
+          headerName: 'Laporan & RLA file',
+          width: 160,
+          renderCell: (params) => (
+            <div className='py-4 pl-4'>
+              {params.value ? (
+                <Link
+                  to={`${base_public_url}izin_operasi/rla/${params.value}`}
+                  target='_blank'
+                  className=' text-lime-500'
+                  onClick={() => handleAddActivity(params.value, "Izin Operasi")}
+                >
+                  <IconCloudDownload stroke={2} />
+                </Link>
+              ) : (
+                <p>-</p>
+              )}
+            </div>
+          ),
+        },
+        {
+          field: 'rla_old_certificate',
+          headerName: 'Laporan & RLA lama',
+          width: 160,
+          renderCell: (params) => (
+            <div className='py-4 pl-4'>
+              {params.value ? (
+                <Link
+                  to={`${base_public_url}izin_operasi/rla/${params.value}`}
+                  target='_blank'
+                  className=' text-lime-500'
+                  onClick={() => handleAddActivity(params.value, "Izin Operasi")}
+                >
+                  <IconCloudDownload stroke={2} />
+                </Link>
+              ) : (
+                <p>-</p>
+              )}
+            </div>
+          ),
+        },
     ...(userLevel !== '4' && userLevel !== '5'
       ? [
           {
