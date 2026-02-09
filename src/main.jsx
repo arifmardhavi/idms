@@ -75,6 +75,7 @@ import ReportIzinOperasi from './components/izin_operasi/ReportIzinOperasi.jsx';
 import Pir from './pages/Pir.jsx';
 import Mdr from './components/engineering_data/Mdr.jsx';
 import MdrFiles from './components/engineering_data/MdrFiles.jsx';
+import HistoricalEquipment from './pages/HistoricalEquipment.jsx';
 const router = createBrowserRouter([
   {
     path: '/login',
@@ -157,6 +158,7 @@ const router = createBrowserRouter([
       { path: '/pir', element: <Pir /> },
       { path: '/engineering_data/mdr/:id', element: <Mdr /> },
       { path: '/engineering_data/mdr/:folder/:id', element: <MdrFiles /> },
+      { path: '/historical_equipment', element: <HistoricalEquipment /> },
 
 
     ],
