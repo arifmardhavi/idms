@@ -21,6 +21,7 @@ const MdrFiles = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validation, setValidation] = useState({});
   const [uploadProgress, setUploadProgress] = useState({});
+  const [engineering_data_id, setEngineering_data_id ] = useState('');
   
 
   useEffect(() => {
@@ -40,7 +41,7 @@ const MdrFiles = () => {
       try {
           const data = await getMdrItemByFolder(id);
           setMdrItem(data.data);
-          console.log(data.data[0]);
+          setEngineering_data_id(data.data[0].mdr_folder.engineering_data_id);
       } catch (error) {
           console.error('Error fetching MDR data:', error);
       } finally {
@@ -243,7 +244,10 @@ const MdrFiles = () => {
             <Link className='hover:underline text-emerald-950' to='/engineering_data'>
               Engineering Data
             </Link>
-            <Typography className='text-lime-500'>{folder}</Typography>
+            <Link className='hover:underline text-emerald-950' to={`/engineering_data/mdr/${engineering_data_id}`}>
+              {folder}
+            </Link>
+            <Typography className='text-lime-500'>MDR File</Typography>
           </Breadcrumbs>
         <div className='w-full bg-white shadow-sm px-2 py-4 rounded-lg space-y-2'>
           <div className='flex flex-row justify-end items-center space-x-2'>

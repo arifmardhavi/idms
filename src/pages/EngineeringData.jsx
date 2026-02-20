@@ -37,6 +37,7 @@ const EngineeringData = () => {
             setLoading(true)
             const data = await getEngineeringData();
             setEngineeringData(data.data)
+            console.log(data.data)
         } catch (error) {
             console.error('Error fetching engineering data:', error)
         } finally {
@@ -78,6 +79,13 @@ const EngineeringData = () => {
             valueGetter: (params) => params ? params.tag_number : '-', 
             width: 200,  
             renderCell: (params) => <div className="py-4">{params.row.tag_number_id ? params.row.tag_number.tag_number : '-'}</div> 
+        },
+        { 
+            field: 'Unit', 
+            headerName: 'Unit',
+            valueGetter: (params) => params ? params.unit : '-', 
+            width: 100,  
+            renderCell: (params) => <div className="py-4">{params.row.unit ?? '-'}</div> 
         },
         {
             field: 'ga_drawing',

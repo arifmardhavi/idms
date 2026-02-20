@@ -117,6 +117,11 @@ const MdrTable = () => {
     }
   };
 
+  const updateEventOpen = (row) => {
+    setSelectedMdrFolder(row);
+    setOpenEvent(true);
+  }
+
   const columns = [
     { field: 'folder_name', 
       headerName: 'Nama Folder', 
@@ -137,7 +142,7 @@ const MdrTable = () => {
       renderCell: (params) => (
         <div className='py-2 flex flex-row justify-center items-center'>
           <button
-            // onClick={() => updateEventOpen(params.row)}
+            onClick={() => updateEventOpen(params.row)}
             className='bg-yellow-500 text-sm rounded-full px-2 py-1 hover:scale-110 transition duration-100 mr-2 flex items-center space-x-1'
           >
             <IconPencil />

@@ -2,7 +2,7 @@ import { IconArticle, IconCloudDownload, IconPencil, IconPlus, IconRefresh, Icon
 import Header from "../components/Header"
 import { useState } from "react"
 import { DataGrid, GridToolbarQuickFilter } from "@mui/x-data-grid"
-import { Box, Modal, Tooltip } from "@mui/material"
+import { Autocomplete, Box, Modal, TextField, Tooltip } from "@mui/material"
 import { addPir, deletePir, getPir, updatePir } from "../services/pir.service"
 import { useEffect } from "react"
 import Swal from "sweetalert2"
@@ -10,6 +10,7 @@ import { Link } from "react-router-dom"
 import { handleAddActivity } from "../utils/handleAddActivity"
 import * as motion from 'motion/react-client';
 import { api_public } from "../services/config"
+import { getHistoricalMemorandum } from "../services/historical_memorandum.service"
 
 const Pir = () => {
   const [hide, setHide] = useState(false);
@@ -19,19 +20,36 @@ const Pir = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [SelectedEditData, setSelectedEditData] = useState({});
+  const [historicalMemorandum, setHistoricalMemorandum] = useState([]);
+  const [hasMemo, setHasMemo] = useState(false);
+  const [selectedHistoricalMemo, setSelectedHistoricalMemo] = useState(null);
   const [validation, setValidation] = useState([]);
   const base_public_url = api_public;
 
   useEffect(() => {
     fetchPir();
+    fetchHistoricalMemorandum();
   }, []);
+
+  const fetchHistoricalMemorandum = async () => {
+      try {
+          setLoading(true);
+          const data = await getHistoricalMemorandum();
+          setHistoricalMemorandum(data.data);
+          // console.log(data.data);
+      } catch (error) {
+          console.error("Error fetching historical memorandum:", error);
+      } finally {
+          setLoading(false);
+      }
+  }
 
   const fetchPir = async () => {
     try {
       setLoading(true);
       const data = await getPir();
       setPir(data.data);
-      console.log("PIR Data:", data.data);
+      // console.log("PIR Data:", data.data);
     } catch (error) {
       console.error("Error fetching PIR data:", error);
     } finally {
@@ -44,6 +62,9 @@ const Pir = () => {
     setOpenEdit(false);
     setIsSubmitting(false);
     setSelectedEditData({});
+    setHasMemo(false);
+    setSelectedHistoricalMemo(null);
+    setValidation([]);
   }
 
   const handleAddPir = async (e) => {
@@ -51,8 +72,9 @@ const Pir = () => {
     try {
       setIsSubmitting(true);
       const formData = new FormData(e.target);
+      hasMemo ? formData.append('historical_memorandum_id', selectedHistoricalMemo) : formData.append('pir_file', e.target.pir_file.files[0]);
       const data = await addPir(formData);
-      console.log("Added PIR:", data);
+      // console.log("Added PIR:", data);
       handleClose();
       fetchPir();
       Swal.fire({
@@ -75,8 +97,16 @@ const Pir = () => {
     try {
       setIsSubmitting(true);
       const formData = new FormData(e.target);
+      if(hasMemo) {
+        formData.append('historical_memorandum_id', selectedHistoricalMemo);
+        formData.delete('pir_file');
+      }else{
+        e.target.pir_file.files[0] && formData.append('pir_file', e.target.pir_file?.files[0])
+        formData.delete('historical_memorandum_id');
+      }
+      // console.log("Form Data for Update:", formData);
       const data = await updatePir(SelectedEditData.id, formData);
-      console.log("Updated PIR:", data);
+      // console.log("Updated PIR:", data);
       handleClose();
       fetchPir();
       Swal.fire({
@@ -95,8 +125,11 @@ const Pir = () => {
   }
 
   const handleClickEdit = (row) => {
+    // console.log("Selected Edit Data:", row);
+    row.historical_memorandum_id ? setSelectedHistoricalMemo(row.historical_memorandum_id) : setSelectedHistoricalMemo(null);
     setSelectedEditData(row);
     setOpenEdit(true);
+    setHasMemo(row.historical_memorandum_id ? true : false);
   }
 
   const handleDelete = async (row) => {
@@ -141,7 +174,7 @@ const Pir = () => {
         </div>
       ),
     },    
-    { field: 'pir_file', headerName: 'File', width: 100, renderCell: (params) => (
+    { field: 'pir_file', headerName: 'PIR File', width: 100, renderCell: (params) => (
       <div className='flex py-2 pl-5 '>
         {params.row.pir_file ? (
           <Tooltip title={`${params.row.pir_file}`} placement='bottom'>
@@ -150,6 +183,22 @@ const Pir = () => {
               target='_blank'
               className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
               onClick={() => handleAddActivity(params.row.pir_file, "PIR") }
+            >
+              <IconCloudDownload />
+            </Link>
+          </Tooltip>
+        ) : '-'}
+      </div>
+    )},
+    { field: 'memorandum_file', headerName: 'Memo File', width: 100, renderCell: (params) => (
+      <div className='flex py-2 pl-5 '>
+        {params.row.memorandum_file ? (
+          <Tooltip title={`${params.row.memorandum_file}`} placement='bottom'>
+            <Link
+              to={`${base_public_url}historical_memorandum/${params.row.memorandum_file}`}
+              target='_blank'
+              className='text-lime-400 px-2 rounded-md hover:underline cursor-pointer'
+              onClick={() => handleAddActivity(params.row.memorandum_file, "PIR") }
             >
               <IconCloudDownload />
             </Link>
@@ -264,8 +313,51 @@ const Pir = () => {
                       <input type="date" name="tanggal_pir" className="border rounded-md p-2 w-full" required />
                     </div>
                     <div>
-                      <label htmlFor="pir_file">PIR File<sup className='text-red-500'>*</sup></label>
-                      <input type="file" name="pir_file" className="border rounded-md p-2 w-full" required />
+                      <div>
+                        <label htmlFor="hasMemo">Ada Memo ?</label>
+                        <select onChange={(e) => (e.target.value === 'yes') ? setHasMemo(true) : setHasMemo(false) } className="border rounded-md p-2 w-full">
+                          <option value="no">Tidak</option>
+                          <option value="yes">Ada</option>
+                        </select>
+                      </div>
+                      {hasMemo ?
+                      <div className="flex flex-col space-y-2">
+                        <label htmlFor="historicalMemorandum">Historical Memorandum<sup className='text-red-500'>*</sup></label>
+                        <Autocomplete
+                          id="historical_memorandum_id"
+                          options={Array.isArray(historicalMemorandum) ? historicalMemorandum : []}
+                          getOptionLabel={(option) => `${option?.no_dokumen ?? ''} - ${option?.perihal ?? ''}`}
+                          isOptionEqualToValue={(option, value) => option.id === value.id}
+                          value={historicalMemorandum.find((item) => item.id === selectedHistoricalMemo) || null}
+                          onChange={(e, value) => {
+                              setSelectedHistoricalMemo(value?.id || null);
+                          }}
+                          required
+                          renderInput={(params) => (
+                          <TextField
+                              {...params}
+                              name="historical_memorandum_id" // Tambahkan name di sini
+                              placeholder={'N/A'}
+                              variant="outlined"
+                              error={!!validation.historical_memorandum_id}
+                              helperText={
+                              validation.historical_memorandum_id &&
+                              validation.historical_memorandum_id.map((item, index) => (
+                                  <span key={index} className="text-red-600 text-sm">
+                                  {item}
+                                  </span>
+                              ))
+                              }
+                          />
+                          )}
+                      />
+                      </div>
+                      :
+                      <div>
+                        <label htmlFor="pir_file">PIR File<sup className='text-red-500'>*</sup></label>
+                        <input type="file" name="pir_file" className="border rounded-md p-2 w-full" required />
+                      </div>
+                      }
                     </div>
                   </div>
                   <div className="flex flex-row space-x-2 justify-end text-center items-center">
@@ -311,32 +403,56 @@ const Pir = () => {
                       )}
                     </div>
                     <div>
-                      <label htmlFor="pir_file">File PIR <sup className='text-red-500'>*</sup></label>
-                      <input
-                        type="file"
-                        name="pir_file"
-                        id="pir_file"
-                        className="border border-slate-200 rounded-md p-2 w-full bg-transparent outline-none"
-                        // required
-                        accept=".pdf"
-                      />
-                      {validation.pir_file && (
-                        validation.pir_file.map((item, index) => (
-                          <div key={index}>
-                            <small className="text-red-600 text-sm">{item}</small>
-                          </div>
-                        ))
-                      )}
-                      {SelectedEditData && SelectedEditData.pir_file && <div className="m-2 bg-lime-300 text-emerald-950 p-1">
-                        <Link 
-                          to={`${base_public_url}pir/${SelectedEditData.pir_file}`} 
-                          target='_blank'
-                          className="hover:underline" 
-                          onClick={() => handleAddActivity(SelectedEditData.pir_file, "PIR")}
-                        >
-                          {SelectedEditData.pir_file}
-                        </Link>
+                      <div>
+                        <label htmlFor="HasMemo">Ada Memo ?</label>
+                        <select onChange={(e) => (e.target.value === 'yes') ? setHasMemo(true) : setHasMemo(false) } defaultValue={hasMemo ? 'yes' : 'no'} className="border rounded-md p-2 w-full">
+                          <option value="no">Tidak</option>
+                          <option value="yes">Ada</option>
+                        </select>
                       </div>
+                      {hasMemo ?
+                        <div className="flex flex-col space-y-2">
+                          <label htmlFor="historicalMemorandum">Historical Memorandum<sup className='text-red-500'>*</sup></label>
+                          <Autocomplete
+                            id="historical_memorandum_id"
+                            options={Array.isArray(historicalMemorandum) ? historicalMemorandum : []}
+                            getOptionLabel={(option) => `${option?.no_dokumen ?? ''} - ${option?.perihal ?? ''}`}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            value={historicalMemorandum.find((item) => item.id === selectedHistoricalMemo) || null}
+                            onChange={(e, value) => {
+                                setSelectedHistoricalMemo(value?.id || null);
+                            }}
+                            required
+                            renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                name="historical_memorandum_id" // Tambahkan name di sini
+                                placeholder={'N/A'}
+                                variant="outlined"
+                                error={!!validation.historical_memorandum_id}
+                                helperText={
+                                validation.historical_memorandum_id &&
+                                validation.historical_memorandum_id.map((item, index) => (
+                                    <span key={index} className="text-red-600 text-sm">
+                                    {item}
+                                    </span>
+                                ))
+                                }
+                            />
+                            )}
+                        />
+                        </div>
+                        :
+                        <div>
+                          <label htmlFor="pir_file">Upload Pir File<sup className='text-red-500'>*</sup></label>
+                          <input 
+                            type="file" 
+                            name="pir_file"
+                            className="border rounded-md p-2 w-full" />
+                            <div className="text-sm bg-lime-300 text-emerald-950 p-2 rounded-xl">
+                              <Link className="hover:underline" target="_blank" onClick={() => handleAddActivity(SelectedEditData?.pir_file, "PIR") } to={`${base_public_url}pir/${SelectedEditData.pir_file}`}>{SelectedEditData.pir_file ? SelectedEditData.pir_file : '-'}</Link>
+                            </div>
+                        </div>
                       }
                     </div>
                   </div>
